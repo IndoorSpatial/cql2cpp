@@ -10,6 +10,9 @@
 
 #include <FlexLexer.h>
 
+extern void parse_all();
+
 int main(int argc, char** argv) {
+  parse_all();
   return 0;
 }

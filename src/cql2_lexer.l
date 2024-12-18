@@ -35,12 +35,8 @@ if|then|begin|end|procedure|function        {
 
 %%
 
-// This include is required if main() is an another source file.
-//#include <FlexLexer.h>
-
-int main( int /* argc */, char** /* argv */ )
+void parse_all()
 {
     FlexLexer* lexer = new yyFlexLexer();
     while(lexer->yylex() != 0);
-    return 0;
 }
