@@ -1,6 +1,7 @@
 [requires]
 flex/2.6.4
 bison/3.8.2
+gflags/2.2.2
 
 [generators]
 CMakeDeps

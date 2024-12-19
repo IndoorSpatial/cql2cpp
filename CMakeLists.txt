@@ -6,7 +6,8 @@ project(cql2cpp
   LANGUAGES CXX
 )
 
-find_package(bison REQUIRED)
+find_package(gflags REQUIRED)
+
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_BINARY_DIR})
 
@@ -30,3 +31,4 @@ add_custom_command(
 
 add_executable(cql2 src/main.cc ${FLEX_OUTPUT} ${BISON_OUTPUT})
 target_compile_options(cql2 PRIVATE -Wno-register)
+target_link_libraries(cql2 gflags::gflags)
