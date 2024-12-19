@@ -8,11 +8,11 @@
  *
  */
 
-#include <FlexLexer.h>
-
-extern void parse_all();
+#include <cql2_lexer.h>
 
 int main(int argc, char** argv) {
-  parse_all();
+  FlexLexer* lexer = new Cql2Lexer();
+  while (lexer->yylex() != 0)
+    ;
   return 0;
 }

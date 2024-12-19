@@ -1,5 +1,5 @@
 %{
-#include <math.h>
+#include <cql2_lexer-internal.h>
 %}
 
 %option noyywrap
@@ -34,9 +34,3 @@ if|then|begin|end|procedure|function        {
 .           printf( "Unrecognized character: %s\n", yytext );
 
 %%
-
-void parse_all()
-{
-    FlexLexer* lexer = new yyFlexLexer();
-    while(lexer->yylex() != 0);
-}

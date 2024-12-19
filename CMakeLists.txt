@@ -7,12 +7,13 @@ project(cql2cpp
 )
 
 find_package(bison REQUIRED)
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
 set(FLEX_FILE ${CMAKE_SOURCE_DIR}/src/cql2_lexer.l)
 set(FLEX_OUTPUT ${CMAKE_BINARY_DIR}/cql2_lexer.cc)
 add_custom_command(
 	OUTPUT ${FLEX_OUTPUT}
-  COMMAND flex++ --c++ --outfile=${FLEX_OUTPUT} ${FLEX_FILE}
+  COMMAND flex++ --c++ --outfile=${FLEX_OUTPUT} --yyclass=Cql2Lexer ${FLEX_FILE}
 	DEPENDS ${FLEX_FILE}
 	COMMENT "Generating ${FLEX_OUTPUT} from ${FLEX_FILE} using flex"
 )
