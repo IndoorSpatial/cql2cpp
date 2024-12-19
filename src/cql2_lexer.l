@@ -1,5 +1,5 @@
 %{
-#include <cql2_lexer-internal.h>
+#include <cql2cpp/cql2_lexer-internal.h>
 %}
 
 %option noyywrap

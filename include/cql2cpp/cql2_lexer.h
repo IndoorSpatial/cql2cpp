@@ -14,4 +14,4 @@
 // file by flex++. So we can include current header file in our main.cc
 // https://stackoverflow.com/questions/71300080/change-yylex-in-c-flex
 #include <FlexLexer.h>
-#include <cql2_lexer-internal.h>
+#include "cql2_lexer-internal.h"
