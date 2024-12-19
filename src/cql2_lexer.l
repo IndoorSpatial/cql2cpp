@@ -18,12 +18,43 @@ ID       [a-z][a-z0-9]*
 
 {DIGIT}+"."{DIGIT}* {
   printf( "float: \"%s\" (%g)\n", yytext, atof( yytext ) );
+  lval_->num_float = atof(yytext);
   return Cql2ParserBase::NUMBER_INT;
 }
 
-TRUE|FALSE {
+"TRUE" {
   printf("bool %s\n", yytext);
-  return 0;
+  lval_->boolean = true;
+  return Cql2ParserBase::TRUE;
+}
+"FALSE" {
+  printf("bool %s\n", yytext);
+  lval_->boolean = false;
+  return Cql2ParserBase::FALSE;
+}
+
+"AND" {
+  printf("logical %s\n", yytext);
+  lval_->str = yytext;
+  return Cql2ParserBase::AND;
+}
+
+"OR" {
+  printf("logical %s\n", yytext);
+  lval_->str = yytext;
+  return Cql2ParserBase::OR;
+}
+
+"(" {
+  printf("parenthesis %s\n", yytext);
+  lval_->c = '(';
+  return Cql2ParserBase::LPT;
+}
+
+")" {
+  printf("parenthesis %s\n", yytext);
+  lval_->c = ')';
+  return Cql2ParserBase::RPT;
 }
 
 POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION {
