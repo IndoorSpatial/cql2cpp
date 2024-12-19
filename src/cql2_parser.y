@@ -16,10 +16,12 @@ extern void yyerror(const char *s);  // Declare the error handler
   int num_int;  // Union for holding integers (for number tokens)
   double num_double;
   char* str;
+  char c;
 }
 
 %token <num_int> NUMBER_INT
 %token PLUS MINUS MULT DIV
+%token EQ GT LT
 
 %type <num_int> expr  // Declare the type of 'expr' as 'int'
 

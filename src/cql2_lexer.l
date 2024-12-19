@@ -41,6 +41,10 @@ POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECT
 "*" { printf( "op: %s\n", yytext ); return Cql2ParserBase::MULT; }
 "/" { printf( "op: %s\n", yytext ); return Cql2ParserBase::DIV;  }
 
+"=" { printf( "comp: %s\n", yytext ); return Cql2ParserBase::EQ;  }
+"<" { printf( "comp: %s\n", yytext ); return Cql2ParserBase::LT;  }
+">" { printf( "comp: %s\n", yytext ); return Cql2ParserBase::GT;  }
+
 "{"[^{}\n]*"}" {/* eat up one-line comments */}
 
 [ \t\n]+ {/* eat up whitespace */}
