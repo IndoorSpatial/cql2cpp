@@ -2,8 +2,6 @@
 #include <iostream>
 #include <cstdlib>
 
-using namespace std;
-
 extern int yylex();  // Declare the lexer function
 extern void yyerror(const char *s);  // Declare the error handler
 
@@ -15,13 +13,15 @@ extern void yyerror(const char *s);  // Declare the error handler
 %name Cql2ParserBase
 
 %union {
-    int num;  // Union for holding integers (for number tokens)
+  int num_int;  // Union for holding integers (for number tokens)
+  double num_double;
+  char* str;
 }
 
-%token <num> NUMBER  // Declare token type as 'NUMBER'
-%token PLUS MINUS MULT DIV  // Declare operator tokens
+%token <num_int> NUMBER_INT
+%token PLUS MINUS MULT DIV
 
-%type <num> expr  // Declare the type of 'expr' as 'int'
+%type <num_int> expr  // Declare the type of 'expr' as 'int'
 
 %left PLUS MINUS
 %left MULT DIV
@@ -31,12 +31,12 @@ extern void yyerror(const char *s);  // Declare the error handler
 // Grammar rules:
 
 program:
-    expr { cout << "Result = " << $1 << endl; }  // Print the result
+    expr { std::cout << "Result = " << $1 << std::endl; }  // Print the result
 ;
 
 expr:
-    NUMBER { $$ = $1; }
-    | expr PLUS expr { $$ = $1 + $3; }
+    NUMBER_INT { $$ = $1; }
+    | expr PLUS expr { $$ = $1 + $3; std::cout << $$ << "=" << $1 << "+" << $3 << std::endl; }
     | expr MINUS expr { $$ = $1 - $3; }
     | expr MULT expr { $$ = $1 * $3; }
     | expr DIV expr { $$ = $1 / $3; }
@@ -46,6 +46,6 @@ expr:
 
 // Error handling function (C++ version)
 void yyerror(const char *s) {
-    cerr << "Error: " << s << endl;
+    std::cerr << "Error: " << s << std::endl;
 }
 

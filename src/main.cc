@@ -12,9 +12,11 @@
 #include <cql2cpp/cql2_parser.h>
 
 int main(int argc, char** argv) {
-  FlexLexer* lexer = new Cql2Lexer();
-  while (lexer->yylex() != 0)
+  Cql2Lexer* lexer = new Cql2Lexer();
+  Cql2Parser parser(lexer);
+  lexer->RegisterLval(&parser.yylval);
+
+  while (parser.yyparse() != 0)
     ;
-  Cql2Parser parser;
   return 0;
 }
