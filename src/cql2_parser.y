@@ -36,16 +36,10 @@ program:
 
 expr:
     NUMBER_INT { $$ = $1; }
-    | expr PLUS expr { $$ = $1 + $3; std::cout << $$ << "=" << $1 << "+" << $3 << std::endl; }
-    | expr MINUS expr { $$ = $1 - $3; }
-    | expr MULT expr { $$ = $1 * $3; }
-    | expr DIV expr { $$ = $1 / $3; }
+    | expr PLUS  expr { $$ = $1 + $3; std::cout << $$ << "=" << $1 << "+" << $3 << std::endl; }
+    | expr MINUS expr { $$ = $1 - $3; std::cout << $$ << "=" << $1 << "-" << $3 << std::endl; }
+    | expr MULT  expr { $$ = $1 * $3; std::cout << $$ << "=" << $1 << "*" << $3 << std::endl; }
+    | expr DIV   expr { $$ = $1 / $3; std::cout << $$ << "=" << $1 << "/" << $3 << std::endl; }
 ;
 
 %%
-
-// Error handling function (C++ version)
-void yyerror(const char *s) {
-    std::cerr << "Error: " << s << std::endl;
-}
-

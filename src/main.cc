@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
   Cql2Parser parser(lexer);
   lexer->RegisterLval(&parser.yylval);
 
-  while (parser.yyparse() != 0)
-    ;
+  parser.yyparse();
+
   return 0;
 }
