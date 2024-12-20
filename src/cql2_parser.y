@@ -1,12 +1,26 @@
 %{
 #include <iostream>
 #include <cstdlib>
+#include <cql2cpp/ast_node.h>
 
 extern int yylex();  // Declare the lexer function
 extern void yyerror(const char *s);  // Declare the error handler
 
 #define YY_Cql2ParserBase_ERROR_BODY   {}
 #define YY_Cql2ParserBase_LEX_BODY   {}
+
+using cql2cpp::AstNode;
+using cql2cpp::Not;
+using cql2cpp::And;
+using cql2cpp::Or;
+using cql2cpp::BoolExpression;
+
+%}
+
+%header{
+
+#include <cql2cpp/ast_node.h>
+#define YY_Cql2ParserBase_MEMBERS cql2cpp::AstNode* root_;
 
 %}
 
@@ -18,6 +32,7 @@ extern void yyerror(const char *s);  // Declare the error handler
   double num_float;
   char* str;
   char c;
+  cql2cpp::AstNode* node;
 }
 
 %token <num_int> NUMBER_INT
@@ -29,11 +44,11 @@ extern void yyerror(const char *s);  // Declare the error handler
 %token LPT RPT  // ( )
 
 %type <num_int> IntExpression
-%type <boolean> booleanExpression
-%type <boolean> booleanTerm
-%type <boolean> booleanFactor
-%type <boolean> booleanPrimary
-%type <boolean> booleanLiteral
+%type <node> booleanExpression
+%type <node> booleanTerm
+%type <node> booleanFactor
+%type <node> booleanPrimary
+%type <node> booleanLiteral
 %type <boolean> TRUE
 %type <boolean> FALSE
 
@@ -46,28 +61,27 @@ extern void yyerror(const char *s);  // Declare the error handler
 // Grammar rules:
 
 program:
-    booleanExpression { std::cout << "Result = " << ($1 ? "T" : "F") << std::endl; }
-;
+       booleanExpression { root_ = $1; }
 
 booleanExpression:
   booleanTerm { $$ = $1 }
-  | booleanTerm OR booleanExpression { $$ = $1 || $3 }
+  | booleanTerm OR booleanExpression { $$ = new AstNode(BoolExpression, Or, {$1, $3}); }
 
 booleanTerm:
   booleanFactor { $$ = $1 }
-  | booleanFactor AND booleanTerm  { $$ = $1 && $3 }
+  | booleanFactor AND booleanTerm  { $$ = new AstNode(BoolExpression, And, {$1, $3}); }
 
 booleanFactor:
   booleanPrimary { $$ = $1; }
-  | NOT booleanPrimary { $$ = ! $2 }
+  | NOT booleanPrimary { $$ = new AstNode(BoolExpression, Not, { $2 }); }
 
 booleanPrimary:
   booleanLiteral { $$ = $1; }
   | LPT booleanExpression RPT { $$ = $2; }
 
 booleanLiteral:
-  TRUE { $$ = $1; }
-  | FALSE { $$ = $1; }
+  TRUE { $$ = new AstNode($1); }
+  | FALSE { $$ = new AstNode($1); }
 
 
 IntExpression:

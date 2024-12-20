@@ -11,6 +11,11 @@
 #pragma once
 
 #include <FlexLexer.h>
+
+#ifdef YY_Cql2ParserBase_MEMBERS
+#undef YY_Cql2ParserBase_MEMBERS
+#endif
+
 #include <cql2_parser_base.h>
 
 class Cql2Parser : public Cql2ParserBase {
@@ -25,4 +30,6 @@ class Cql2Parser : public Cql2ParserBase {
   }
 
   int yylex() override { return lexer_->yylex(); }
+
+  cql2cpp::AstNode* root() const { return root_; }
 };

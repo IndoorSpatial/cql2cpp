@@ -13,10 +13,9 @@
 namespace cql2cpp {
 
 enum NodeType {
-  BoolExpr,
-  BoolTerm,
-  BoolFactor,
-  BoolPrimary,
+  Literal,
+
+  BoolExpression,
 
   // Comparison Predicate
   BinCompPred,

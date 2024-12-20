@@ -45,6 +45,12 @@ ID       [a-z][a-z0-9]*
   return Cql2ParserBase::OR;
 }
 
+"NOT" {
+  printf("logical %s\n", yytext);
+  lval_->str = yytext;
+  return Cql2ParserBase::NOT;
+}
+
 "(" {
   printf("parenthesis %s\n", yytext);
   lval_->c = '(';

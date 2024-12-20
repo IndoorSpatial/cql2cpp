@@ -10,6 +10,9 @@
 
 #pragma once
 
+#include <map>
+#include <string>
+
 namespace cql2cpp {
 
 enum Operator {
@@ -64,6 +67,57 @@ enum Operator {
   A_Contains,
   A_Equals,
   A_Overlaps,
+};
+
+#define OP_2_NAME(op) {op, #op },
+
+const std::map<Operator, std::string> OpName {
+  OP_2_NAME(NullOp)
+
+  OP_2_NAME(And)
+  OP_2_NAME(Or)
+  OP_2_NAME(Not)
+
+  OP_2_NAME(Equal)
+  OP_2_NAME(NotEqual)
+  OP_2_NAME(Greater)
+  OP_2_NAME(Lesser)
+  OP_2_NAME(GreaterEqual)
+  OP_2_NAME(LesserEqual)
+
+  OP_2_NAME(Like)
+  OP_2_NAME(Between)
+  OP_2_NAME(In)
+  OP_2_NAME(IsNull)
+
+  OP_2_NAME(S_Contains)
+  OP_2_NAME(S_Crosses)
+  OP_2_NAME(S_Equals)
+  OP_2_NAME(S_Intersects)
+  OP_2_NAME(S_Overlaps)
+  OP_2_NAME(S_Touches)
+  OP_2_NAME(S_Within)
+
+  OP_2_NAME(T_After)
+  OP_2_NAME(T_Before)
+  OP_2_NAME(T_Contains)
+  OP_2_NAME(T_Disjoint)
+  OP_2_NAME(T_During)
+  OP_2_NAME(T_Equals)
+  OP_2_NAME(T_FinishedBy)
+  OP_2_NAME(T_Finishes)
+  OP_2_NAME(T_Intersects)
+  OP_2_NAME(T_Meets)
+  OP_2_NAME(T_MetBy)
+  OP_2_NAME(T_OverlappedBy)
+  OP_2_NAME(T_Overlaps)
+  OP_2_NAME(T_StartedBy)
+  OP_2_NAME(T_Starts)
+
+  OP_2_NAME(A_ContainedBy)
+  OP_2_NAME(A_Contains)
+  OP_2_NAME(A_Equals)
+  OP_2_NAME(A_Overlaps)
 };
 
 }

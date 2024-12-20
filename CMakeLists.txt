@@ -33,7 +33,7 @@ add_custom_command(
 )
 
 # CLI tool
-add_executable(cql2 src/main.cc ${FLEX_OUTPUT} ${BISON_OUTPUT})
+add_executable(cql2 src/main.cc src/id_generator.cc ${FLEX_OUTPUT} ${BISON_OUTPUT})
 target_compile_options(cql2 PRIVATE -Wno-register)
 target_link_libraries(cql2 gflags::gflags)
 
