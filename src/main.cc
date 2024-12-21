@@ -11,6 +11,8 @@
 #include <cql2cpp/ast_node.h>
 #include <cql2cpp/cql2_lexer.h>
 #include <cql2cpp/cql2_parser.h>
+#include <cql2cpp/node_evaluator.h>
+#include <cql2cpp/evaluator.h>
 #include <cql2cpp/tree_dot.h>
 #include <gflags/gflags.h>
 
@@ -53,6 +55,16 @@ int main(int argc, char** argv) {
       std::cerr << "Can not open file " << dot_filename;
     }
   }
+
+  cql2cpp::TreeEvaluator te;
+  te.RegisterNodeEvaluator(cql2cpp::node_evals);
+
+  cql2cpp::ValueT result;
+  cql2cpp::DataSource ds;
+  if (te.Evaluate(parser.root(), ds, &result))
+    std::cout << std::get<bool>(result) << std::endl;
+  else
+    std::cerr << "evaluate error: " << te.error_msg() << std::endl;
 
   gflags::ShutDownCommandLineFlags();
   return ret;

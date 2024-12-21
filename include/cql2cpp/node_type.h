@@ -10,7 +10,11 @@
 
 #pragma once
 
+#include <map>
+#include <string>
+
 namespace cql2cpp {
+
 
 enum NodeType {
   Literal,
@@ -27,6 +31,13 @@ enum NodeType {
   SpatialPred,
   TemporalPred,
   ArrayPred,
+};
+
+#define TYPE_2_NAME(op) {op, #op },
+
+const std::map<NodeType, std::string> TypeName {
+  TYPE_2_NAME(Literal)
+  TYPE_2_NAME(BoolExpression)
 };
 
 }  // namespace cql2cpp

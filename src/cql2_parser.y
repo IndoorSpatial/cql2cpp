@@ -7,7 +7,7 @@ extern int yylex();  // Declare the lexer function
 extern void yyerror(const char *s);  // Declare the error handler
 
 #define YY_Cql2ParserBase_ERROR_BODY   {}
-#define YY_Cql2ParserBase_LEX_BODY   {}
+#define YY_Cql2ParserBase_LEX_BODY   { return 0; }
 
 using cql2cpp::AstNode;
 using cql2cpp::Not;

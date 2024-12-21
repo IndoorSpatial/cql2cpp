@@ -12,6 +12,9 @@ find_package(GTest REQUIRED)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_BINARY_DIR})
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Lexer
 set(FLEX_FILE ${CMAKE_SOURCE_DIR}/src/cql2_lexer.l)
 set(FLEX_OUTPUT ${CMAKE_BINARY_DIR}/cql2_lexer.cc)
@@ -34,7 +37,7 @@ add_custom_command(
 
 # CLI tool
 add_executable(cql2 src/main.cc src/id_generator.cc ${FLEX_OUTPUT} ${BISON_OUTPUT})
-target_compile_options(cql2 PRIVATE -Wno-register)
+target_compile_options(cql2 PRIVATE -Wno-register -Wno-write-strings)
 target_link_libraries(cql2 gflags::gflags)
 
 # Test
