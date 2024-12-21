@@ -53,6 +53,8 @@ class TreeEvaluator {
     }
 
     *result = type_evaluator_[root->op()].operator()(root, child_values, ds);
+    root->set_value(*result);
+
     return true;
   }
 

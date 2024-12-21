@@ -19,12 +19,14 @@ namespace cql2cpp {
 
 class Tree2Dot {
  public:
-  static std::string value_name(ValueT value) {
+  static std::string value_str(ValueT value) {
+    if (std::holds_alternative<void*>(value)) return "un-evaluate";
+
     if (std::holds_alternative<bool>(value))
       return std::get<bool>(value) ? "T" : "F";
 
     if (std::holds_alternative<bool>(value))
-      return std::to_string(std::get<size_t>(value));
+      return std::to_string(std::get<int64_t>(value));
 
     if (std::holds_alternative<double>(value))
       return std::to_string(std::get<double>(value));
@@ -34,11 +36,16 @@ class Tree2Dot {
 
     return "unknown type";
   }
-  static std::string name(const AstNode* node) {
+
+  static std::string node_name(const AstNode* node) {
     if (node->op() != NullOp)
-      return OpName.at(node->op());
+      return OpName.at(node->op()) + "(" + value_str(node->value()) + ")";
     else
-      return value_name(node->value());
+      return value_str(node->value());
+  }
+
+  static std::string node_value_str(const AstNode* node) {
+    return value_str(node->value());
   }
 
   static bool GenerateDot(std::ostream& ous, const AstNode* node) {
@@ -53,7 +60,7 @@ class Tree2Dot {
   static bool GenerateDotNode(std::ostream& ous, const AstNode* node) {
     if (node == nullptr) return true;
 
-    ous << "  \"" << node->id() << "\" [label=\"" << name(node) << "\"];"
+    ous << "  \"" << node->id() << "\" [label=\"" << node_name(node) << "\"];"
         << std::endl;
     for (const auto child : node->children()) GenerateDotNode(ous, child);
 

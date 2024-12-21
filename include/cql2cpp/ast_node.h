@@ -31,7 +31,7 @@ class AstNode {
   NodeType type_;
   Operator op_;
   std::vector<AstNode*> children_;
-  ValueT value_;
+  mutable ValueT value_;
 
  public:
   AstNode(NodeType type, Operator op, const std::vector<AstNode*> children)
@@ -54,6 +54,7 @@ class AstNode {
   const std::vector<AstNode*>& children() const { return children_; }
 
   ValueT value() const { return value_; }
+  void set_value(const ValueT& value) const { value_ = value; }
 };
 
 }  // namespace cql2cpp

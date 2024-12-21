@@ -29,6 +29,7 @@ enum ValueType {
 };
 
 
-typedef std::variant<bool, size_t, double, std::string> ValueT;
+// void* is just a placeholder
+typedef std::variant<void*, bool, int64_t, double, std::string> ValueT;
 
 }
