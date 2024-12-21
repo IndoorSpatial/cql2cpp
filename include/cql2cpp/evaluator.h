@@ -54,6 +54,8 @@ class TreeEvaluator {
 
     *result = type_evaluator_[root->op()].operator()(root, child_values, ds);
     root->set_value(*result);
+    std::cout << "Evaluate Node " << root->id()
+              << " value: " << value_str(*result, true) << std::endl;
 
     return true;
   }

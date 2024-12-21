@@ -33,38 +33,45 @@ int main(int argc, char** argv) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
   // print flags
+  std::cout << "==== flags ====" << std::endl;
   std::cout << "query: " << FLAGS_cql2_query << std::endl;
   std::cout << "file: " << FLAGS_cql2_file << std::endl;
   std::cout << "geojson: " << FLAGS_geojson << std::endl;
   std::cout << "dot: " << FLAGS_dot << std::endl;
 
   // Parse query as AST
+  std::cout << std::endl << "==== lexer/parser ====" << std::endl;
   std::istringstream ss(FLAGS_cql2_query);
   Cql2Lexer* lexer = new Cql2Lexer(ss, std::cout);
+
   Cql2Parser parser(lexer);
   lexer->RegisterLval(&parser.yylval);
   int ret = parser.yyparse();
   if (ret != 0) return ret;
 
   // Evaluate value of AST according to data source
+  std::cout << std::endl << "==== evaluation ====" << std::endl;
   cql2cpp::TreeEvaluator tree_evaluator;
   tree_evaluator.RegisterNodeEvaluator(cql2cpp::node_evals);
 
   cql2cpp::ValueT result;
   cql2cpp::DataSource ds;
-  if (tree_evaluator.Evaluate(parser.root(), ds, &result))
-    std::cout << std::get<bool>(result) << std::endl;
-  else
+  if (not tree_evaluator.Evaluate(parser.root(), ds, &result))
     std::cerr << "evaluate error: " << tree_evaluator.error_msg() << std::endl;
 
   // save AST to dot file
   if (not FLAGS_dot.empty()) {
+    std::cout << std::endl << "==== dot ====" << std::endl;
+    std::stringstream ss;
+    cql2cpp::Tree2Dot::GenerateDot(ss, parser.root());
+    std::cout << ss.str() << std::endl;
+
     std::string dot_filename = FLAGS_dot;
     if (dot_filename.find(".dot") == std::string::npos) dot_filename += ".dot";
-    std::ofstream fout(dot_filename);
 
+    std::ofstream fout(dot_filename);
     if (fout.is_open()) {
-      cql2cpp::Tree2Dot::GenerateDot(fout, parser.root());
+      fout << ss.str();
       fout.close();
     } else {
       std::cerr << "Can not open file " << dot_filename;

@@ -11,7 +11,6 @@
 #pragma once
 
 #include <ostream>
-#include <variant>
 
 #include "ast_node.h"
 
@@ -19,24 +18,6 @@ namespace cql2cpp {
 
 class Tree2Dot {
  public:
-  static std::string value_str(ValueT value) {
-    if (std::holds_alternative<void*>(value)) return "un-evaluate";
-
-    if (std::holds_alternative<bool>(value))
-      return std::get<bool>(value) ? "T" : "F";
-
-    if (std::holds_alternative<bool>(value))
-      return std::to_string(std::get<int64_t>(value));
-
-    if (std::holds_alternative<double>(value))
-      return std::to_string(std::get<double>(value));
-
-    if (std::holds_alternative<std::string>(value))
-      return std::get<std::string>(value);
-
-    return "unknown type";
-  }
-
   static std::string node_name(const AstNode* node) {
     if (node->op() != NullOp)
       return OpName.at(node->op()) + "(" + value_str(node->value()) + ")";
@@ -60,8 +41,8 @@ class Tree2Dot {
   static bool GenerateDotNode(std::ostream& ous, const AstNode* node) {
     if (node == nullptr) return true;
 
-    ous << "  \"" << node->id() << "\" [label=\"" << node_name(node) << "\"];"
-        << std::endl;
+    ous << "  \"" << node->id() << "\" [label=\"" << node->id() << " "
+        << node_name(node) << "\"];" << std::endl;
     for (const auto child : node->children()) GenerateDotNode(ous, child);
 
     return true;

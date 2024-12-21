@@ -36,13 +36,13 @@ class AstNode {
  public:
   AstNode(NodeType type, Operator op, const std::vector<AstNode*> children)
       : type_(type), op_(op), children_(children) {
-    std::cout << "Construct AstNode " << std::endl;
     id_ = idg.Gen();
+    std::cout << "AstNode " << ToString() << std::endl;
   }
 
   AstNode(const ValueT& value) : type_(Literal), op_(NullOp), value_(value) {
-    std::cout << "Construct AstNode literal" << std::endl;
     id_ = idg.Gen();
+    std::cout << "AstNode " << ToString() << std::endl;
   }
 
   const std::string& id() const { return id_; }
@@ -55,6 +55,8 @@ class AstNode {
 
   ValueT value() const { return value_; }
   void set_value(const ValueT& value) const { value_ = value; }
+
+  std::string ToString() { return id_ + " " + TypeName.at(type()) + " " + OpName.at(op()); }
 };
 
 }  // namespace cql2cpp

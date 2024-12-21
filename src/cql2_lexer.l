@@ -23,64 +23,64 @@ ID       [a-z][a-z0-9]*
 }
 
 "TRUE" {
-  printf("bool %s\n", yytext);
+  printf("TOKEN \"%s\"\n", yytext);
   lval_->boolean = true;
   return Cql2ParserBase::TRUE;
 }
 "FALSE" {
-  printf("bool %s\n", yytext);
+  printf("TOKEN \"%s\"\n", yytext);
   lval_->boolean = false;
   return Cql2ParserBase::FALSE;
 }
 
 "AND" {
-  printf("logical %s\n", yytext);
+  printf("TOKEN \"%s\"\n", yytext);
   lval_->str = yytext;
   return Cql2ParserBase::AND;
 }
 
 "OR" {
-  printf("logical %s\n", yytext);
+  printf("TOKEN \"%s\"\n", yytext);
   lval_->str = yytext;
   return Cql2ParserBase::OR;
 }
 
 "NOT" {
-  printf("logical %s\n", yytext);
+  printf("TOKEN \"%s\"\n", yytext);
   lval_->str = yytext;
   return Cql2ParserBase::NOT;
 }
 
 "(" {
-  printf("parenthesis %s\n", yytext);
+  printf("TOKEN \"%s\"\n", yytext);
   lval_->c = '(';
   return Cql2ParserBase::LPT;
 }
 
 ")" {
-  printf("parenthesis %s\n", yytext);
+  printf("TOKEN \"%s\"\n", yytext);
   lval_->c = ')';
   return Cql2ParserBase::RPT;
 }
 
 POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION {
-  printf( "geom: %s\n", yytext );
+  printf("TOKEN \"%s\"\n", yytext);
   return 0;
 }
 
 {ID} {
-  printf( "identifier: %s\n", yytext );
+  printf("TOKEN \"%s\"\n", yytext);
   return 0;
 }
 
-"+" { printf( "op: %s\n", yytext ); return Cql2ParserBase::PLUS; }
-"-" { printf( "op: %s\n", yytext ); return Cql2ParserBase::MINUS;}
-"*" { printf( "op: %s\n", yytext ); return Cql2ParserBase::MULT; }
-"/" { printf( "op: %s\n", yytext ); return Cql2ParserBase::DIV;  }
+"+" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::PLUS; }
+"-" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::MINUS;}
+"*" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::MULT; }
+"/" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::DIV;  }
 
-"=" { printf( "comp: %s\n", yytext ); return Cql2ParserBase::EQ;  }
-"<" { printf( "comp: %s\n", yytext ); return Cql2ParserBase::LT;  }
-">" { printf( "comp: %s\n", yytext ); return Cql2ParserBase::GT;  }
+"=" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::EQ;  }
+"<" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::LT;  }
+">" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::GT;  }
 
 "{"[^{}\n]*"}" {/* eat up one-line comments */}
 
