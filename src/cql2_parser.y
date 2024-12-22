@@ -14,6 +14,7 @@ using cql2cpp::Not;
 using cql2cpp::And;
 using cql2cpp::Or;
 using cql2cpp::BoolExpression;
+using cql2cpp::BinCompPred;
 
 %}
 
@@ -37,11 +38,14 @@ using cql2cpp::BoolExpression;
 
 %token <num_int> NUMBER_INT
 %token <boolean> BOOLEAN
+%token <boolean> TRUE FALSE
+%token <str> ID
 %token PLUS MINUS MULT DIV
 %token EQ GT LT  // = > <
 %token AND OR NOT
-%token TRUE FALSE
 %token LPT RPT  // ( )
+%token CASEI ACCENTI
+%token SQUOTE DQUOTE
 
 %type <num_int> IntExpression
 %type <node> booleanExpression
@@ -49,8 +53,14 @@ using cql2cpp::BoolExpression;
 %type <node> booleanFactor
 %type <node> booleanPrimary
 %type <node> booleanLiteral
-%type <boolean> TRUE
-%type <boolean> FALSE
+%type <node> characterLiteral
+%type <node> characterExpression
+%type <node> characterClause
+%type <node> propertyName
+%type <node> predicate
+%type <node> comparisonPredicate
+%type <node> binaryComparisonPredicate
+%type <node> scalarExpression
 
 %left PLUS MINUS
 %left MULT DIV
@@ -76,13 +86,49 @@ booleanFactor:
   | NOT booleanPrimary { $$ = new AstNode(BoolExpression, Not, { $2 }); }
 
 booleanPrimary:
-  booleanLiteral { $$ = $1; }
+  predicate
+  | booleanLiteral { $$ = $1; }
   | LPT booleanExpression RPT { $$ = $2; }
 
 booleanLiteral:
   TRUE { $$ = new AstNode($1); }
   | FALSE { $$ = new AstNode($1); }
 
+predicate:
+  comparisonPredicate { $$ = $1; }
+
+comparisonPredicate:
+  binaryComparisonPredicate { $$ = $1; }
+
+binaryComparisonPredicate:
+  scalarExpression EQ scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::Equal, {$1, $3}); }
+  | scalarExpression LT GT scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::NotEqual, {$1, $4}); }
+  | scalarExpression LT    scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::Lesser,   {$1, $3}); }
+  | scalarExpression GT    scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::Greater,  {$1, $3}); }
+  | scalarExpression LT EQ scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::LesserEqual, {$1, $4}); }
+  | scalarExpression GT EQ scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::GreaterEqual, {$1, $4}); }
+
+scalarExpression:
+  characterClause
+  | booleanLiteral
+  | propertyName
+
+characterClause:
+  CASEI LPT characterExpression RPT
+  | ACCENTI LPT characterExpression RPT
+  | characterLiteral;
+
+characterExpression:
+  characterClause
+  | propertyName
+
+characterLiteral:
+  SQUOTE SQUOTE
+  | SQUOTE ID SQUOTE
+
+propertyName:
+  ID
+  | DQUOTE ID DQUOTE;
 
 IntExpression:
   NUMBER_INT { $$ = $1; }

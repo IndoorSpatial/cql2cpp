@@ -51,6 +51,18 @@ ID       [a-z][a-z0-9]*
   return Cql2ParserBase::NOT;
 }
 
+"CASEI" {
+  printf("TOKEN \"%s\"\n", yytext);
+  lval_->str = yytext;
+  return Cql2ParserBase::CASEI;
+}
+
+"ACCENTI" {
+  printf("TOKEN \"%s\"\n", yytext);
+  lval_->str = yytext;
+  return Cql2ParserBase::ACCENTI;
+}
+
 "(" {
   printf("TOKEN \"%s\"\n", yytext);
   lval_->c = '(';
@@ -65,13 +77,22 @@ ID       [a-z][a-z0-9]*
 
 POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION {
   printf("TOKEN \"%s\"\n", yytext);
+  lval_->str = yytext;
   return 0;
 }
 
 {ID} {
   printf("TOKEN \"%s\"\n", yytext);
+  lval_->str = yytext;
   return 0;
 }
+
+"\"" {
+  printf("TOKEN \"%s\"\n", yytext);
+  lval_->c = '"';
+  return 0;
+}
+
 
 "+" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::PLUS; }
 "-" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::MINUS;}

@@ -16,6 +16,7 @@
 #include <cql2cpp/node_evaluator.h>
 #include <cql2cpp/tree_dot.h>
 #include <geos/geom/GeometryFactory.h>
+#include <geos/io/GeoJSONReader.h>
 #include <gflags/gflags.h>
 
 #include <fstream>
@@ -54,17 +55,50 @@ int main(int argc, char** argv) {
   if (ret != 0) return ret;
 
   // Evaluate value of AST according to data source
-  std::cout << std::endl << "==== evaluation ====" << std::endl;
-  cql2cpp::TreeEvaluator tree_evaluator;
-  tree_evaluator.RegisterNodeEvaluator(cql2cpp::node_evals);
+  if (not FLAGS_geojson.empty()) {
+    std::cout << std::endl << "==== evaluation ====" << std::endl;
+    cql2cpp::TreeEvaluator tree_evaluator;
+    tree_evaluator.RegisterNodeEvaluator(cql2cpp::node_evals);
 
-  geos::geom::GeometryFactory::Ptr gf = geos::geom::GeometryFactory::create();
-  geos::io::GeoJSONFeature feature(gf->createEmpty(2), {});
-  cql2cpp::FeatureSourceGeoJson fgs(feature);
+    std::string geojson_text;
+    std::ifstream fin(FLAGS_geojson);
+    if (fin.good()) {
+      if (fin.is_open()) {
+        geojson_text.assign(std::istreambuf_iterator<char>(fin),
+                            std::istreambuf_iterator<char>());
+        fin.close();
+      } else {
+        std::cerr << "can not open " << FLAGS_geojson;
+        goto GEOJSON_FAILED;
+      }
+    } else {
+      std::cerr << FLAGS_geojson << " not exist";
+      goto GEOJSON_FAILED;
+    }
 
-  cql2cpp::ValueT result;
-  if (not tree_evaluator.Evaluate(parser.root(), &fgs, &result))
-    std::cerr << "evaluate error: " << tree_evaluator.error_msg() << std::endl;
+    geos_nlohmann::json geojson = geos_nlohmann::json::parse(geojson_text);
+    try {
+      geos_nlohmann::json j = geos_nlohmann::json::parse(geojson_text);
+    } catch (const geos_nlohmann::json::parse_error& e) {
+      std::cerr << "parse geojson error: " << e.what();
+      goto GEOJSON_FAILED;
+    }
+
+    geos::io::GeoJSONReader reader;
+
+    geos::io::GeoJSONFeatureCollection features = reader.readFeatures(geojson);
+    for (const auto& feature : features.getFeatures()) {
+      cql2cpp::FeatureSourceGeoJson fgs(feature);
+      cql2cpp::ValueT result;
+      if (tree_evaluator.Evaluate(parser.root(), &fgs, &result)) {
+        std::cout << std::get<bool>(result) << feature.getId();
+      } else {
+        std::cerr << "evaluate error: " << tree_evaluator.error_msg()
+                  << std::endl;
+      }
+    }
+  }
+GEOJSON_FAILED:
 
   // save AST to dot file
   if (not FLAGS_dot.empty()) {

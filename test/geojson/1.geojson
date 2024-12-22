@@ -1,0 +1,29 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": 0,
+      "type": "Feature",
+      "geometry": {
+        "coordinates": [
+          0,
+          0
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "string_field": "text",
+        "bool_field_t": true,
+        "bool_field_f": false,
+        "array_field": [
+          "value1",
+          "value2"
+        ],
+        "int_field": 123,
+        "signed_int_field": 123,
+        "minus_int_field": -123,
+        "float_field": 0.123
+      }
+    }
+  ]
+}
