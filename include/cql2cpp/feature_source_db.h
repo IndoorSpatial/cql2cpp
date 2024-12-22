@@ -1,5 +1,5 @@
 /*
- * File Name: json_data_source.h
+ * File Name: feature_source_db.h
  *
  * Copyright (c) 2024 IndoorSpatial
  *
@@ -10,11 +10,11 @@
 
 #pragma once
 
-#include "data_source.h"
+#include "feature_source.h"
 
 namespace cql2cpp {
 
-class JsonDataSource : public DataSource {
+class FeatureSourceDB : public FeatureSource {
  public:
 };
 

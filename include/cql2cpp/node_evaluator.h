@@ -16,19 +16,19 @@ namespace cql2cpp {
 
 const std::map<Operator, NodeEval> node_evals = {
     {NullOp,
-     [](auto n, auto vs, auto ds) -> ValueT {
+     [](auto n, auto vs, auto fs) -> ValueT {
        return n->value();
      }},
     {And,
-     [](auto n, auto vs, auto ds) -> ValueT {
+     [](auto n, auto vs, auto fs) -> ValueT {
        return std::get<bool>(vs.at(0)) and std::get<bool>(vs.at(1));
      }},
     {Or,
-     [](auto n, auto vs, auto ds) -> ValueT {
+     [](auto n, auto vs, auto fs) -> ValueT {
        return std::get<bool>(vs.at(0)) or std::get<bool>(vs.at(1));
      }},
     {Not,
-     [](auto n, auto vs, auto ds) -> ValueT {
+     [](auto n, auto vs, auto fs) -> ValueT {
        return not std::get<bool>(vs.at(0));
      }},
 };

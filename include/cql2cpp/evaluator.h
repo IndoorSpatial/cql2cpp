@@ -14,12 +14,12 @@
 #include <map>
 
 #include "ast_node.h"
-#include "data_source/data_source.h"
+#include "feature_source.h"
 
 namespace cql2cpp {
 
 using NodeEval = std::function<ValueT(
-    const AstNode*, const std::vector<ValueT>&, const DataSource&)>;
+    const AstNode*, const std::vector<ValueT>&, const FeatureSource*)>;
 
 class TreeEvaluator {
  private:
@@ -35,7 +35,7 @@ class TreeEvaluator {
     type_evaluator_.insert(evaluators.begin(), evaluators.end());
   }
 
-  bool Evaluate(const AstNode* root, const DataSource& ds, ValueT* result) {
+  bool Evaluate(const AstNode* root, const FeatureSource* fs, ValueT* result) {
     if (type_evaluator_.find(root->op()) == type_evaluator_.end()) {
       error_msg_ = "can not find evaluator for operator " +
                    OpName.at(root->op()) + " in node type " +
@@ -46,13 +46,13 @@ class TreeEvaluator {
     std::vector<ValueT> child_values;
     for (AstNode* child : root->children()) {
       ValueT value;
-      if (Evaluate(child, ds, &value))
+      if (Evaluate(child, fs, &value))
         child_values.emplace_back(value);
       else
         return false;
     }
 
-    *result = type_evaluator_[root->op()].operator()(root, child_values, ds);
+    *result = type_evaluator_[root->op()].operator()(root, child_values, fs);
     root->set_value(*result);
     std::cout << "Evaluate Node " << root->id()
               << " value: " << value_str(*result, true) << std::endl;

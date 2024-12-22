@@ -8,6 +8,7 @@ project(cql2cpp
 
 find_package(gflags REQUIRED)
 find_package(GTest REQUIRED)
+find_package(geos REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_BINARY_DIR})
@@ -38,7 +39,7 @@ add_custom_command(
 # CLI tool
 add_executable(cql2 src/main.cc src/id_generator.cc ${FLEX_OUTPUT} ${BISON_OUTPUT})
 target_compile_options(cql2 PRIVATE -Wno-register -Wno-write-strings)
-target_link_libraries(cql2 gflags::gflags)
+target_link_libraries(cql2 gflags::gflags GEOS::geos_c)
 
 # Test
 enable_testing()

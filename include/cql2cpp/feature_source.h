@@ -1,5 +1,5 @@
 /*
- * File Name: db_data_source.h
+ * File Name: feature_source.h
  *
  * Copyright (c) 2024 IndoorSpatial
  *
@@ -10,13 +10,14 @@
 
 #pragma once
 
-#include "data_source.h"
+#include "value.h"
 
 namespace cql2cpp {
 
-class DBDataSource : public DataSource {
+class FeatureSource {
  public:
+   virtual ValueT get_property(const std::string& property_path) = 0;
+   virtual ~FeatureSource() {}
 };
 
 };  // namespace cql2cpp
-
