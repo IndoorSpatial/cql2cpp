@@ -15,6 +15,7 @@ using cql2cpp::And;
 using cql2cpp::Or;
 using cql2cpp::BoolExpression;
 using cql2cpp::BinCompPred;
+using cql2cpp::PropertyName;
 
 %}
 
@@ -40,6 +41,7 @@ using cql2cpp::BinCompPred;
 %token <boolean> BOOLEAN
 %token <boolean> TRUE FALSE
 %token <str> ID
+%token <str> CHAR_LIT
 %token PLUS MINUS MULT DIV
 %token EQ GT LT  // = > <
 %token AND OR NOT
@@ -53,7 +55,6 @@ using cql2cpp::BinCompPred;
 %type <node> booleanFactor
 %type <node> booleanPrimary
 %type <node> booleanLiteral
-%type <node> characterLiteral
 %type <node> characterExpression
 %type <node> characterClause
 %type <node> propertyName
@@ -111,23 +112,19 @@ binaryComparisonPredicate:
 scalarExpression:
   characterClause
   | booleanLiteral
-  | propertyName
+  | propertyName { $$ = $1; }
 
 characterClause:
   CASEI LPT characterExpression RPT
   | ACCENTI LPT characterExpression RPT
-  | characterLiteral;
+  | CHAR_LIT { std::string s = std::string($1); $$ = new AstNode(s.substr(1, s.size() - 2)); }
 
 characterExpression:
   characterClause
-  | propertyName
-
-characterLiteral:
-  SQUOTE SQUOTE
-  | SQUOTE ID SQUOTE
+  | propertyName { $$ = $1; }
 
 propertyName:
-  ID
+  ID { $$ = new AstNode(PropertyName, { std::string($1) }); }
   | DQUOTE ID DQUOTE;
 
 IntExpression:

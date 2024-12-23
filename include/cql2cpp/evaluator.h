@@ -18,25 +18,29 @@
 
 namespace cql2cpp {
 
-using NodeEval = std::function<ValueT(
-    const AstNode*, const std::vector<ValueT>&, const FeatureSource*)>;
+using NodeEval =
+    std::function<bool(const AstNode*, const std::vector<ValueT>&,
+                       const FeatureSource*, ValueT*, std::string* error_msg)>;
 
 class TreeEvaluator {
  private:
-  std::map<Operator, NodeEval> type_evaluator_;
+  std::map<NodeType, std::map<Operator, NodeEval>> type_evaluator_;
   std::string error_msg_;
 
  public:
-  void RegisterNodeEvaluator(Operator type, NodeEval evaluator) {
-    type_evaluator_[type] = evaluator;
+  void RegisterNodeEvaluator(Operator op, NodeType type, NodeEval evaluator) {
+    type_evaluator_[type][op] = evaluator;
   }
 
-  void RegisterNodeEvaluator(const std::map<Operator, NodeEval> evaluators) {
+  void RegisterNodeEvaluator(
+      const std::map<NodeType, std::map<Operator, NodeEval>> evaluators) {
     type_evaluator_.insert(evaluators.begin(), evaluators.end());
   }
 
   bool Evaluate(const AstNode* root, const FeatureSource* fs, ValueT* result) {
-    if (type_evaluator_.find(root->op()) == type_evaluator_.end()) {
+    if (type_evaluator_.find(root->type()) == type_evaluator_.end() ||
+        type_evaluator_[root->type()].find(root->op()) ==
+            type_evaluator_[root->type()].end()) {
       error_msg_ = "can not find evaluator for operator " +
                    OpName.at(root->op()) + " in node type " +
                    TypeName.at(root->type());
@@ -52,12 +56,17 @@ class TreeEvaluator {
         return false;
     }
 
-    *result = type_evaluator_[root->op()].operator()(root, child_values, fs);
-    root->set_value(*result);
-    std::cout << "Evaluate Node " << root->id()
-              << " value: " << value_str(*result, true) << std::endl;
+    bool ret = type_evaluator_[root->type()][root->op()].operator()(
+        root, child_values, fs, result, &error_msg_);
+    if (ret) {
+      root->set_value(*result);
+      std::cout << "Evaluate Node " << root->id()
+                << " value: " << value_str(*result, true) << std::endl;
+    } else {
+      std::cout << "Evaluate Node " << root->id() << " error: " << error_msg_;
+    }
 
-    return true;
+    return ret;
   }
 
   const std::string& error_msg() { return error_msg_; }

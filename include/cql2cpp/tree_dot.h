@@ -21,6 +21,8 @@ class Tree2Dot {
   static std::string node_name(const AstNode* node) {
     if (node->op() != NullOp)
       return OpName.at(node->op()) + "(" + value_str(node->value()) + ")";
+    else if (node->type() == PropertyName)
+      return std::string("property") + "(" + value_str(node->value()) + ")";
     else
       return value_str(node->value());
   }

@@ -14,10 +14,10 @@
 #include <memory>
 #include <vector>
 
+#include "id_generator.h"
 #include "node_type.h"
 #include "operator.h"
 #include "value.h"
-#include "id_generator.h"
 
 namespace cql2cpp {
 
@@ -40,6 +40,12 @@ class AstNode {
     std::cout << "AstNode " << ToString() << std::endl;
   }
 
+  AstNode(NodeType type, const ValueT& value)
+      : type_(type), op_(NullOp), value_(value) {
+    id_ = idg.Gen();
+    std::cout << "AstNode " << ToString() << std::endl;
+  }
+
   AstNode(const ValueT& value) : type_(Literal), op_(NullOp), value_(value) {
     id_ = idg.Gen();
     std::cout << "AstNode " << ToString() << std::endl;
@@ -56,7 +62,12 @@ class AstNode {
   ValueT value() const { return value_; }
   void set_value(const ValueT& value) const { value_ = value; }
 
-  std::string ToString() { return id_ + " " + TypeName.at(type()) + " " + OpName.at(op()); }
+  std::string ToString() {
+    if (op_ == NullOp)
+      return id_ + " " + TypeName.at(type()) + " " + value_str(value_, true);
+    else
+      return id_ + " " + TypeName.at(type()) + " " + OpName.at(op());
+  }
 };
 
 }  // namespace cql2cpp

@@ -16,7 +16,7 @@ namespace cql2cpp {
 
 class FeatureSource {
  public:
-   virtual ValueT get_property(const std::string& property_path) = 0;
+   virtual ValueT get_property(const std::string& property_path) const = 0;
    virtual ~FeatureSource() {}
 };
 

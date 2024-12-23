@@ -12,7 +12,7 @@
         "type": "Point"
       },
       "properties": {
-        "string_field": "text",
+        "string_field": "Beijing",
         "bool_field_t": true,
         "bool_field_f": false,
         "array_field": [

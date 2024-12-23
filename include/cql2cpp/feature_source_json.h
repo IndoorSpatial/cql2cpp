@@ -24,7 +24,7 @@ class FeatureSourceJson : public FeatureSource {
  public:
   FeatureSourceJson(const geos_nlohmann::json& json) : json_(json) {}
 
-  ValueT get_property(const std::string& property_path) override {
+  ValueT get_property(const std::string& property_path) const override {
     const geos_nlohmann::json* value =
         JsonHelper::get_property(property_path, json_);
     if (value == nullptr) return nullptr;

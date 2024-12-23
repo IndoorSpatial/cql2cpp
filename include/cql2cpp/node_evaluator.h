@@ -10,27 +10,102 @@
 
 #pragma once
 
+#include <variant>
+
 #include "evaluator.h"
 
 namespace cql2cpp {
 
-const std::map<Operator, NodeEval> node_evals = {
-    {NullOp,
-     [](auto n, auto vs, auto fs) -> ValueT {
-       return n->value();
-     }},
-    {And,
-     [](auto n, auto vs, auto fs) -> ValueT {
-       return std::get<bool>(vs.at(0)) and std::get<bool>(vs.at(1));
-     }},
-    {Or,
-     [](auto n, auto vs, auto fs) -> ValueT {
-       return std::get<bool>(vs.at(0)) or std::get<bool>(vs.at(1));
-     }},
-    {Not,
-     [](auto n, auto vs, auto fs) -> ValueT {
-       return not std::get<bool>(vs.at(0));
-     }},
+template <typename ValueType>
+bool CheckValueNumberType(const std::string& op, size_t num,
+                          const std::vector<ValueT>& vs, std::string* errmsg) {
+  if (vs.size() != num) {
+    *errmsg = op + " needs two values but we have " + std::to_string(vs.size());
+    return false;
+  }
+  for (size_t i = 0; i < num; i++)
+    if (not std::holds_alternative<ValueType>(vs.at(0))) {
+      *errmsg = "value " + std::to_string(i) + "of " + op + " is incorrect";
+      return false;
+    }
+  return true;
+}
+
+const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
+    {Literal,
+     {{NullOp,
+       [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+         *value = n->value();
+         return true;
+       }}}},
+    {BoolExpression,
+     {{And,
+       [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+         if (CheckValueNumberType<bool>("AND", 2, vs, errmsg)) return false;
+         *value = std::get<bool>(vs.at(0)) and std::get<bool>(vs.at(1));
+         return true;
+       }},
+      {Or,
+       [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+         if (CheckValueNumberType<bool>("OR", 2, vs, errmsg)) return false;
+         *value = std::get<bool>(vs.at(0)) or std::get<bool>(vs.at(1));
+         return true;
+       }},
+      {Not,
+       [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+         if (CheckValueNumberType<bool>("NOT", 1, vs, errmsg)) return false;
+         *value = not std::get<bool>(vs.at(0));
+         return true;
+       }}}},
+    {PropertyName,
+     {{NullOp,
+       [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+         if (not std::holds_alternative<std::string>(n->value())) {
+           *errmsg = "value of property name is not string";
+           return false;
+         }
+         *value = fs->get_property(std::get<std::string>(n->value()));
+         return true;
+       }}}},
+    {BinCompPred,
+     {{Equal,
+       [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+         if (vs.size() != 2) {
+           *errmsg = "Equal needs two values but we have " +
+                     std::to_string(vs.size());
+           return false;
+         }
+         if (std::holds_alternative<bool>(vs.at(0)) and
+             std::holds_alternative<bool>(vs.at(1))) {
+           *value = std::get<bool>(vs.at(0)) == std::get<bool>(vs.at(1));
+           return true;
+         }
+         if (std::holds_alternative<int64_t>(vs.at(0)) and
+             std::holds_alternative<int64_t>(vs.at(1))) {
+           *value = std::get<int64_t>(vs.at(0)) == std::get<int64_t>(vs.at(1));
+           return true;
+         }
+         if (std::holds_alternative<uint64_t>(vs.at(0)) and
+             std::holds_alternative<uint64_t>(vs.at(1))) {
+           *value =
+               std::get<uint64_t>(vs.at(0)) == std::get<uint64_t>(vs.at(1));
+           return true;
+         }
+         if (std::holds_alternative<double>(vs.at(0)) and
+             std::holds_alternative<double>(vs.at(1))) {
+           *value = fabs(std::get<double>(vs.at(0)) -
+                         std::get<double>(vs.at(1))) < 1e-5;
+           return true;
+         }
+         if (std::holds_alternative<std::string>(vs.at(0)) and
+             std::holds_alternative<std::string>(vs.at(1))) {
+           *value = std::get<std::string>(vs.at(0)) ==
+                    std::get<std::string>(vs.at(1));
+           return true;
+         }
+
+         return true;
+       }}}},
 };
 
 }  // namespace cql2cpp

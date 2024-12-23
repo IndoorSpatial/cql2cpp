@@ -57,9 +57,8 @@ int main(int argc, char** argv) {
   // Evaluate value of AST according to data source
   if (not FLAGS_geojson.empty()) {
     std::cout << std::endl << "==== evaluation ====" << std::endl;
-    cql2cpp::TreeEvaluator tree_evaluator;
-    tree_evaluator.RegisterNodeEvaluator(cql2cpp::node_evals);
 
+    // read geojson text
     std::string geojson_text;
     std::ifstream fin(FLAGS_geojson);
     if (fin.good()) {
@@ -76,17 +75,13 @@ int main(int argc, char** argv) {
       goto GEOJSON_FAILED;
     }
 
-    geos_nlohmann::json geojson = geos_nlohmann::json::parse(geojson_text);
-    try {
-      geos_nlohmann::json j = geos_nlohmann::json::parse(geojson_text);
-    } catch (const geos_nlohmann::json::parse_error& e) {
-      std::cerr << "parse geojson error: " << e.what();
-      goto GEOJSON_FAILED;
-    }
-
+    // read geojson features
     geos::io::GeoJSONReader reader;
+    geos::io::GeoJSONFeatureCollection features = reader.readFeatures(geojson_text);
 
-    geos::io::GeoJSONFeatureCollection features = reader.readFeatures(geojson);
+    // evaluate
+    cql2cpp::TreeEvaluator tree_evaluator;
+    tree_evaluator.RegisterNodeEvaluator(cql2cpp::node_evals);
     for (const auto& feature : features.getFeatures()) {
       cql2cpp::FeatureSourceGeoJson fgs(feature);
       cql2cpp::ValueT result;

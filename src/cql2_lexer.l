@@ -6,73 +6,80 @@
 %option noyywrap
 
 DIGIT    [0-9]
-ID       [a-z][a-z0-9]*
+ID       [a-z][a-z0-9_-]*
+CHAR_LIT \'.*\'
 
 %%
 
+{CHAR_LIT} {
+  printf( "char_lit: %s\n", yytext);
+  lval_->str = yytext;
+  return Cql2ParserBase::CHAR_LIT;
+}
+
 {DIGIT}+    {
-  printf( "int: \"%s\" (%d)\n", yytext, atoi( yytext ) );
+  printf( "int: %s\n", yytext);
   lval_->num_int = atoi(yytext);
   return Cql2ParserBase::NUMBER_INT;
 }
 
 {DIGIT}+"."{DIGIT}* {
-  printf( "float: \"%s\" (%g)\n", yytext, atof( yytext ) );
+  printf( "float: %s\n", yytext);
   lval_->num_float = atof(yytext);
   return Cql2ParserBase::NUMBER_INT;
 }
 
 "TRUE" {
-  printf("TOKEN \"%s\"\n", yytext);
-  lval_->boolean = true;
+  printf("TOKEN %s\n", yytext);
   return Cql2ParserBase::TRUE;
 }
 "FALSE" {
-  printf("TOKEN \"%s\"\n", yytext);
-  lval_->boolean = false;
+  printf("TOKEN %s\n", yytext);
   return Cql2ParserBase::FALSE;
 }
 
 "AND" {
-  printf("TOKEN \"%s\"\n", yytext);
-  lval_->str = yytext;
+  printf("TOKEN %s\n", yytext);
   return Cql2ParserBase::AND;
 }
 
 "OR" {
-  printf("TOKEN \"%s\"\n", yytext);
-  lval_->str = yytext;
+  printf("TOKEN %s\n", yytext);
   return Cql2ParserBase::OR;
 }
 
 "NOT" {
-  printf("TOKEN \"%s\"\n", yytext);
-  lval_->str = yytext;
+  printf("TOKEN %s\n", yytext);
   return Cql2ParserBase::NOT;
 }
 
 "CASEI" {
-  printf("TOKEN \"%s\"\n", yytext);
-  lval_->str = yytext;
+  printf("TOKEN %s\n", yytext);
   return Cql2ParserBase::CASEI;
 }
 
 "ACCENTI" {
-  printf("TOKEN \"%s\"\n", yytext);
-  lval_->str = yytext;
+  printf("TOKEN %s\n", yytext);
   return Cql2ParserBase::ACCENTI;
 }
 
 "(" {
-  printf("TOKEN \"%s\"\n", yytext);
-  lval_->c = '(';
+  printf("TOKEN %s\n", yytext);
   return Cql2ParserBase::LPT;
 }
 
 ")" {
-  printf("TOKEN \"%s\"\n", yytext);
-  lval_->c = ')';
+  printf("TOKEN %s\n", yytext);
   return Cql2ParserBase::RPT;
+}
+
+"\"" {
+  printf("DQUOTE %s\n", yytext);
+  return Cql2ParserBase::DQUOTE;
+}
+"'" {
+  printf("SQUOTE %s\n", yytext);
+  return Cql2ParserBase::SQUOTE;
 }
 
 POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION {
@@ -82,17 +89,10 @@ POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECT
 }
 
 {ID} {
-  printf("TOKEN \"%s\"\n", yytext);
+  printf("ID \"%s\"\n", yytext);
   lval_->str = yytext;
-  return 0;
+  return Cql2ParserBase::ID;
 }
-
-"\"" {
-  printf("TOKEN \"%s\"\n", yytext);
-  lval_->c = '"';
-  return 0;
-}
-
 
 "+" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::PLUS; }
 "-" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::MINUS;}
