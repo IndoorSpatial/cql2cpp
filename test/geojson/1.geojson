@@ -22,7 +22,10 @@
         "int_field": 1,
         "signed_int_field": 456,
         "minus_int_field": -789,
-        "float_field": 0.666
+        "float_field": 0.666,
+        "object": {
+          "key": "value"
+        }
       }
     }
   ]
