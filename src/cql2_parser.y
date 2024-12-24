@@ -15,7 +15,9 @@ using cql2cpp::And;
 using cql2cpp::Or;
 using cql2cpp::BoolExpression;
 using cql2cpp::BinCompPred;
+using cql2cpp::SpatialPred;
 using cql2cpp::PropertyName;
+using cql2cpp::NameOp;
 
 %}
 
@@ -45,12 +47,14 @@ using cql2cpp::PropertyName;
 %token <boolean> TRUE FALSE
 %token <str> ID
 %token <str> CHAR_LIT
+%token <str> SPT_FUNC
 %token PLUS MINUS MULT DIV
 %token EQ GT LT  // = > <
 %token AND OR NOT
-%token LPT RPT  // ( )
+%token LPT RPT COMMA  // ( ) ,
 %token CASEI ACCENTI
 %token SQUOTE DQUOTE
+%token POINT LINESTRING POLYGON BBOX
 
 %type <node> booleanExpression
 %type <node> booleanTerm
@@ -65,6 +69,8 @@ using cql2cpp::PropertyName;
 %type <node> binaryComparisonPredicate
 %type <node> scalarExpression
 %type <node> numericLiteral
+%type <node> spatialPredicate
+%type <node> geomExpression
 
 %left PLUS MINUS
 %left MULT DIV
@@ -100,6 +106,7 @@ booleanLiteral:
 
 predicate:
   comparisonPredicate { $$ = $1; }
+  | spatialPredicate
 
 comparisonPredicate:
   binaryComparisonPredicate { $$ = $1; }
@@ -134,5 +141,61 @@ numericLiteral:
 propertyName:
   ID { $$ = new AstNode(PropertyName, { std::string($1) }); }
   | DQUOTE ID DQUOTE;
+
+spatialPredicate:
+  SPT_FUNC LPT geomExpression COMMA geomExpression RPT {
+    $$ = new AstNode(SpatialPred, NameOp.at($1), {$3, $5});
+  }
+
+geomExpression:
+  spatialInstance
+  | propertyName { $$ = $1; }
+
+spatialInstance:
+  geometryLiteral
+  | bboxTaggedText;
+
+geometryLiteral:
+  pointTaggedText
+  | linestringTaggedText
+  | polygonTaggedText
+
+pointTaggedText: POINT pointText
+
+bboxTaggedText: BBOX bboxText
+
+bboxText:
+  LPT Coord COMMA Coord COMMA Coord COMMA Coord RPT
+  | LPT Coord COMMA Coord COMMA Coord COMMA Coord COMMA Coord COMMA Coord RPT
+
+linestringTaggedText: LINESTRING lineStringText;
+
+lineStringText: LPT point COMMA point points RPT
+
+pointText: LPT point RPT
+
+polygonTaggedText: POLYGON polygonText
+
+polygonText:
+  LPT linearRingText linearRingTexts RPT
+
+linearRingTexts:
+  /* empty */
+  | linearRingTexts COMMA linearRingText
+
+linearRingText:
+  | LPT point COMMA point COMMA point COMMA point points RPT
+
+point:
+  Coord Coord
+  | Coord Coord Coord
+
+points:
+  /* empty */
+  | points COMMA point
+
+Coord:
+  NUMBER_INT
+  | NUMBER_FLOAT
 
 %%

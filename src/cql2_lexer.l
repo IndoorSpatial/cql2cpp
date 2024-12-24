@@ -90,10 +90,41 @@ CHAR_LIT \'.*\'
   return Cql2ParserBase::SQUOTE;
 }
 
-POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION {
+"," {
+  yyout << "COMMA " << yytext << std::endl;
+  return Cql2ParserBase::COMMA;
+}
+
+
+S_INTERSECTS|S_EQUALS|S_DISJOINT|S_TOUCHES|S_WITHIN|S_OVERLAPS|S_CROSSES|S_CONTAINS {
   yyout << "TOKEN " << yytext << std::endl;
   lval_->str = yytext;
-  return 0;
+  return Cql2ParserBase::SPT_FUNC;
+}
+
+
+POINT[Z]? {
+  yyout << "TOKEN " << yytext << std::endl;
+  lval_->str = yytext;
+  return Cql2ParserBase::POINT;
+}
+
+LINESTRING[Z]? {
+  yyout << "TOKEN " << yytext << std::endl;
+  lval_->str = yytext;
+  return Cql2ParserBase::LINESTRING;
+}
+
+POLYGON[Z]? {
+  yyout << "TOKEN " << yytext << std::endl;
+  lval_->str = yytext;
+  return Cql2ParserBase::POLYGON;
+}
+
+BBOX {
+  yyout << "TOKEN " << yytext << std::endl;
+  lval_->str = yytext;
+  return Cql2ParserBase::BBOX;
 }
 
 {ID} {
