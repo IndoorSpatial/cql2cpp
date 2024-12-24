@@ -11,6 +11,7 @@
 #pragma once
 
 #include <FlexLexer.h>
+#include <glog/logging.h>
 
 #include <cql2_parser_base.h>
 
@@ -24,7 +25,7 @@ class Cql2Parser : public Cql2ParserBase {
   }
 
   void yyerror(char* s) override {
-    std::cerr << "Cql2Parser Error: " << s << std::endl;
+    LOG(ERROR) << "Cql2Parser Error: " << s << std::endl;
   }
 
   int yylex() override { return lexer_->yylex(); }

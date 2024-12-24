@@ -128,7 +128,7 @@ characterExpression:
   | propertyName { $$ = $1; }
 
 numericLiteral:
-  NUMBER_INT { std::cout << "debug: " << $1 << std::endl; $$ = new AstNode($1); }
+  NUMBER_INT { $$ = new AstNode($1); }
   | NUMBER_FLOAT { $$ = new AstNode($1); }
 
 propertyName:

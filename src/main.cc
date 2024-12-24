@@ -18,6 +18,8 @@
 #include <geos/geom/GeometryFactory.h>
 #include <geos/io/GeoJSONReader.h>
 #include <gflags/gflags.h>
+#include <glog/export.h>
+#include <glog/logging.h>
 
 #include <fstream>
 #include <sstream>
@@ -30,33 +32,43 @@ DEFINE_string(geojson, "", "data set to be queried");
 DEFINE_string(dot, "", "generate dot file");
 
 int main(int argc, char** argv) {
-  // handle gflags
   gflags::SetUsageMessage(
       "cql2 usage: cql2 [-cql2_query=\"city='Toronto'\"] "
       "[-cql2_file=\"path/to/query.cql2\"] "
       "-geojson=\"path/to/geo.json\"");
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
+  google::InitGoogleLogging(argv[0]);
+  google::InstallFailureSignalHandler();
+  google::LogToStderr();
+
   // print flags
-  std::cout << "==== flags ====" << std::endl;
-  std::cout << "query: " << FLAGS_cql2_query << std::endl;
-  std::cout << "file: " << FLAGS_cql2_file << std::endl;
-  std::cout << "geojson: " << FLAGS_geojson << std::endl;
-  std::cout << "dot: " << FLAGS_dot << std::endl;
+  LOG(INFO) << "==== flags ====";
+  LOG(INFO) << "query: " << FLAGS_cql2_query;
+  LOG(INFO) << "file: " << FLAGS_cql2_file;
+  LOG(INFO) << "geojson: " << FLAGS_geojson;
+  LOG(INFO) << "dot: " << FLAGS_dot;
 
   // Parse query as AST
-  std::cout << std::endl << "==== lexer/parser ====" << std::endl;
-  std::istringstream ss(FLAGS_cql2_query);
-  Cql2Lexer* lexer = new Cql2Lexer(ss, std::cout);
+  LOG(INFO) << "==== lexer/parser ====";
+  std::istringstream iss(FLAGS_cql2_query);
+  std::ostringstream oss;
+  Cql2Lexer* lexer = new Cql2Lexer(iss, oss);
 
+  cql2cpp::AstNode::set_ostream(&oss);
   Cql2Parser parser(lexer);
   lexer->RegisterLval(&parser.yylval);
   int ret = parser.yyparse();
-  if (ret != 0) return ret;
+  if (ret == 0) {
+    LOG(INFO) << "log of generated code of flex and bison:\n" << oss.str();
+  } else {
+    LOG(ERROR) << "log of generated code of flex and bison:\n" << oss.str();
+    return ret;
+  }
 
   // Evaluate value of AST according to data source
   if (not FLAGS_geojson.empty()) {
-    std::cout << std::endl << "==== evaluation ====" << std::endl;
+    LOG(INFO) << "==== evaluation ====";
 
     // read geojson text
     std::string geojson_text;
@@ -77,7 +89,8 @@ int main(int argc, char** argv) {
 
     // read geojson features
     geos::io::GeoJSONReader reader;
-    geos::io::GeoJSONFeatureCollection features = reader.readFeatures(geojson_text);
+    geos::io::GeoJSONFeatureCollection features =
+        reader.readFeatures(geojson_text);
 
     // evaluate
     cql2cpp::TreeEvaluator tree_evaluator;
@@ -86,10 +99,11 @@ int main(int argc, char** argv) {
       cql2cpp::FeatureSourceGeoJson fgs(feature);
       cql2cpp::ValueT result;
       if (tree_evaluator.Evaluate(parser.root(), &fgs, &result)) {
-        std::cout << std::get<bool>(result) << feature.getId();
+        LOG(INFO) << "evaluation result of feature " << feature.getId() << ": "
+                  << (std::get<bool>(result) ? "true" : "false");
       } else {
-        std::cerr << "evaluate error: " << tree_evaluator.error_msg()
-                  << std::endl;
+        LOG(ERROR) << "evaluate error: " << tree_evaluator.error_msg()
+                   << std::endl;
       }
     }
   }
@@ -97,10 +111,10 @@ GEOJSON_FAILED:
 
   // save AST to dot file
   if (not FLAGS_dot.empty()) {
-    std::cout << std::endl << "==== dot ====" << std::endl;
+    LOG(INFO) << "==== dot ====";
     std::stringstream ss;
     cql2cpp::Tree2Dot::GenerateDot(ss, parser.root());
-    std::cout << ss.str() << std::endl;
+    LOG(INFO) << ss.str();
 
     std::string dot_filename = FLAGS_dot;
     if (dot_filename.find(".dot") == std::string::npos) dot_filename += ".dot";

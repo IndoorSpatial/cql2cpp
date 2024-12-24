@@ -4,6 +4,7 @@ bison/3.8.2
 gflags/2.2.2
 gtest/1.15.0
 geos/3.13.0
+glog/0.7.1
 
 [generators]
 CMakeDeps

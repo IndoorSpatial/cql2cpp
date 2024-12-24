@@ -10,9 +10,10 @@
 
 #pragma once
 
-#include <iostream>
 #include <memory>
 #include <vector>
+
+#include <glog/logging.h>
 
 #include "id_generator.h"
 #include "node_type.h"
@@ -32,24 +33,28 @@ class AstNode {
   Operator op_;
   std::vector<AstNode*> children_;
   mutable ValueT value_;
+  static std::ostream* ous_;
 
  public:
+  static void set_ostream(std::ostream* ous) { ous_ = ous; }
+
   AstNode(NodeType type, Operator op, const std::vector<AstNode*> children)
       : type_(type), op_(op), children_(children) {
     id_ = idg.Gen();
-    std::cout << "AstNode " << ToString() << std::endl;
+    *ous_ << "AstNode " << ToString() << std::endl;
   }
 
   AstNode(NodeType type, const ValueT& value)
       : type_(type), op_(NullOp), value_(value) {
     id_ = idg.Gen();
-    std::cout << "AstNode " << ToString() << std::endl;
+    *ous_ << "AstNode " << ToString() << std::endl;
   }
 
   AstNode(const ValueT& value) : type_(Literal), op_(NullOp), value_(value) {
     id_ = idg.Gen();
-    std::cout << "AstNode " << ToString() << std::endl;
+    *ous_ << "AstNode " << ToString() << std::endl;
   }
+
 
   const std::string& id() const { return id_; }
 

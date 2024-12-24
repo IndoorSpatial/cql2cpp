@@ -12,109 +12,108 @@ CHAR_LIT \'.*\'
 %%
 
 {CHAR_LIT} {
-  printf( "char_lit: %s\n", yytext);
+  yyout << "CHAR_LIT " << yytext << std::endl;
   lval_->str = yytext;
   return Cql2ParserBase::CHAR_LIT;
 }
 
 [+-]?{DIGIT}+    {
-  printf( "int: %s\n", yytext);
+  yyout << "NUMBER_INT " << yytext << std::endl;
   lval_->num_int = atoi(yytext);
   return Cql2ParserBase::NUMBER_INT;
 }
 
 [+-]?{DIGIT}+"."{DIGIT}* {
-  printf( "float: %s\n", yytext);
+  yyout << "NUMBER_FLOAT " << yytext << std::endl;
   lval_->num_float = atof(yytext);
   return Cql2ParserBase::NUMBER_FLOAT;
 }
 
 [+-]?"."{DIGIT}* {
-  printf( "float: %s\n", yytext);
+  yyout << "NUMBER_FLOAT " << yytext << std::endl;
   lval_->num_float = atof(yytext);
   return Cql2ParserBase::NUMBER_FLOAT;
 }
 
 "TRUE" {
-  printf("TOKEN %s\n", yytext);
+  yyout << "TOKEN " << yytext << std::endl;
   lval_->boolean = true;
   return Cql2ParserBase::TRUE;
 }
 "FALSE" {
-  printf("TOKEN %s\n", yytext);
+  yyout << "TOKEN " << yytext << std::endl;
   lval_->boolean = false;
   return Cql2ParserBase::FALSE;
 }
 
 "AND" {
-  printf("TOKEN %s\n", yytext);
+  yyout << "TOKEN " << yytext << std::endl;
   return Cql2ParserBase::AND;
 }
 
 "OR" {
-  printf("TOKEN %s\n", yytext);
+  yyout << "TOKEN " << yytext << std::endl;
   return Cql2ParserBase::OR;
 }
 
 "NOT" {
-  printf("TOKEN %s\n", yytext);
+  yyout << "TOKEN " << yytext << std::endl;
   return Cql2ParserBase::NOT;
 }
 
 "CASEI" {
-  printf("TOKEN %s\n", yytext);
+  yyout << "TOKEN " << yytext << std::endl;
   return Cql2ParserBase::CASEI;
 }
 
 "ACCENTI" {
-  printf("TOKEN %s\n", yytext);
+  yyout << "TOKEN " << yytext << std::endl;
   return Cql2ParserBase::ACCENTI;
 }
 
 "(" {
-  printf("TOKEN %s\n", yytext);
+  yyout << "LPT " << yytext << std::endl;
   return Cql2ParserBase::LPT;
 }
 
 ")" {
-  printf("TOKEN %s\n", yytext);
+  yyout << "RPT " << yytext << std::endl;
   return Cql2ParserBase::RPT;
 }
 
 "\"" {
-  printf("DQUOTE %s\n", yytext);
+  yyout << "DQUOTE " << yytext << std::endl;
   return Cql2ParserBase::DQUOTE;
 }
 "'" {
-  printf("SQUOTE %s\n", yytext);
+  yyout << "SQUOTE " << yytext << std::endl;
   return Cql2ParserBase::SQUOTE;
 }
 
 POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION {
-  printf("TOKEN \"%s\"\n", yytext);
+  yyout << "TOKEN " << yytext << std::endl;
   lval_->str = yytext;
   return 0;
 }
 
 {ID} {
-  printf("ID \"%s\"\n", yytext);
+  yyout << "ID " << yytext << std::endl;
   lval_->str = yytext;
   return Cql2ParserBase::ID;
 }
 
-"+" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::PLUS; }
-"-" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::MINUS;}
-"*" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::MULT; }
-"/" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::DIV;  }
-
-"=" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::EQ;  }
-"<" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::LT;  }
-">" { printf("TOKEN \"%s\"\n", yytext); return Cql2ParserBase::GT;  }
+"+" { yyout << "TOKEN " << yytext << std::endl; return Cql2ParserBase::PLUS; }
+"-" { yyout << "TOKEN " << yytext << std::endl; return Cql2ParserBase::MINUS;}
+"*" { yyout << "TOKEN " << yytext << std::endl; return Cql2ParserBase::MULT; }
+"/" { yyout << "TOKEN " << yytext << std::endl; return Cql2ParserBase::DIV;  }
+"=" { yyout << "TOKEN " << yytext << std::endl; return Cql2ParserBase::EQ;  }
+"<" { yyout << "TOKEN " << yytext << std::endl; return Cql2ParserBase::LT;  }
+">" { yyout << "TOKEN " << yytext << std::endl; return Cql2ParserBase::GT;  }
 
 "{"[^{}\n]*"}" {/* eat up one-line comments */}
 
 [ \t\n]+ {/* eat up whitespace */}
 
-. { printf( "Unrecognized character: %s\n", yytext ); }
+. { yyout << "Unrecognized character: " << yytext << std::endl; }
 
 %%

@@ -60,11 +60,10 @@ class TreeEvaluator {
         root, child_values, fs, result, &error_msg_);
     if (ret) {
       root->set_value(*result);
-      std::cout << "Evaluate Node " << root->id()
-                << " value: " << value_str(*result, true) << std::endl;
+      LOG(INFO) << "Evaluate Node " << root->id()
+                << " value: " << value_str(*result, true);
     } else {
-      std::cerr << "Evaluate Node " << root->id() << " error: " << error_msg_
-                << std::endl;
+      LOG(ERROR) << "Evaluate Node " << root->id() << " error: " << error_msg_;
     }
 
     return ret;
