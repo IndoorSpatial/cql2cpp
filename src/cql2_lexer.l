@@ -17,24 +17,32 @@ CHAR_LIT \'.*\'
   return Cql2ParserBase::CHAR_LIT;
 }
 
-{DIGIT}+    {
+[+-]?{DIGIT}+    {
   printf( "int: %s\n", yytext);
   lval_->num_int = atoi(yytext);
   return Cql2ParserBase::NUMBER_INT;
 }
 
-{DIGIT}+"."{DIGIT}* {
+[+-]?{DIGIT}+"."{DIGIT}* {
   printf( "float: %s\n", yytext);
   lval_->num_float = atof(yytext);
-  return Cql2ParserBase::NUMBER_INT;
+  return Cql2ParserBase::NUMBER_FLOAT;
+}
+
+[+-]?"."{DIGIT}* {
+  printf( "float: %s\n", yytext);
+  lval_->num_float = atof(yytext);
+  return Cql2ParserBase::NUMBER_FLOAT;
 }
 
 "TRUE" {
   printf("TOKEN %s\n", yytext);
+  lval_->boolean = true;
   return Cql2ParserBase::TRUE;
 }
 "FALSE" {
   printf("TOKEN %s\n", yytext);
+  lval_->boolean = false;
   return Cql2ParserBase::FALSE;
 }
 

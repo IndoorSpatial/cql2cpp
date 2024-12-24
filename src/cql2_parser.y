@@ -23,6 +23,8 @@ using cql2cpp::PropertyName;
 
 #include <cql2cpp/ast_node.h>
 #define YY_Cql2ParserBase_MEMBERS cql2cpp::AstNode* root_;
+#define YY_Cql2ParserBase_DEBUG 1
+#define YYDEBUG
 
 %}
 
@@ -30,7 +32,7 @@ using cql2cpp::PropertyName;
 
 %union {
   bool boolean;
-  int num_int;  // Union for holding integers (for number tokens)
+  int num_int;
   double num_float;
   char* str;
   char c;
@@ -38,6 +40,7 @@ using cql2cpp::PropertyName;
 }
 
 %token <num_int> NUMBER_INT
+%token <num_float> NUMBER_FLOAT
 %token <boolean> BOOLEAN
 %token <boolean> TRUE FALSE
 %token <str> ID
@@ -49,7 +52,6 @@ using cql2cpp::PropertyName;
 %token CASEI ACCENTI
 %token SQUOTE DQUOTE
 
-%type <num_int> IntExpression
 %type <node> booleanExpression
 %type <node> booleanTerm
 %type <node> booleanFactor
@@ -62,6 +64,7 @@ using cql2cpp::PropertyName;
 %type <node> comparisonPredicate
 %type <node> binaryComparisonPredicate
 %type <node> scalarExpression
+%type <node> numericLiteral
 
 %left PLUS MINUS
 %left MULT DIV
@@ -111,6 +114,7 @@ binaryComparisonPredicate:
 
 scalarExpression:
   characterClause
+  | numericLiteral { $$ = $1; }
   | booleanLiteral
   | propertyName { $$ = $1; }
 
@@ -123,16 +127,12 @@ characterExpression:
   characterClause
   | propertyName { $$ = $1; }
 
+numericLiteral:
+  NUMBER_INT { std::cout << "debug: " << $1 << std::endl; $$ = new AstNode($1); }
+  | NUMBER_FLOAT { $$ = new AstNode($1); }
+
 propertyName:
   ID { $$ = new AstNode(PropertyName, { std::string($1) }); }
   | DQUOTE ID DQUOTE;
-
-IntExpression:
-  NUMBER_INT { $$ = $1; }
-  | IntExpression PLUS  IntExpression { $$ = $1 + $3; std::cout << $$ << "=" << $1 << "+" << $3 << std::endl; }
-  | IntExpression MINUS IntExpression { $$ = $1 - $3; std::cout << $$ << "=" << $1 << "-" << $3 << std::endl; }
-  | IntExpression MULT  IntExpression { $$ = $1 * $3; std::cout << $$ << "=" << $1 << "*" << $3 << std::endl; }
-  | IntExpression DIV   IntExpression { $$ = $1 / $3; std::cout << $$ << "=" << $1 << "/" << $3 << std::endl; }
-;
 
 %%

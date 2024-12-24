@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <cmath>
 #include <variant>
 
 #include "evaluator.h"
@@ -41,19 +42,19 @@ const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
     {BoolExpression,
      {{And,
        [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
-         if (CheckValueNumberType<bool>("AND", 2, vs, errmsg)) return false;
+         if (not CheckValueNumberType<bool>("AND", 2, vs, errmsg)) return false;
          *value = std::get<bool>(vs.at(0)) and std::get<bool>(vs.at(1));
          return true;
        }},
       {Or,
        [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
-         if (CheckValueNumberType<bool>("OR", 2, vs, errmsg)) return false;
+         if (not CheckValueNumberType<bool>("OR", 2, vs, errmsg)) return false;
          *value = std::get<bool>(vs.at(0)) or std::get<bool>(vs.at(1));
          return true;
        }},
       {Not,
        [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
-         if (CheckValueNumberType<bool>("NOT", 1, vs, errmsg)) return false;
+         if (not CheckValueNumberType<bool>("NOT", 1, vs, errmsg)) return false;
          *value = not std::get<bool>(vs.at(0));
          return true;
        }}}},
@@ -80,23 +81,6 @@ const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
            *value = std::get<bool>(vs.at(0)) == std::get<bool>(vs.at(1));
            return true;
          }
-         if (std::holds_alternative<int64_t>(vs.at(0)) and
-             std::holds_alternative<int64_t>(vs.at(1))) {
-           *value = std::get<int64_t>(vs.at(0)) == std::get<int64_t>(vs.at(1));
-           return true;
-         }
-         if (std::holds_alternative<uint64_t>(vs.at(0)) and
-             std::holds_alternative<uint64_t>(vs.at(1))) {
-           *value =
-               std::get<uint64_t>(vs.at(0)) == std::get<uint64_t>(vs.at(1));
-           return true;
-         }
-         if (std::holds_alternative<double>(vs.at(0)) and
-             std::holds_alternative<double>(vs.at(1))) {
-           *value = fabs(std::get<double>(vs.at(0)) -
-                         std::get<double>(vs.at(1))) < 1e-5;
-           return true;
-         }
          if (std::holds_alternative<std::string>(vs.at(0)) and
              std::holds_alternative<std::string>(vs.at(1))) {
            *value = std::get<std::string>(vs.at(0)) ==
@@ -104,7 +88,41 @@ const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
            return true;
          }
 
-         return true;
+         double* lhs = nullptr;
+         if (std::holds_alternative<int64_t>(vs.at(0))) {
+           lhs = new double;
+           *lhs = (double)std::get<int64_t>(vs.at(0));
+         } else if (std::holds_alternative<uint64_t>(vs.at(0))) {
+           lhs = new double;
+           *lhs = (double)std::get<uint64_t>(vs.at(0));
+         } else if (std::holds_alternative<double>(vs.at(0))) {
+           lhs = new double;
+           *lhs = std::get<double>(vs.at(0));
+         }
+         double* rhs = nullptr;
+         if (std::holds_alternative<int64_t>(vs.at(1))) {
+           rhs = new double;
+           *rhs = (double)std::get<int64_t>(vs.at(1));
+         } else if (std::holds_alternative<uint64_t>(vs.at(1))) {
+           rhs = new double;
+           *rhs = (double)std::get<uint64_t>(vs.at(1));
+         } else if (std::holds_alternative<double>(vs.at(1))) {
+           rhs = new double;
+           *rhs = std::get<double>(vs.at(1));
+         }
+
+         if (lhs != nullptr and rhs != nullptr) {
+           *value = fabs(*lhs - *rhs) < 1e-5;
+           delete lhs;
+           delete rhs;
+           return true;
+         }
+
+         if (lhs != nullptr) delete lhs;
+         if (rhs != nullptr) delete rhs;
+
+         *errmsg = "type mismatch around equal";
+         return false;
        }}}},
 };
 

@@ -63,7 +63,8 @@ class TreeEvaluator {
       std::cout << "Evaluate Node " << root->id()
                 << " value: " << value_str(*result, true) << std::endl;
     } else {
-      std::cout << "Evaluate Node " << root->id() << " error: " << error_msg_;
+      std::cerr << "Evaluate Node " << root->id() << " error: " << error_msg_
+                << std::endl;
     }
 
     return ret;
