@@ -69,10 +69,17 @@ const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
          return true;
        }}}},
     {BinCompPred,
-     {{Equal,
+     {{NotEqual,
+       {[](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+         const NodeEval& equal_lambda = node_evals.at(BinCompPred).at(Equal);
+         bool ret = equal_lambda.operator()(n, vs, fs, value, errmsg);
+         if (ret) *value = not std::get<bool>(*value);
+         return ret;
+       }}},
+      {Equal,
        [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
          if (vs.size() != 2) {
-           *errmsg = "Equal needs two values but we have " +
+           *errmsg = "binary compare needs two values but we have " +
                      std::to_string(vs.size());
            return false;
          }
