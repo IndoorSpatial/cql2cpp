@@ -18,13 +18,12 @@
 #include <geos/geom/GeometryFactory.h>
 #include <geos/io/GeoJSONReader.h>
 #include <gflags/gflags.h>
-#include <glog/export.h>
 #include <glog/logging.h>
+
+#include <geos/geom/Point.h>
 
 #include <fstream>
 #include <sstream>
-
-#include "geos/io/GeoJSON.h"
 
 DEFINE_string(cql2_query, "", "cql2 query string");
 DEFINE_string(cql2_file, "", "a file contains cql2");
@@ -91,6 +90,7 @@ int main(int argc, char** argv) {
     geos::io::GeoJSONReader reader;
     geos::io::GeoJSONFeatureCollection features =
         reader.readFeatures(geojson_text);
+
 
     // evaluate
     cql2cpp::TreeEvaluator tree_evaluator;

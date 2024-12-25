@@ -10,6 +10,10 @@
 
 #pragma once
 
+#include <geos/geom/Envelope.h>
+#include <geos/geom/Geometry.h>
+#include <geos/io/WKTWriter.h>
+
 #include <cctype>
 #include <string>
 #include <variant>
@@ -28,13 +32,16 @@ enum ValueType {
   TimeInterval,
 };
 
-// void* is just a placeholder
-// TODO: add geometry and bbox
-typedef std::variant<void*, bool, int64_t, uint64_t, double, std::string>
+enum NullStruct {
+  NullValue
+};
+
+typedef std::variant<NullStruct, bool, int64_t, uint64_t, double, std::string,
+                     geos::geom::Geometry*, geos::geom::Envelope*>
     ValueT;
 
 static std::string value_str(ValueT value, bool with_type = false) {
-  if (std::holds_alternative<void*>(value)) return "?";
+  if (std::holds_alternative<NullStruct>(value)) return "?";
 
   if (std::holds_alternative<bool>(value))
     return std::get<bool>(value) ? "T"
@@ -55,6 +62,11 @@ static std::string value_str(ValueT value, bool with_type = false) {
   if (std::holds_alternative<std::string>(value))
     return std::get<std::string>(value) +
            std::string(with_type ? " string" : "");
+
+  if (std::holds_alternative<geos::geom::Geometry*>(value)) {
+    geos::io::WKTWriter writer;
+    return writer.write(std::get<geos::geom::Geometry*>(value));
+  }
 
   return "unknown type";
 }

@@ -13,7 +13,8 @@ CHAR_LIT \'.*\'
 
 {CHAR_LIT} {
   yyout << "CHAR_LIT " << yytext << std::endl;
-  lval_->str = yytext;
+  token_texts_.emplace_back(yytext);
+  lval_->str = token_texts_.back().c_str();
   return Cql2ParserBase::CHAR_LIT;
 }
 
@@ -73,11 +74,13 @@ CHAR_LIT \'.*\'
 
 "(" {
   yyout << "LPT " << yytext << std::endl;
+  lval_->c = '(';
   return Cql2ParserBase::LPT;
 }
 
 ")" {
   yyout << "RPT " << yytext << std::endl;
+  lval_->c = ')';
   return Cql2ParserBase::RPT;
 }
 
@@ -92,44 +95,51 @@ CHAR_LIT \'.*\'
 
 "," {
   yyout << "COMMA " << yytext << std::endl;
+  lval_->c = ',';
   return Cql2ParserBase::COMMA;
 }
 
 
 S_INTERSECTS|S_EQUALS|S_DISJOINT|S_TOUCHES|S_WITHIN|S_OVERLAPS|S_CROSSES|S_CONTAINS {
   yyout << "TOKEN " << yytext << std::endl;
-  lval_->str = yytext;
+  token_texts_.emplace_back(yytext);
+  lval_->str = token_texts_.back().c_str();
   return Cql2ParserBase::SPT_FUNC;
 }
 
 
-POINT[Z]? {
+POINT[Z]?"("[0-9. +\-\n]+")" {
   yyout << "TOKEN " << yytext << std::endl;
-  lval_->str = yytext;
-  return Cql2ParserBase::POINT;
+  token_texts_.emplace_back(yytext);
+  lval_->str = token_texts_.back().c_str();
+  return Cql2ParserBase::POINT_WKT;
 }
 
-LINESTRING[Z]? {
+LINESTRING[Z]?"("[0-9. +\-,\n]+")" {
   yyout << "TOKEN " << yytext << std::endl;
-  lval_->str = yytext;
-  return Cql2ParserBase::LINESTRING;
+  token_texts_.emplace_back(yytext);
+  lval_->str = token_texts_.back().c_str();
+  return Cql2ParserBase::LINESTRING_WKT;
 }
 
-POLYGON[Z]? {
+POLYGON[Z]?"(("[0-9. +\-,\n]+"))" {
   yyout << "TOKEN " << yytext << std::endl;
-  lval_->str = yytext;
-  return Cql2ParserBase::POLYGON;
+  token_texts_.emplace_back(yytext);
+  lval_->str = token_texts_.back().c_str();
+  return Cql2ParserBase::POLYGON_WKT;
 }
 
-BBOX {
+BBOX"("[0-9. +\-,\n]+")" {
   yyout << "TOKEN " << yytext << std::endl;
-  lval_->str = yytext;
-  return Cql2ParserBase::BBOX;
+  token_texts_.emplace_back(yytext);
+  lval_->str = token_texts_.back().c_str();
+  return Cql2ParserBase::BBOX_TEXT;
 }
 
 {ID} {
   yyout << "ID " << yytext << std::endl;
-  lval_->str = yytext;
+  token_texts_.emplace_back(yytext);
+  lval_->str = token_texts_.back().c_str();
   return Cql2ParserBase::ID;
 }
 

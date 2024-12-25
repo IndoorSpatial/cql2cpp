@@ -120,49 +120,35 @@ const std::map<Operator, std::string> OpName {
   OP_2_NAME(A_Overlaps)
 };
 
-#define NAME_2_OP(op) {#op, op},
-
 const std::map<std::string, Operator> NameOp {
-  NAME_2_OP(NullOp)
-  NAME_2_OP(And)
-  NAME_2_OP(Or)
-  NAME_2_OP(Not)
-  NAME_2_OP(Equal)
-  NAME_2_OP(NotEqual)
-  NAME_2_OP(Greater)
-  NAME_2_OP(Lesser)
-  NAME_2_OP(GreaterEqual)
-  NAME_2_OP(LesserEqual)
-  NAME_2_OP(Like)
-  NAME_2_OP(Between)
-  NAME_2_OP(In)
-  NAME_2_OP(IsNull)
-  NAME_2_OP(S_Contains)
-  NAME_2_OP(S_Crosses)
-  NAME_2_OP(S_Equals)
-  NAME_2_OP(S_Intersects)
-  NAME_2_OP(S_Overlaps)
-  NAME_2_OP(S_Touches)
-  NAME_2_OP(S_Within)
-  NAME_2_OP(T_After)
-  NAME_2_OP(T_Before)
-  NAME_2_OP(T_Contains)
-  NAME_2_OP(T_Disjoint)
-  NAME_2_OP(T_During)
-  NAME_2_OP(T_Equals)
-  NAME_2_OP(T_FinishedBy)
-  NAME_2_OP(T_Finishes)
-  NAME_2_OP(T_Intersects)
-  NAME_2_OP(T_Meets)
-  NAME_2_OP(T_MetBy)
-  NAME_2_OP(T_OverlappedBy)
-  NAME_2_OP(T_Overlaps)
-  NAME_2_OP(T_StartedBy)
-  NAME_2_OP(T_Starts)
-  NAME_2_OP(A_ContainedBy)
-  NAME_2_OP(A_Contains)
-  NAME_2_OP(A_Equals)
-  NAME_2_OP(A_Overlaps)
+  {"S_CONTAINS", S_Contains},
+  {"S_CROSSES", S_Crosses},
+  {"S_EQUALS", S_Equals},
+  {"S_INTERSECTS", S_Intersects},
+  {"S_OVERLAPS", S_Overlaps},
+  {"S_TOUCHES", S_Touches},
+  {"S_WITHIN", S_Within},
+
+  {"T_AFTER", T_After},
+  {"T_BEFORE", T_Before},
+  {"T_CONTAINS", T_Contains},
+  {"T_DISJOINT", T_Disjoint},
+  {"T_DURING", T_During},
+  {"T_EQUALS", T_Equals},
+  {"T_FINISHEDBY", T_FinishedBy},
+  {"T_FINISHES", T_Finishes},
+  {"T_INTERSECTS", T_Intersects},
+  {"T_MEETS", T_Meets},
+  {"T_METBY", T_MetBy},
+  {"T_OVERLAPPEDBY", T_OverlappedBy},
+  {"T_OVERLAPS", T_Overlaps},
+  {"T_STARTEDBY", T_StartedBy},
+
+  {"T_STARTS", T_Starts},
+  {"A_CONTAINEDBY", A_ContainedBy},
+  {"A_CONTAINS", A_Contains},
+  {"A_EQUALS", A_Equals},
+  {"A_OVERLAPS", A_Overlaps}
 };
 
 }

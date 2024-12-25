@@ -29,7 +29,9 @@ enum NodeType {
   IsNullPred,
 
   SpatialPred,
+
   TemporalPred,
+
   ArrayPred,
 
   PropertyName,

@@ -27,13 +27,13 @@ class FeatureSourceJson : public FeatureSource {
   ValueT get_property(const std::string& property_path) const override {
     const geos_nlohmann::json* value =
         JsonHelper::get_property(property_path, json_);
-    if (value == nullptr) return nullptr;
+    if (value == nullptr) return NullValue;
 
     switch (value->type()) {
       case geos_nlohmann::json::value_t::null:
-        return nullptr;
+        return NullValue;
       case geos_nlohmann::json::value_t::object:
-        return nullptr;
+        return NullValue;
       case geos_nlohmann::json::value_t::string:
         return value->get<std::string>();
       case geos_nlohmann::json::value_t::boolean:
@@ -47,9 +47,9 @@ class FeatureSourceJson : public FeatureSource {
       case geos_nlohmann::json::value_t::binary:
         return value->get<std::string>();
       case geos_nlohmann::json::value_t::discarded:
-        return nullptr;
+        return NullValue;
       default:
-        return nullptr;
+        return NullValue;
     }
   }
 };
