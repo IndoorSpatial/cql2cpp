@@ -158,22 +158,7 @@ propertyName:
   // | DQUOTE ID DQUOTE;
 
 spatialPredicate:
-  SPT_FUNC LPT geomExpression COMMA geomExpression RPT {
-    std::cout << "$1: " << $1 << std::endl;
-    std::cout << "$2: " << $2 << std::endl;
-    std::cout << "$3: " << std::get<geos::geom::Geometry*>($3->value())->getGeometryType() << std::endl;
-    std::cout << "$4: " << $4 << std::endl;
-    std::cout << "$5: " << std::get<geos::geom::Geometry*>($5->value())->getGeometryType() << std::endl;
-    std::cout << "$6: " << $6 << std::endl;
-
-    if (NameOp.find($1) != NameOp.end()) {
-      $$ = new AstNode(SpatialPred, NameOp.at($1), {$3, $5});
-      std::cout << "OK " << std::endl;
-    } else {
-      std::cout << "can not find op name " << $1 << std::endl;
-      return -1;
-    }
-  }
+  SPT_FUNC LPT geomExpression COMMA geomExpression RPT { $$ = new AstNode(SpatialPred, NameOp.at($1), {$3, $5}) }
 
 
 geomExpression:

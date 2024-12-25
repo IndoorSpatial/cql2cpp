@@ -78,11 +78,11 @@ int main(int argc, char** argv) {
                             std::istreambuf_iterator<char>());
         fin.close();
       } else {
-        std::cerr << "can not open " << FLAGS_geojson;
+        LOG(ERROR) << "can not open " << FLAGS_geojson;
         goto GEOJSON_FAILED;
       }
     } else {
-      std::cerr << FLAGS_geojson << " not exist";
+      LOG(ERROR) << FLAGS_geojson << " not exist";
       goto GEOJSON_FAILED;
     }
 

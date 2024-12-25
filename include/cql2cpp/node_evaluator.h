@@ -14,6 +14,7 @@
 #include <variant>
 
 #include "evaluator.h"
+#include "geos/geom/Geometry.h"
 
 namespace cql2cpp {
 
@@ -56,6 +57,17 @@ const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
        [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
          if (not CheckValueNumberType<bool>("NOT", 1, vs, errmsg)) return false;
          *value = not std::get<bool>(vs.at(0));
+         return true;
+       }}}},
+    {SpatialPred,
+     {{S_Intersects,
+       [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+         if (not CheckValueNumberType<geos::geom::Geometry*>("S_INTERSECTS", 2,
+                                                             vs, errmsg))
+           return false;
+         geos::geom::Geometry* lhs = std::get<geos::geom::Geometry*>(vs.at(0));
+         auto rhs = std::get<geos::geom::Geometry*>(vs.at(1));
+         *value = lhs->intersects(rhs);
          return true;
        }}}},
     {PropertyName,

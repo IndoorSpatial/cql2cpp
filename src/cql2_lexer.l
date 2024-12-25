@@ -12,26 +12,26 @@ CHAR_LIT \'.*\'
 %%
 
 {CHAR_LIT} {
-  yyout << "CHAR_LIT " << yytext << std::endl;
+  yyout << "TOKEN CHAR_LIT " << yytext << std::endl;
   token_texts_.emplace_back(yytext);
   lval_->str = token_texts_.back().c_str();
   return Cql2ParserBase::CHAR_LIT;
 }
 
 [+-]?{DIGIT}+    {
-  yyout << "NUMBER_INT " << yytext << std::endl;
+  yyout << "TOKEN NUMBER_INT " << yytext << std::endl;
   lval_->num_int = atoi(yytext);
   return Cql2ParserBase::NUMBER_INT;
 }
 
 [+-]?{DIGIT}+"."{DIGIT}* {
-  yyout << "NUMBER_FLOAT " << yytext << std::endl;
+  yyout << "TOKEN NUMBER_FLOAT " << yytext << std::endl;
   lval_->num_float = atof(yytext);
   return Cql2ParserBase::NUMBER_FLOAT;
 }
 
 [+-]?"."{DIGIT}* {
-  yyout << "NUMBER_FLOAT " << yytext << std::endl;
+  yyout << "TOKEN NUMBER_FLOAT " << yytext << std::endl;
   lval_->num_float = atof(yytext);
   return Cql2ParserBase::NUMBER_FLOAT;
 }
@@ -73,28 +73,28 @@ CHAR_LIT \'.*\'
 }
 
 "(" {
-  yyout << "LPT " << yytext << std::endl;
+  yyout << "TOKEN LPT " << yytext << std::endl;
   lval_->c = '(';
   return Cql2ParserBase::LPT;
 }
 
 ")" {
-  yyout << "RPT " << yytext << std::endl;
+  yyout << "TOKEN RPT " << yytext << std::endl;
   lval_->c = ')';
   return Cql2ParserBase::RPT;
 }
 
 "\"" {
-  yyout << "DQUOTE " << yytext << std::endl;
+  yyout << "TOKEN DQUOTE " << yytext << std::endl;
   return Cql2ParserBase::DQUOTE;
 }
 "'" {
-  yyout << "SQUOTE " << yytext << std::endl;
+  yyout << "TOKEN SQUOTE " << yytext << std::endl;
   return Cql2ParserBase::SQUOTE;
 }
 
 "," {
-  yyout << "COMMA " << yytext << std::endl;
+  yyout << "TOKEN COMMA " << yytext << std::endl;
   lval_->c = ',';
   return Cql2ParserBase::COMMA;
 }
@@ -137,7 +137,7 @@ BBOX"("[0-9. +\-,\n]+")" {
 }
 
 {ID} {
-  yyout << "ID " << yytext << std::endl;
+  yyout << "TOKEN ID " << yytext << std::endl;
   token_texts_.emplace_back(yytext);
   lval_->str = token_texts_.back().c_str();
   return Cql2ParserBase::ID;
