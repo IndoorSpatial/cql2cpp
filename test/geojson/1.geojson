@@ -6,8 +6,8 @@
       "type": "Feature",
       "geometry": {
         "coordinates": [
-          0,
-          0
+          -70,
+         2
         ],
         "type": "Point"
       },

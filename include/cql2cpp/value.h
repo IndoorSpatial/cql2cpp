@@ -20,24 +20,12 @@
 
 namespace cql2cpp {
 
-enum ValueType {
-  Bool,
-  Integer,
-  Float,
-  String,
-  Array,
-  Geometry,
-  BBox,
-  Timestamp,
-  TimeInterval,
-};
-
 enum NullStruct {
   NullValue
 };
 
 typedef std::variant<NullStruct, bool, int64_t, uint64_t, double, std::string,
-                     geos::geom::Geometry*, geos::geom::Envelope*>
+                     const geos::geom::Geometry*, const geos::geom::Envelope*>
     ValueT;
 
 static std::string value_str(ValueT value, bool with_type = false) {
@@ -63,9 +51,9 @@ static std::string value_str(ValueT value, bool with_type = false) {
     return std::get<std::string>(value) +
            std::string(with_type ? " string" : "");
 
-  if (std::holds_alternative<geos::geom::Geometry*>(value)) {
+  if (std::holds_alternative<const geos::geom::Geometry*>(value)) {
     geos::io::WKTWriter writer;
-    return writer.write(std::get<geos::geom::Geometry*>(value));
+    return writer.write(std::get<const geos::geom::Geometry*>(value));
   }
 
   return "unknown type";

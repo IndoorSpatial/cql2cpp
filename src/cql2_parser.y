@@ -100,24 +100,24 @@ program:
 
 booleanExpression:
   booleanTerm
-  | booleanTerm OR booleanExpression { $$ = new AstNode(BoolExpression, Or, {$1, $3}) }
+  | booleanTerm OR booleanExpression { $$ = new AstNode(BoolExpression, Or, {$1, $3}); }
 
 booleanTerm:
   booleanFactor
-  | booleanFactor AND booleanTerm  { $$ = new AstNode(BoolExpression, And, {$1, $3}) }
+  | booleanFactor AND booleanTerm  { $$ = new AstNode(BoolExpression, And, {$1, $3}); }
 
 booleanFactor:
   booleanPrimary
-  | NOT booleanPrimary { $$ = new AstNode(BoolExpression, Not, { $2 }) }
+  | NOT booleanPrimary { $$ = new AstNode(BoolExpression, Not, { $2 }); }
 
 booleanPrimary:
-  predicate { $$ = $1 }
-  | booleanLiteral { $$ = $1 }
-  | LPT booleanExpression RPT { $$ = $2 }
+  predicate
+  | booleanLiteral
+  | LPT booleanExpression RPT
 
 booleanLiteral:
-  TRUE { $$ = new AstNode($1) }
-  | FALSE { $$ = new AstNode($1) }
+  TRUE { $$ = new AstNode($1); }
+  | FALSE { $$ = new AstNode($1); }
 
 predicate:
   comparisonPredicate
@@ -127,11 +127,11 @@ comparisonPredicate:
   binaryComparisonPredicate
 
 binaryComparisonPredicate:
-  scalarExpression EQ scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::Equal, {$1, $3}) }
-  | scalarExpression LT GT scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::NotEqual, {$1, $4}) }
-  | scalarExpression LT    scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::Lesser,   {$1, $3}) }
-  | scalarExpression GT    scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::Greater,  {$1, $3}) }
-  | scalarExpression LT EQ scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::LesserEqual, {$1, $4}) }
+  scalarExpression EQ scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::Equal, {$1, $3}); }
+  | scalarExpression LT GT scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::NotEqual, {$1, $4}); }
+  | scalarExpression LT    scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::Lesser,   {$1, $3}); }
+  | scalarExpression GT    scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::Greater,  {$1, $3}); }
+  | scalarExpression LT EQ scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::LesserEqual, {$1, $4}); }
   | scalarExpression GT EQ scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::GreaterEqual, {$1, $4}) }
 
 scalarExpression:
@@ -150,15 +150,15 @@ scalarExpression:
 //   | propertyName { $$ = $1; }
 
 numericLiteral:
-  NUMBER_INT { $$ = new AstNode($1) }
-  | NUMBER_FLOAT { $$ = new AstNode($1) }
+  NUMBER_INT { $$ = new AstNode($1); }
+  | NUMBER_FLOAT { $$ = new AstNode($1); }
 
 propertyName:
-  ID { $$ = new AstNode(PropertyName, std::string($1)) }
+  ID { $$ = new AstNode(PropertyName, std::string($1)); }
   // | DQUOTE ID DQUOTE;
 
 spatialPredicate:
-  SPT_FUNC LPT geomExpression COMMA geomExpression RPT { $$ = new AstNode(SpatialPred, NameOp.at($1), {$3, $5}) }
+  SPT_FUNC LPT geomExpression COMMA geomExpression RPT { $$ = new AstNode(SpatialPred, NameOp.at($1), {$3, $5}); }
 
 
 geomExpression:
@@ -168,14 +168,7 @@ geomExpression:
 
 
 spatialInstance:
-  geometryLiteral {
-    geos::io::WKTReader reader;
-    auto ptr = reader.read($1);
-    $$ = new AstNode(ptr.release());
-
-    // for (int i = 0; i < 3; i++)
-    //   std::cout << i << "---------------------:" << yyvsp[-1 * i].str << std::endl;
-  }
+  geometryLiteral { $$ = new AstNode(geos::io::WKTReader().read($1).release()); }
 //| bboxTaggedText
 
 

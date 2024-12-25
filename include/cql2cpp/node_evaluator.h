@@ -62,11 +62,12 @@ const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
     {SpatialPred,
      {{S_Intersects,
        [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
-         if (not CheckValueNumberType<geos::geom::Geometry*>("S_INTERSECTS", 2,
-                                                             vs, errmsg))
+         if (not CheckValueNumberType<const geos::geom::Geometry*>(
+                 "S_INTERSECTS", 2, vs, errmsg))
            return false;
-         geos::geom::Geometry* lhs = std::get<geos::geom::Geometry*>(vs.at(0));
-         auto rhs = std::get<geos::geom::Geometry*>(vs.at(1));
+         const geos::geom::Geometry* lhs =
+             std::get<const geos::geom::Geometry*>(vs.at(0));
+         auto rhs = std::get<const geos::geom::Geometry*>(vs.at(1));
          *value = lhs->intersects(rhs);
          return true;
        }}}},

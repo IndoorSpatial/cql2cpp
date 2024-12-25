@@ -19,7 +19,7 @@ namespace cql2cpp {
 
 class FeatureSourceGeoJson : public FeatureSourceJson {
  private:
-  geos::io::GeoJSONFeature feature_;
+  const geos::io::GeoJSONFeature& feature_;
 
  public:
   FeatureSourceGeoJson(const geos::io::GeoJSONFeature& feature)
@@ -31,6 +31,14 @@ class FeatureSourceGeoJson : public FeatureSourceJson {
       json_ = j.at("properties");
     else
       json_ = geos_nlohmann::json::object();
+  }
+  ValueT get_property(const std::string& property_path) const override {
+    // Annex A: Abstract Test Suite (Normative)
+    // "the queryable for the feature geometry is geom"
+    if (property_path == "geom")
+      return feature_.getGeometry();
+    else
+      return FeatureSourceJson::get_property(property_path);
   }
 };
 

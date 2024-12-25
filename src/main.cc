@@ -16,11 +16,10 @@
 #include <cql2cpp/node_evaluator.h>
 #include <cql2cpp/tree_dot.h>
 #include <geos/geom/GeometryFactory.h>
+#include <geos/geom/Point.h>
 #include <geos/io/GeoJSONReader.h>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-
-#include <geos/geom/Point.h>
 
 #include <fstream>
 #include <sstream>
@@ -66,6 +65,7 @@ int main(int argc, char** argv) {
   }
 
   // Evaluate value of AST according to data source
+  geos::io::GeoJSONFeatureCollection features({});
   if (not FLAGS_geojson.empty()) {
     LOG(INFO) << "==== evaluation ====";
 
@@ -88,9 +88,7 @@ int main(int argc, char** argv) {
 
     // read geojson features
     geos::io::GeoJSONReader reader;
-    geos::io::GeoJSONFeatureCollection features =
-        reader.readFeatures(geojson_text);
-
+    features = reader.readFeatures(geojson_text);
 
     // evaluate
     cql2cpp::TreeEvaluator tree_evaluator;
