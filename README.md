@@ -1,5 +1,6 @@
 # Cql2Cpp
 Cql2Cpp is a C++ library that implements the parsing and evaluation of OGC CQL2(Common Query Language).
+https://www.ogc.org/publications/standard/cql2/
 
 # History
 Syrius Robotics has been focused on developing applications for indoor robots, which led us to create an indoor geographic information system. At the end of 2024, while working on this system, we recognized the need for a filter language to help robots query indoor features more efficiently. Around that time, OGC CQL2 had just been released, but there were no existing C++ libraries available for it. As a result, Syrius Robotics decided to develop their own solution.
