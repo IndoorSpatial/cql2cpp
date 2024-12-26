@@ -6,10 +6,15 @@ project(cql2cpp
   LANGUAGES CXX
 )
 
-find_package(gflags REQUIRED)
 find_package(GTest REQUIRED)
 find_package(geos REQUIRED)
 find_package(glog REQUIRED)
+
+find_package(GFlags QUIET)
+find_package(gflags QUIET)
+if (NOT GFlags-FOUND AND NOT gflags_FOUND)
+  message(FATAL_ERROR "can not find gflags")
+endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_BINARY_DIR})
@@ -37,14 +42,17 @@ add_custom_command(
 	COMMENT "Generating ${BISON_OUTPUT} from ${BISON_FILE} using bison++"
 )
 
+add_definitions(-DUSE_UNSTABLE_GEOS_CPP_API)
+
+# library
 add_library(cql2cpp src/id_generator.cc src/ast_node.cc ${FLEX_OUTPUT} ${BISON_OUTPUT})
 target_compile_options(cql2cpp PRIVATE -Wno-register -Wno-write-strings)
-target_link_libraries(cql2cpp gflags::gflags GEOS::geos_c glog::glog)
+target_link_libraries(cql2cpp GEOS::geos glog::glog)
 
 # CLI tool
 add_executable(cql2 src/main.cc)
 target_compile_options(cql2 PRIVATE -Wno-register -Wno-write-strings)
-target_link_libraries(cql2 cql2cpp gflags::gflags GEOS::geos_c glog::glog)
+target_link_libraries(cql2 cql2cpp GEOS::geos glog::glog)
 
 # Test
 enable_testing()

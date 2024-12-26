@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
     if (cql2cpp.filter(FLAGS_cql2_query, &result)) {
       LOG(INFO) << "get feature count: " << result.size();
       for (const auto& feature : result) {
-        LOG(INFO) << "get feature id " << feature->getId();
+        LOG(INFO) << "get feature geometry: " << feature->getGeometry()->toText();
       }
     } else {
       LOG(ERROR) << "filter error: " << cql2cpp.error_msg();
