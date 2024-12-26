@@ -21,6 +21,7 @@
 #include "evaluator.h"
 #include "feature_source.h"
 #include "node_evaluator.h"
+#include "tree_dot.h"
 
 namespace cql2cpp {
 
@@ -68,7 +69,7 @@ class Cql2Cpp {
   const std::string error_msg() const { return error_msg_; }
 
   static bool filter(const std::string& cql2_query, const FeatureSource& fs,
-                     bool* result, std::string* error_msg) {
+                     bool* result, std::string* error_msg, std::string* dot) {
     // Parse
     AstNode* root;
     if (not Parse(cql2_query, &root, error_msg)) return false;
@@ -80,6 +81,11 @@ class Cql2Cpp {
     if (tree_evaluator.Evaluate(root, &fs, &value) &&
         std::holds_alternative<bool>(value)) {
       *result = std::get<bool>(value);
+      if (dot != nullptr) {
+        std::stringstream ss;
+        cql2cpp::Tree2Dot::GenerateDot(ss, root);
+        *dot = ss.str();
+      }
       Cql2Parser::DeConstructAST(root);
       return true;
     } else {
@@ -89,7 +95,21 @@ class Cql2Cpp {
     }
   }
 
-  static std::string ToDot(const std::string& cql2_query) { return ""; }
+  static bool ToDot(const std::string& cql2_query, std::string* dot,
+                    std::string* error_msg) {
+    // Parse
+    AstNode* root;
+    if (not Parse(cql2_query, &root, error_msg)) return false;
+
+    // to dot
+    std::stringstream ss;
+    cql2cpp::Tree2Dot::GenerateDot(ss, root);
+    *dot = ss.str();
+
+    Cql2Parser::DeConstructAST(root);
+
+    return true;
+  }
 
  private:
   static bool Parse(const std::string& cql2_query, AstNode** root,
