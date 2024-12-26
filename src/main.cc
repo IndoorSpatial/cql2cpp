@@ -20,6 +20,7 @@
 #include <geos/io/GeoJSONReader.h>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
+#include <cql2cpp/cql2cpp.h>
 
 #include <fstream>
 #include <sstream>

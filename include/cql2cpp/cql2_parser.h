@@ -31,4 +31,12 @@ class Cql2Parser : public Cql2ParserBase {
   int yylex() override { return lexer_->yylex(); }
 
   cql2cpp::AstNode* root() const { return root_; }
+
+  void DeConstructRoot() {
+    // TODO
+  }
+
+  static void DeConstructAST(cql2cpp::AstNode*) {
+    // TODO
+  }
 };
