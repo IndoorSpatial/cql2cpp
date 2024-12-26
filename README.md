@@ -1,9 +1,23 @@
 # Cql2Cpp
-c++ library for OGC CQL2(Common Query Language)
+Cql2Cpp is a C++ library that implements the parsing and evaluation of OGC CQL2(Common Query Language).
 
-## Build
+# History
+Syrius Robotics has been focused on developing applications for indoor robots, which led us to create an indoor geographic information system. At the end of 2024, while working on this system, we recognized the need for a filter language to help robots query indoor features more efficiently. Around that time, OGC CQL2 had just been released, but there were no existing C++ libraries available for it. As a result, Syrius Robotics decided to develop their own solution.
 
-### build locally
+# Progress and Plan
+As of the end of 2024, only a limited number of syntax features have been developed, including the most basic field operations and a small set of spatial operations. This library is not recommended for use in any production environment or product. We plan to complete all the requirements specified in Requirement 1 "/req/basic-cql2/cql2-filter"([Clause 6.2](https://docs.ogc.org/is/21-065r2/21-065r2.html#basic-cql2_filter-expression)) of CQL2, along with a subset of spatialPredicate, by early 2025.
+
+# Dependencies
+1. flex: lexer
+2. bison++: parser
+3. gflags: for cli tool
+4. glog: for logging
+5. geos: for geometry and spatial predicate and geojson
+6. gtest: for unit test
+
+# Build
+
+## build locally
 ```bash
 sudo apt-get install -y build-essential g++-aarch64-linux-gnu
 sudo apt-get install -y flex bison++
@@ -14,7 +28,7 @@ make -j16
 
 ```
 
-### build by conan
+## build by conan
 ```bash
 pip install conan
 cd cql2cpp
