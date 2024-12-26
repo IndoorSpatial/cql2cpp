@@ -33,7 +33,7 @@ class Cql2Cpp {
   mutable std::string error_msg_;
 
  public:
-  Cql2Cpp() {}
+  Cql2Cpp() : ostr_(std::cout) {}
 
   Cql2Cpp(std::ostream& ostr) : ostr_(ostr) {}
 
@@ -56,7 +56,7 @@ class Cql2Cpp {
 
     // Loop over all features
     for (const auto& [fs, f] : feature_source_2_type_) {
-      if (tree_evaluator.Evaluate(root, &fs, &value) &&
+      if (tree_evaluator.Evaluate(root, fs.get(), &value) &&
           std::holds_alternative<bool>(value) && std::get<bool>(value)) {
         result->emplace_back(f);
       }
@@ -123,12 +123,12 @@ class Cql2Cpp {
     lexer->RegisterLval(&parser.yylval);
 
     int ret = parser.yyparse();
+    if (error_msg != nullptr) *error_msg = oss.str();
     if (ret == 0) {
       *root = parser.root();
       return true;
     } else {
       parser.DeConstructRoot();
-      if (error_msg != nullptr) *error_msg = oss.str();
       return false;
     }
   }
