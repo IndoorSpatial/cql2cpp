@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: kunlinyu/cql2cpp:latest
-      options: --user root -v .:/home/ubuntu/cql2cpp/
+      options: --user root
       
     steps:
     - uses: actions/checkout@v4
