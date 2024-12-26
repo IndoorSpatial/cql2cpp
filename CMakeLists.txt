@@ -37,10 +37,14 @@ add_custom_command(
 	COMMENT "Generating ${BISON_OUTPUT} from ${BISON_FILE} using bison++"
 )
 
+add_library(cql2cpp src/id_generator.cc src/ast_node.cc ${FLEX_OUTPUT} ${BISON_OUTPUT})
+target_compile_options(cql2cpp PRIVATE -Wno-register -Wno-write-strings)
+target_link_libraries(cql2cpp gflags::gflags GEOS::geos_c glog::glog)
+
 # CLI tool
-add_executable(cql2 src/main.cc src/id_generator.cc src/ast_node.cc ${FLEX_OUTPUT} ${BISON_OUTPUT})
+add_executable(cql2 src/main.cc)
 target_compile_options(cql2 PRIVATE -Wno-register -Wno-write-strings)
-target_link_libraries(cql2 gflags::gflags GEOS::geos_c glog::glog)
+target_link_libraries(cql2 cql2cpp gflags::gflags GEOS::geos_c glog::glog)
 
 # Test
 enable_testing()
