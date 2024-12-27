@@ -84,6 +84,7 @@ using cql2cpp::NameOp;
 %type <node> spatialInstance
 %type <node> isInListPredicate
 %type <node> inList
+%type <node> function
 %type <str> geometryLiteral
 %type <str> pointTaggedText
 %type <str> linestringTaggedText
@@ -115,7 +116,8 @@ booleanFactor:
   | NOT booleanPrimary { $$ = new AstNode(BoolExpression, Not, { $2 }); }
 
 booleanPrimary:
-  predicate
+  function
+  | predicate
   | booleanLiteral
   | LPT booleanExpression RPT { $$ = $2 }
 
@@ -150,7 +152,8 @@ binaryComparisonPredicate:
 scalarExpression:
   numericLiteral
   | propertyName
-//| booleanLiteral
+  | function
+  | booleanLiteral
 //| characterClause
 
 // characterClause:
@@ -177,7 +180,7 @@ spatialPredicate:
 geomExpression:
   spatialInstance
   | propertyName
-//| function
+  | function
 
 
 spatialInstance:
@@ -200,6 +203,24 @@ spatialInstance:
     }
   }
 
+function:
+  ID LPT RPT  // TODO
+  | ID LPT argumentList RPT  // TODO
+
+argumentList:
+  argument  // TODO
+  | argumentList COMMA argument  // TODO append
+
+argument:
+  propertyName  // TODO
+  | function    // TODO
+  // | characterClause
+  // | numericLiteral
+  // | temporalInstance
+  // | spatialInstance
+  // | array
+  // | arithmeticExpression
+  // | booleanExpression
 
 geometryLiteral:
   pointTaggedText
