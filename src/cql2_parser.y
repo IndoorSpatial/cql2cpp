@@ -12,15 +12,24 @@ extern void yyerror(const char *s);  // Declare the error handler
 #define YY_Cql2ParserBase_LEX_BODY   { return 0; }
 
 using cql2cpp::AstNode;
-using cql2cpp::Not;
-using cql2cpp::And;
-using cql2cpp::Or;
+
 using cql2cpp::BoolExpression;
 using cql2cpp::BinCompPred;
 using cql2cpp::SpatialPred;
 using cql2cpp::PropertyName;
-using cql2cpp::NameOp;
+using cql2cpp::IsInListPred;
+using cql2cpp::InList;
+using cql2cpp::Function;
+using cql2cpp::ArgumentList;
 
+using cql2cpp::NullOp;
+using cql2cpp::Not;
+using cql2cpp::And;
+using cql2cpp::Or;
+using cql2cpp::In;
+using cql2cpp::NotIn;
+
+using cql2cpp::NameOp;
 %}
 
 %header{
@@ -85,6 +94,8 @@ using cql2cpp::NameOp;
 %type <node> isInListPredicate
 %type <node> inList
 %type <node> function
+%type <node> argumentList
+%type <node> argument
 %type <str> geometryLiteral
 %type <str> pointTaggedText
 %type <str> linestringTaggedText
@@ -134,12 +145,12 @@ comparisonPredicate:
   | isInListPredicate
 
 isInListPredicate:
-  scalarExpression IN LPT inList RPT  // TODO
-  | scalarExpression NOT IN LPT inList RPT  // TODO
+  scalarExpression IN LPT inList RPT { $$ = new AstNode(IsInListPred, In, {$1, $4}); }
+  | scalarExpression NOT IN LPT inList RPT { $$ = new AstNode(IsInListPred, NotIn, {$1, $5}); }
 
 inList:
-  scalarExpression  // TODO
-  | scalarExpression COMMA inList // TODO append
+  scalarExpression { $$ = new AstNode(InList, NullOp, {$1}); }
+  | inList COMMA scalarExpression { $1->append($3);  $$ = $1; }
 
 binaryComparisonPredicate:
   scalarExpression EQ scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::Equal, {$1, $3}); }
@@ -204,16 +215,23 @@ spatialInstance:
   }
 
 function:
-  ID LPT RPT  // TODO
-  | ID LPT argumentList RPT  // TODO
+  ID LPT RPT {
+    AstNode * function_name = new AstNode($1);
+    $$ = new AstNode(Function, NullOp, {function_name});
+  }
+  | ID LPT argumentList RPT {
+    AstNode * function_name = new AstNode($1);
+    $$ = new AstNode(Function, NullOp, {function_name, $3});
+  }
+
 
 argumentList:
-  argument  // TODO
-  | argumentList COMMA argument  // TODO append
+  argument { $$ = new AstNode(ArgumentList, NullOp, {$1}); }
+  | argumentList COMMA argument { $1->append($3); $$ = $1; }
 
 argument:
-  propertyName  // TODO
-  | function    // TODO
+  propertyName
+  | function
   // | characterClause
   // | numericLiteral
   // | temporalInstance

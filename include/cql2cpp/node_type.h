@@ -25,7 +25,10 @@ enum NodeType {
   BinCompPred,
   IsLikePred,
   IsBetweenPred,
+
   IsInListPred,
+  InList,
+
   IsNullPred,
 
   SpatialPred,
@@ -35,6 +38,9 @@ enum NodeType {
   ArrayPred,
 
   PropertyName,
+
+  Function,
+  ArgumentList,
 };
 
 #define TYPE_2_NAME(op) {op, #op },

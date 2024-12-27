@@ -63,6 +63,7 @@ class AstNode {
   Operator op() const { return op_; }
 
   const std::vector<AstNode*>& children() const { return children_; }
+  void append(AstNode* node) { children_.emplace_back(node); }
 
   ValueT value() const { return value_; }
   void set_value(const ValueT& value) const { value_ = value; }

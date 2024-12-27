@@ -136,6 +136,13 @@ BBOX"("[0-9. +\-,\n]+")" {
   return Cql2ParserBase::BBOX_TEXT;
 }
 
+IN {
+  yyout << "TOKEN " << yytext << std::endl;
+  token_texts_.emplace_back(yytext);
+  lval_->str = token_texts_.back().c_str();
+  return Cql2ParserBase::IN;
+}
+
 {ID} {
   yyout << "TOKEN ID " << yytext << std::endl;
   token_texts_.emplace_back(yytext);
