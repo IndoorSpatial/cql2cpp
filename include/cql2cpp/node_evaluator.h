@@ -14,7 +14,9 @@
 #include <variant>
 
 #include "evaluator.h"
+#include "geos/geom/Envelope.h"
 #include "geos/geom/Geometry.h"
+#include "geos/geom/GeometryFactory.h"
 
 namespace cql2cpp {
 
@@ -26,7 +28,7 @@ bool CheckValueNumberType(const std::string& op, size_t num,
     return false;
   }
   for (size_t i = 0; i < num; i++)
-    if (not std::holds_alternative<ValueType>(vs.at(0))) {
+    if (not std::holds_alternative<ValueType>(vs.at(i))) {
       *errmsg = "value " + std::to_string(i) + "of " + op + " is incorrect";
       return false;
     }
@@ -62,12 +64,35 @@ const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
     {SpatialPred,
      {{S_Intersects,
        [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
-         if (not CheckValueNumberType<const geos::geom::Geometry*>(
-                 "S_INTERSECTS", 2, vs, errmsg))
+         if (vs.size() != 2) {
+           *errmsg = "S_INTERSECTS needs two values but we have " +
+                     std::to_string(vs.size());
            return false;
-         const geos::geom::Geometry* lhs =
-             std::get<const geos::geom::Geometry*>(vs.at(0));
-         auto rhs = std::get<const geos::geom::Geometry*>(vs.at(1));
+         }
+         geos::geom::GeometryFactory::Ptr factory =
+             geos::geom::GeometryFactory::create();
+         const geos::geom::Geometry* lhs = nullptr;
+         std::shared_ptr<geos::geom::Geometry> lhs_shared;
+         if (std::holds_alternative<const geos::geom::Geometry*>(vs.at(0)))
+           lhs = std::get<const geos::geom::Geometry*>(vs.at(0));
+         else if (std::holds_alternative<const geos::geom::Envelope*>(vs.at(0))) {
+           lhs_shared = factory->toGeometry(std::get<const geos::geom::Envelope*>(vs.at(0)));
+           lhs = lhs_shared.get();
+         } else {
+           *errmsg = "left hand side value type of S_INTERSECTS should be geometry or bbox";
+           return false;
+         }
+         const geos::geom::Geometry* rhs = nullptr;
+         std::shared_ptr<geos::geom::Geometry> rhs_shared;
+         if (std::holds_alternative<const geos::geom::Geometry*>(vs.at(1)))
+           rhs = std::get<const geos::geom::Geometry*>(vs.at(1));
+         else if (std::holds_alternative<const geos::geom::Envelope*>(vs.at(1))) {
+           rhs_shared = factory->toGeometry(std::get<const geos::geom::Envelope*>(vs.at(1)));
+           rhs = rhs_shared.get();
+         } else {
+           *errmsg = "right hand side value type of S_INTERSECTS should be geometry or bbox";
+           return false;
+         }
          *value = lhs->intersects(rhs);
          return true;
        }}}},
