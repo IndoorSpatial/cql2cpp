@@ -1,0 +1,1 @@
+'PICKING' IN labels AND 'A-01-03' IN refs_prop_union(fois, binlocations)

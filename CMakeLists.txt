@@ -56,6 +56,7 @@ target_link_libraries(cql2 cql2cpp GEOS::geos glog::glog)
 
 # Test
 enable_testing()
-add_executable(test_parse test/test_parse.cc)
-target_link_libraries(test_parse GTest::GTest GTest::Main)
-add_test(NAME test_parse COMMAND test_parse)
+set(TEST_DIR ${CMAKE_SOURCE_DIR}/test)
+add_executable(test_parse ${TEST_DIR}/test_parse.cc)
+target_link_libraries(test_parse cql2cpp GTest::GTest GTest::Main glog::glog GEOS::geos)
+add_test(NAME test_parse COMMAND test_parse WORKING_DIRECTORY ${TEST_DIR})

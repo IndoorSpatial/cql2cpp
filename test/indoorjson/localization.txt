@@ -1,0 +1,1 @@
+S_INTERSECTS(space, POINT(0 0))

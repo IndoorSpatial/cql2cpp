@@ -1,0 +1,1 @@
+S_INTERSECTS(geom, BBOX(0 0 1 1))
