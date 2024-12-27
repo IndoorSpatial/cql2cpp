@@ -12,7 +12,7 @@
 #include <cql2cpp/bbox_reader.h>
 
 TEST(BBOX_READER, CASE1) {
-  std::string input = "BBOX(00 11 22 33)";
+  std::string input = "BBOX(00,11,22,33)";
   auto env = cql2cpp::BBoxReader().read(input);
   EXPECT_NEAR(env->getMinX(), 0, 1e-6);
   EXPECT_NEAR(env->getMinY(), 11, 1e-6);
@@ -21,7 +21,7 @@ TEST(BBOX_READER, CASE1) {
 }
 
 TEST(BBOX_READER, CASE2) {
-  std::string input = "BBOX ( 00 11 22 33 )";
+  std::string input = "BBOX ( 00, 11, 22 ,33 )";
   auto env = cql2cpp::BBoxReader().read(input);
   EXPECT_NEAR(env->getMinX(), 0, 1e-6);
   EXPECT_NEAR(env->getMinY(), 11, 1e-6);
@@ -30,7 +30,7 @@ TEST(BBOX_READER, CASE2) {
 }
 
 TEST(BBOX_READER, CASE3) {
-  std::string input = "BBOX ( -01.0 +11 22 +33.0 )";
+  std::string input = "BBOX ( -01.0, +11, 22, +33.0 )";
   auto env = cql2cpp::BBoxReader().read(input);
   EXPECT_NEAR(env->getMinX(), -1, 1e-6);
   EXPECT_NEAR(env->getMinY(), 11, 1e-6);
@@ -39,7 +39,7 @@ TEST(BBOX_READER, CASE3) {
 }
 
 TEST(BBOX_READER, CASE4) {
-  std::string input = "BBOX (0 0 0 0)";
+  std::string input = "BBOX (0,0,0,0)";
   auto env = cql2cpp::BBoxReader().read(input);
   EXPECT_NEAR(env->getMinX(), 0, 1e-6);
   EXPECT_NEAR(env->getMinY(), 0, 1e-6);
@@ -48,13 +48,13 @@ TEST(BBOX_READER, CASE4) {
 }
 
 TEST(BBOX_READER, CASE5) {
-  std::string input = "BBOX (0,0,0,0)";
+  std::string input = "BBOX (0 0 0 0)";
   auto env = cql2cpp::BBoxReader().read(input);
   EXPECT_EQ(env, nullptr);
 }
 
 TEST(BBOX_READER, CASE6) {
-  std::string input = "BBOX (0 0 0 0 ";
+  std::string input = "BBOX (0,0,0,0 ";
   auto env = cql2cpp::BBoxReader().read(input);
   EXPECT_EQ(env, nullptr);
 }

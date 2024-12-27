@@ -19,7 +19,7 @@
 namespace cql2cpp {
 
 const std::string pattern_str =
-    R"(BBOX\s*[(]\s*([-+]?\d*\.?\d+)\s+([-+]?\d*\.?\d+)\s+([-+]?\d*\.?\d+)\s+([-+]?\d*\.?\d+)\s*[)])";
+    R"(BBOX\s*\(\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*[)])";
 
 class BBoxReader {
  private:
