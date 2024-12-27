@@ -80,8 +80,8 @@ using cql2cpp::NameOp;
 %type <node> booleanFactor
 %type <node> booleanPrimary
 %type <node> booleanLiteral
-// %type <node> characterExpression
-// %type <node> characterClause
+%type <node> characterExpression
+%type <node> characterClause
 %type <node> propertyName
 %type <node> predicate
 %type <node> comparisonPredicate
@@ -165,16 +165,16 @@ scalarExpression:
   | propertyName
   | function
   | booleanLiteral
-//| characterClause
+  | characterClause
 
-// characterClause:
-//   CASEI LPT characterExpression RPT
-//   | ACCENTI LPT characterExpression RPT
-//   | CHAR_LIT { std::string s = std::string($1); $$ = new AstNode(s.substr(1, s.size() - 2)); }
+characterClause:
+  CASEI LPT characterExpression RPT { $$ = $3; }  // TODO
+  | ACCENTI LPT characterExpression RPT { $$ = $3; }  // TODO
+  | CHAR_LIT { std::string s = std::string($1); $$ = new AstNode(s.substr(1, s.size() - 2)); }
 
-// characterExpression:
-//   characterClause
-//   | propertyName { $$ = $1; }
+characterExpression:
+  characterClause
+  | propertyName { $$ = $1; }
 
 numericLiteral:
   NUMBER_INT { $$ = new AstNode($1); }

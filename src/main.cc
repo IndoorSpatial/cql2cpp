@@ -22,6 +22,7 @@
 DEFINE_string(cql2_query, "", "cql2 query string");
 DEFINE_string(geojson, "", "data set to be queried");
 DEFINE_string(dot, "", "generate dot file");
+DEFINE_bool(verbose, false, "Enable verbose output");
 
 int main(int argc, char** argv) {
   gflags::SetUsageMessage(
@@ -38,6 +39,9 @@ int main(int argc, char** argv) {
   LOG(INFO) << "cql2_query: " << FLAGS_cql2_query;
   LOG(INFO) << "geojson: " << FLAGS_geojson;
   LOG(INFO) << "dot: " << FLAGS_dot;
+
+  if (FLAGS_verbose)
+    cql2cpp::AstNode::set_ostream(&std::cout);
 
   if (FLAGS_cql2_query.empty()) {
     LOG(ERROR) << "you should provide cql2_query";

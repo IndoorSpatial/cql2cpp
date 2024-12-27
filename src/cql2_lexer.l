@@ -7,7 +7,7 @@
 
 DIGIT    [0-9]
 ID       [a-z][.a-z0-9_\-]*
-CHAR_LIT \'.*\'
+CHAR_LIT \'[^\']*\'
 
 %%
 

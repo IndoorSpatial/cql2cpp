@@ -20,15 +20,9 @@ class Tree2Dot {
  public:
   static std::string node_name(const AstNode* node) {
     if (node->op() != NullOp)
-      return OpName.at(node->op()) + "(" + value_str(node->value()) + ")";
-    else if (node->type() == PropertyName)
-      return std::string("property") + "(" + value_str(node->value()) + ")";
+      return OpName.at(node->op());
     else
-      return value_str(node->value());
-  }
-
-  static std::string node_value_str(const AstNode* node) {
-    return value_str(node->value());
+      return TypeName.at(node->type());
   }
 
   static bool GenerateDot(std::ostream& ous, const AstNode* node) {
@@ -43,8 +37,9 @@ class Tree2Dot {
   static bool GenerateDotNode(std::ostream& ous, const AstNode* node) {
     if (node == nullptr) return true;
 
-    ous << "  \"" << node->id() << "\" [label=\"(" << node->id() << ") "
-        << node_name(node) << "\"];" << std::endl;
+    ous << "  \"" << node->id() << "\" [label=\"" << node->id() << ". "
+        << node_name(node) << "(" << value_str(node->value()) << ")"
+        << "\"];" << std::endl;
     for (const auto child : node->children()) GenerateDotNode(ous, child);
 
     return true;
