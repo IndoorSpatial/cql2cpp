@@ -56,6 +56,7 @@ using cql2cpp::NameOp;
 %token PLUS MINUS MULT DIV
 %token EQ GT LT  // = > <
 %token AND OR NOT
+%token IN
 %token <c> LPT RPT COMMA  // ( ) ,
 %token CASEI ACCENTI
 %token SQUOTE DQUOTE
@@ -81,6 +82,8 @@ using cql2cpp::NameOp;
 %type <node> spatialPredicate
 %type <node> geomExpression
 %type <node> spatialInstance
+%type <node> isInListPredicate
+%type <node> inList
 %type <str> geometryLiteral
 %type <str> pointTaggedText
 %type <str> linestringTaggedText
@@ -126,6 +129,15 @@ predicate:
 
 comparisonPredicate:
   binaryComparisonPredicate
+  | isInListPredicate
+
+isInListPredicate:
+  scalarExpression IN LPT inList RPT  // TODO
+  | scalarExpression NOT IN LPT inList RPT  // TODO
+
+inList:
+  scalarExpression  // TODO
+  | scalarExpression COMMA inList // TODO append
 
 binaryComparisonPredicate:
   scalarExpression EQ scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::Equal, {$1, $3}); }
