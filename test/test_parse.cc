@@ -1,3 +1,12 @@
+/*
+ * File Name: test_parse.cc
+ *
+ * Copyright (c) 2024 IndoorSpatial
+ *
+ * Author: Kunlin Yu <yukunlin@syriusrobotics.com>
+ * Create Date: 2024/12/27
+ *
+ */
 #include <glog/logging.h>
 #include <gtest/gtest.h>
 
@@ -36,8 +45,8 @@ class ParseTest : public testing::Test {
 };
 
 // clang-format off
-// TEST_F(ParseTest, binary      ) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(ParseTest, binlocations) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(ParseTest, labels      ) { EXPECT_TRUE(Parse(case_name_)); }
+// TEST_F(ParseTest, binary      ) { EXPECT_TRUE(Parse(case_name_)); }  // BBOX
+// TEST_F(ParseTest, binlocations) { EXPECT_TRUE(Parse(case_name_)); }  // function
+// TEST_F(ParseTest, labels      ) { EXPECT_TRUE(Parse(case_name_)); }  // IN
 TEST_F(ParseTest, localization) { EXPECT_TRUE(Parse(case_name_)); }
 // clang-format on
