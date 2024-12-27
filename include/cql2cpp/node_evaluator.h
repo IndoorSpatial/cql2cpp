@@ -20,6 +20,8 @@
 
 namespace cql2cpp {
 
+constexpr double kEpsilon = 1e-5;
+
 template <typename ValueType>
 bool CheckValueNumberType(const std::string& op, size_t num,
                           const std::vector<ValueT>& vs, std::string* errmsg) {
@@ -49,7 +51,8 @@ inline bool isVariantEqual(const ValueT& a, const ValueT& b) {
 
   if (std::holds_alternative<uint64_t>(a)) return TypedEqual<uint64_t>(a, b);
 
-  if (std::holds_alternative<double>(a)) return TypedEqual<double>(a, b);
+  if (std::holds_alternative<double>(a))
+    return fabs(std::get<double>(a) - std::get<double>(b)) < kEpsilon;
 
   if (std::holds_alternative<std::string>(a))
     return TypedEqual<std::string>(a, b);
@@ -242,7 +245,7 @@ const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
          }
 
          if (lhs != nullptr and rhs != nullptr) {
-           *value = fabs(*lhs - *rhs) < 1e-5;
+           *value = fabs(*lhs - *rhs) < kEpsilon;
            delete lhs;
            delete rhs;
            return true;
