@@ -7,11 +7,11 @@
  * Create Date: 2024/12/27
  *
  */
+#include <cql2cpp/cql2cpp.h>
 #include <glog/logging.h>
 #include <gtest/gtest.h>
 
 #include <fstream>
-#include <cql2cpp/cql2cpp.h>
 
 class ParseTest : public testing::Test {
  protected:
@@ -34,18 +34,21 @@ class ParseTest : public testing::Test {
     EXPECT_TRUE(fin.is_open());
     std::string query;
     query.assign(std::istreambuf_iterator<char>(fin),
-                   std::istreambuf_iterator<char>());
+                 std::istreambuf_iterator<char>());
     fin.close();
 
     LOG(INFO) << query;
 
     std::string dot;
-    return cql2cpp::Cql2Cpp<void*>::ToDot(query, &dot, nullptr);
+    cql2cpp::AstNode::set_ostream(&std::cout);
+    bool ret = cql2cpp::Cql2Cpp<void*>::ToDot(query, &dot, nullptr);
+    if (ret) LOG(INFO) << dot;
+    return ret;
   }
 };
 
 // clang-format off
-// TEST_F(ParseTest, binary      ) { EXPECT_TRUE(Parse(case_name_)); }  // BBOX
+TEST_F(ParseTest, binary      ) { EXPECT_TRUE(Parse(case_name_)); }  // BBOX
 // TEST_F(ParseTest, binlocations) { EXPECT_TRUE(Parse(case_name_)); }  // function
 // TEST_F(ParseTest, labels      ) { EXPECT_TRUE(Parse(case_name_)); }  // IN
 TEST_F(ParseTest, localization) { EXPECT_TRUE(Parse(case_name_)); }

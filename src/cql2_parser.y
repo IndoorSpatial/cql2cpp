@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <geos/io/WKTReader.h>
 #include <cql2cpp/ast_node.h>
+#include <cql2cpp/bbox_reader.h>
 
 extern int yylex();  // Declare the lexer function
 extern void yyerror(const char *s);  // Declare the error handler
@@ -84,7 +85,7 @@ using cql2cpp::NameOp;
 %type <str> pointTaggedText
 %type <str> linestringTaggedText
 %type <str> polygonTaggedText
-// %type <str> bboxTaggedText
+%type <str> bboxTaggedText
 
 %left PLUS MINUS
 %left MULT DIV
@@ -113,7 +114,7 @@ booleanFactor:
 booleanPrimary:
   predicate
   | booleanLiteral
-  | LPT booleanExpression RPT
+  | LPT booleanExpression RPT { $$ = $2 }
 
 booleanLiteral:
   TRUE { $$ = new AstNode($1); }
@@ -168,8 +169,24 @@ geomExpression:
 
 
 spatialInstance:
-  geometryLiteral { $$ = new AstNode(geos::io::WKTReader().read($1).release()); }
-//| bboxTaggedText
+  geometryLiteral {
+    auto p = geos::io::WKTReader().read($1);
+    if (p) {
+      $$ = new AstNode(p.release());
+    } else {
+      yyerror("Can not parse WKT");
+      YYERROR;
+    }
+  }
+  | bboxTaggedText {
+    auto p = cql2cpp::BBoxReader().read($1);
+    if (p) {
+      $$ = new AstNode(p.release());
+    } else {
+      yyerror("Can not parse BBOX");
+      YYERROR;
+    }
+  }
 
 
 geometryLiteral:
@@ -183,6 +200,6 @@ linestringTaggedText: LINESTRING_WKT
 
 polygonTaggedText: POLYGON_WKT
 
-// bboxTaggedText: BBOX_TEXT
+bboxTaggedText: BBOX_TEXT
 
 %%

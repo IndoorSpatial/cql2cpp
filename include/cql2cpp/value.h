@@ -56,6 +56,10 @@ static std::string value_str(ValueT value, bool with_type = false) {
     return writer.write(std::get<const geos::geom::Geometry*>(value));
   }
 
+  if (std::holds_alternative<const geos::geom::Envelope*>(value)) {
+    return std::get<const geos::geom::Envelope*>(value)->toString();
+  }
+
   return "unknown type";
 }
 
