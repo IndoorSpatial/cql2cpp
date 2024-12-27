@@ -56,9 +56,14 @@ class Cql2Cpp {
 
     // Loop over all features
     for (const auto& [fs, f] : feature_source_2_type_) {
-      if (tree_evaluator.Evaluate(root, fs.get(), &value) &&
-          std::holds_alternative<bool>(value) && std::get<bool>(value)) {
-        result->emplace_back(f);
+      if (tree_evaluator.Evaluate(root, fs.get(), &value)) {
+        if (std::holds_alternative<bool>(value)) {
+          if (std::get<bool>(value)) result->emplace_back(f);
+        } else {
+          LOG(ERROR) << "evaluation result type error";
+        }
+      } else {
+          LOG(ERROR) << "evaluation error: " << tree_evaluator.error_msg();
       }
     }
     Cql2Parser::DeConstructAST(root);

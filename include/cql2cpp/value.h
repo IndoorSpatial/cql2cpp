@@ -20,9 +20,7 @@
 
 namespace cql2cpp {
 
-enum NullStruct {
-  NullValue
-};
+enum NullStruct { NullValue };
 
 typedef std::variant<NullStruct, bool, int64_t, uint64_t, double, std::string,
                      const geos::geom::Geometry*, const geos::geom::Envelope*>
@@ -32,8 +30,8 @@ static std::string value_str(ValueT value, bool with_type = false) {
   if (std::holds_alternative<NullStruct>(value)) return "?";
 
   if (std::holds_alternative<bool>(value))
-    return std::get<bool>(value) ? "T"
-                                 : "F" + std::string(with_type ? " bool" : "");
+    return (std::get<bool>(value) ? "T" : "F") +
+           std::string(with_type ? " bool" : "");
 
   if (std::holds_alternative<int64_t>(value))
     return std::to_string(std::get<int64_t>(value)) +

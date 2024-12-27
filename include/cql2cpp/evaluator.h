@@ -41,8 +41,8 @@ class TreeEvaluator {
     if (type_evaluator_.find(root->type()) == type_evaluator_.end() ||
         type_evaluator_[root->type()].find(root->op()) ==
             type_evaluator_[root->type()].end()) {
-      error_msg_ = "can not find evaluator for operator " +
-                   OpName.at(root->op()) + " in node type " +
+      error_msg_ = "can not find evaluator for operator \"" +
+                   OpName.at(root->op()) + "\" in node type " +
                    TypeName.at(root->type());
       return false;
     }

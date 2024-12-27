@@ -40,8 +40,7 @@ int main(int argc, char** argv) {
   LOG(INFO) << "geojson: " << FLAGS_geojson;
   LOG(INFO) << "dot: " << FLAGS_dot;
 
-  if (FLAGS_verbose)
-    cql2cpp::AstNode::set_ostream(&std::cout);
+  if (FLAGS_verbose) cql2cpp::AstNode::set_ostream(&std::cout);
 
   if (FLAGS_cql2_query.empty()) {
     LOG(ERROR) << "you should provide cql2_query";
@@ -94,6 +93,8 @@ int main(int argc, char** argv) {
     // read geojson features
     geos::io::GeoJSONReader reader;
     fc = reader.readFeatures(geojson_text);
+    LOG(INFO) << "load " << fc.getFeatures().size() << " features from "
+              << FLAGS_geojson;
 
     std::map<cql2cpp::FeatureSourcePtr, const geos::io::GeoJSONFeature*>
         fs_feature;
@@ -109,7 +110,8 @@ int main(int argc, char** argv) {
     if (cql2cpp.filter(FLAGS_cql2_query, &result)) {
       LOG(INFO) << "get feature count: " << result.size();
       for (const auto& feature : result) {
-        LOG(INFO) << "get feature geometry: " << feature->getGeometry()->toText();
+        LOG(INFO) << "get feature geometry: "
+                  << feature->getGeometry()->toText();
       }
     } else {
       LOG(ERROR) << "filter error: " << cql2cpp.error_msg();
