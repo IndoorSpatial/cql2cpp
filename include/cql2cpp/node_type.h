@@ -36,6 +36,7 @@ enum NodeType {
   TemporalPred,
 
   ArrayPred,
+  Array,
 
   PropertyName,
 
@@ -57,6 +58,7 @@ const std::map<NodeType, std::string> TypeName {
   TYPE_2_NAME(SpatialPred)
   TYPE_2_NAME(TemporalPred)
   TYPE_2_NAME(ArrayPred)
+  TYPE_2_NAME(Array)
   TYPE_2_NAME(PropertyName)
   TYPE_2_NAME(Function)
   TYPE_2_NAME(ArgumentList)

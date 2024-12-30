@@ -19,6 +19,8 @@ using cql2cpp::SpatialPred;
 using cql2cpp::PropertyName;
 using cql2cpp::IsInListPred;
 using cql2cpp::InList;
+using cql2cpp::ArrayPred;
+using cql2cpp::Array;
 using cql2cpp::Function;
 using cql2cpp::ArgumentList;
 
@@ -62,6 +64,7 @@ using cql2cpp::NameOp;
 %token <str> ID
 %token <str> CHAR_LIT
 %token <str> SPT_FUNC
+%token <str> arrayFunction
 %token PLUS MINUS MULT DIV
 %token EQ GT LT  // = > <
 %token AND OR NOT
@@ -93,6 +96,10 @@ using cql2cpp::NameOp;
 %type <node> spatialInstance
 %type <node> isInListPredicate
 %type <node> inList
+%type <node> arrayPredicate
+%type <node> arrayExpression
+%type <node> array
+%type <node> arrayElement
 %type <node> function
 %type <node> argumentList
 %type <node> argument
@@ -139,6 +146,7 @@ booleanLiteral:
 predicate:
   comparisonPredicate
   | spatialPredicate
+  | arrayPredicate
 
 comparisonPredicate:
   binaryComparisonPredicate
@@ -213,6 +221,30 @@ spatialInstance:
       YYERROR;
     }
   }
+
+arrayPredicate:
+  arrayFunction LPT arrayExpression COMMA arrayExpression RPT { $$ = new AstNode(ArrayPred, NameOp.at($1), {$3, $5}); }
+
+arrayExpression:
+  LPT RPT { $$ = new AstNode(Array, NullOp, {}); }
+  | propertyName
+  | function
+  | LPT array RPT { $$ = $2 }
+
+array:
+  arrayElement  { $$ = new AstNode(Array, NullOp, {$1}); }
+  | array COMMA arrayElement  { $1->append($3);  $$ = $1; }
+
+arrayElement:
+  characterClause
+  | numericLiteral
+  // | temporalInstance
+  | spatialInstance
+  // | array  // shift/reduce conflict
+  // | arithmeticExpression
+  | booleanExpression
+  | propertyName
+  // | function  // reduce/reduce conflict
 
 function:
   ID LPT RPT {
