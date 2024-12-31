@@ -115,6 +115,10 @@ const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
                   std::to_string(n->children().size());
               return false;
             }
+            if (std::holds_alternative<NullStruct>(vs.at(0))) {
+              *value = NullValue;
+              return true;
+            }
             if (not std::holds_alternative<bool>(vs.at(0)) and
                 not std::holds_alternative<int64_t>(vs.at(0)) and
                 not std::holds_alternative<uint64_t>(vs.at(0)) and
