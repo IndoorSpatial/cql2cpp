@@ -48,6 +48,7 @@ set(CQL2CPP_SRC
   src/id_generator.cc
   src/ast_node.cc
   src/global_yylex.cc
+  src/value.cc
   ${FLEX_OUTPUT}
   ${BISON_OUTPUT}
 )

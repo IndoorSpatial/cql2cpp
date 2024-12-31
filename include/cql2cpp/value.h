@@ -1,5 +1,5 @@
 /*
- * File Name: value_type.h
+ * File Name: value.h
  *
  * Copyright (c) 2024 IndoorSpatial
  *
@@ -15,6 +15,8 @@
 #include <geos/io/WKTWriter.h>
 
 #include <cctype>
+#include <set>
+#include <sstream>
 #include <string>
 #include <variant>
 
@@ -22,12 +24,35 @@ namespace cql2cpp {
 
 enum NullStruct { NullValue };
 
-typedef std::variant<NullStruct, bool, int64_t, uint64_t, double, std::string,
-                     const geos::geom::Geometry*, const geos::geom::Envelope*>
-    ValueT;
+struct ArrayElement;
+
+class ArrayElementComp {
+ public:
+  static constexpr double tolerance = 1e-9;
+
+ public:
+  bool operator()(const ArrayElement& a, const ArrayElement& b) const;
+
+ private:
+  template <typename T, typename U>
+  bool less(const U& lhs, const U& rhs) const {
+    return std::less()(std::get<T>(lhs), std::get<T>(rhs));
+  }
+};
+
+using ArrayType = std::set<ArrayElement, ArrayElementComp>;
+
+using ValueT = std::variant<NullStruct, bool, int64_t, uint64_t, double,
+                            std::string, ArrayType, const geos::geom::Geometry*,
+                            const geos::geom::Envelope*>;
+
+struct ArrayElement {
+  ValueT value;
+  ArrayElement(const ValueT& value) : value(value) {}
+};
 
 static std::string value_str(ValueT value, bool with_type = false) {
-  if (std::holds_alternative<NullStruct>(value)) return "?";
+  if (std::holds_alternative<NullStruct>(value)) return "null";
 
   if (std::holds_alternative<bool>(value))
     return (std::get<bool>(value) ? "T" : "F") +
@@ -48,6 +73,16 @@ static std::string value_str(ValueT value, bool with_type = false) {
   if (std::holds_alternative<std::string>(value))
     return std::get<std::string>(value) +
            std::string(with_type ? " string" : "");
+
+  if (std::holds_alternative<ArrayType>(value)) {
+    std::stringstream ss;
+    ss << "[";
+    for (const auto& element : std::get<ArrayType>(value))
+      ss << value_str(element.value) << ",";
+    ss.seekp(-1, std::ios_base::end);
+    ss << "]";
+    return ss.str() + std::string(with_type ? " array" : "");
+  }
 
   if (std::holds_alternative<const geos::geom::Geometry*>(value)) {
     geos::io::WKTWriter writer;

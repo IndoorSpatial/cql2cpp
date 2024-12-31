@@ -10,17 +10,17 @@
 
 #pragma once
 
+#include <geos/geom/Envelope.h>
+#include <geos/geom/Geometry.h>
+#include <geos/geom/GeometryFactory.h>
+
 #include <cmath>
 #include <variant>
 
 #include "evaluator.h"
-#include "geos/geom/Envelope.h"
-#include "geos/geom/Geometry.h"
-#include "geos/geom/GeometryFactory.h"
+#include "value_compare.h"
 
 namespace cql2cpp {
-
-constexpr double kEpsilon = 1e-5;
 
 template <typename ValueType>
 bool CheckValueNumberType(const std::string& op, size_t num,
@@ -35,29 +35,6 @@ bool CheckValueNumberType(const std::string& op, size_t num,
       return false;
     }
   return true;
-}
-
-template <typename T>
-inline bool TypedEqual(const ValueT& a, const ValueT& b) {
-  return std::get<T>(a) == std::get<T>(b);
-}
-
-inline bool isVariantEqual(const ValueT& a, const ValueT& b) {
-  if (a.index() != b.index()) return false;
-
-  if (std::holds_alternative<bool>(a)) return TypedEqual<bool>(a, b);
-
-  if (std::holds_alternative<int64_t>(a)) return TypedEqual<int64_t>(a, b);
-
-  if (std::holds_alternative<uint64_t>(a)) return TypedEqual<uint64_t>(a, b);
-
-  if (std::holds_alternative<double>(a))
-    return fabs(std::get<double>(a) - std::get<double>(b)) < kEpsilon;
-
-  if (std::holds_alternative<std::string>(a))
-    return TypedEqual<std::string>(a, b);
-
-  return false;
 }
 
 const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
@@ -145,6 +122,73 @@ const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
             return ret;
           }},
      }},
+    {Array,
+     {{NullOp,
+       [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+         ArrayType result;
+         for (const auto& v : vs) result.insert(ArrayElement(v));
+         *value = result;
+         return true;
+       }}}},
+    {
+        ArrayPred,
+        {{A_Equals,
+          [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+            const auto& contains = node_evals.at(ArrayPred).at(A_Contains);
+            const auto& contained = node_evals.at(ArrayPred).at(A_ContainedBy);
+
+            bool ret1 = contains.operator()(n, vs, fs, value, errmsg);
+            bool result_1 = std::get<bool>(*value);
+            if (not ret1) return false;
+            bool ret2 = contained.operator()(n, vs, fs, value, errmsg);
+            bool result_2 = std::get<bool>(*value);
+            if (not ret2) return false;
+
+            *value = result_1 and result_2;
+            return true;
+          }},
+         {A_Contains,
+          [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+            if (not CheckValueNumberType<ArrayType>("Array Op", 2, vs, errmsg))
+              return false;
+            const auto& lhs = std::get<ArrayType>(vs.at(0));
+            const auto& rhs = std::get<ArrayType>(vs.at(1));
+            if (lhs.size() < rhs.size()) {
+              *value = false;
+              return true;
+            }
+            for (const auto& e : rhs)
+              if (lhs.find(e) == lhs.end()) {
+                *value = false;
+                return true;
+              }
+            *value = true;
+            return true;
+          }},
+         {A_ContainedBy,
+          [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+            if (not CheckValueNumberType<ArrayType>("Array Op", 2, vs, errmsg))
+              return false;
+
+            const auto& lhs = std::get<ArrayType>(vs.at(0));
+            const auto& rhs = std::get<ArrayType>(vs.at(1));
+            if (lhs.size() > rhs.size()) {
+              *value = false;
+              return true;
+            }
+            for (const auto& e : lhs)
+              if (rhs.find(e) == rhs.end()) {
+                *value = false;
+                return true;
+              }
+            *value = true;
+            return true;
+          }},
+         {A_Overlaps,
+          [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+            return true;
+          }}},
+    },
     {SpatialPred,
      {{S_Intersects,
        [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {

@@ -64,9 +64,9 @@ enum Operator {
   T_Starts,
 
   // array operators
-  A_ContainedBy,
-  A_Contains,
   A_Equals,
+  A_Contains,
+  A_ContainedBy,
   A_Overlaps,
 };
 
