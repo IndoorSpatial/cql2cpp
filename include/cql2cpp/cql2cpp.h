@@ -22,6 +22,7 @@
 #include "feature_source.h"
 #include "node_evaluator.h"
 #include "tree_dot.h"
+#include "global_yylex.h"
 
 namespace cql2cpp {
 
@@ -121,13 +122,13 @@ class Cql2Cpp {
                     std::string* error_msg) {
     std::istringstream iss(cql2_query);
     std::ostringstream oss;
-    Cql2Lexer* lexer = new Cql2Lexer(iss, oss);
+
+    set_text_lexer(new Cql2Lexer(iss, oss));
 
     cql2cpp::AstNode::set_ostream(&oss);
-    Cql2Parser parser(lexer);
-    lexer->RegisterLval(&parser.yylval);
 
-    int ret = parser.yyparse();
+    Cql2Parser parser;
+    int ret = parser.parse();
     if (error_msg != nullptr) *error_msg = oss.str();
     if (ret == 0) {
       *root = parser.root();

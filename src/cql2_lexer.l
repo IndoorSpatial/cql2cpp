@@ -1,6 +1,13 @@
 %{
+#include <cql2_parser_base.hh>
 #include <cql2cpp/cql2_lexer-internal.h>
-#include <cql2_parser_base.h>
+
+using cql2cpp::Cql2ParserBase;
+
+void print(const std::string& prefix, const char* yytext) {
+  LOG(INFO) << "TOKEN " << prefix << " \"" << yytext << "\"";
+}
+
 %}
 
 %option noyywrap
@@ -12,156 +19,144 @@ CHAR_LIT \'[^\']*\'
 %%
 
 {CHAR_LIT} {
-  yyout << "TOKEN CHAR_LIT " << yytext << std::endl;
-  token_texts_.emplace_back(yytext);
-  lval_->str = token_texts_.back().c_str();
-  return Cql2ParserBase::CHAR_LIT;
+  print("CHAR_LIT", yytext);
+  yylval_->emplace<std::string>() = yytext;
+  return Cql2ParserBase::token::CHAR_LIT;
 }
 
 [+-]?{DIGIT}+    {
-  yyout << "TOKEN NUMBER_INT " << yytext << std::endl;
-  lval_->num_int = atoi(yytext);
-  return Cql2ParserBase::NUMBER_INT;
+  print("DIGIT_INT", yytext);
+  yylval_->emplace<int>() = atoi(yytext);
+  return Cql2ParserBase::token::NUMBER_INT;
 }
 
 [+-]?{DIGIT}+"."{DIGIT}* {
-  yyout << "TOKEN NUMBER_FLOAT " << yytext << std::endl;
-  lval_->num_float = atof(yytext);
-  return Cql2ParserBase::NUMBER_FLOAT;
+  print("DIGIT_FLOAT", yytext);
+  yylval_->emplace<double>() = atof(yytext);
+  return Cql2ParserBase::token::NUMBER_FLOAT;
 }
 
 [+-]?"."{DIGIT}* {
-  yyout << "TOKEN NUMBER_FLOAT " << yytext << std::endl;
-  lval_->num_float = atof(yytext);
-  return Cql2ParserBase::NUMBER_FLOAT;
+  print("DIGIT_FLOAT", yytext);
+  yylval_->emplace<double>() = atof(yytext);
+  return Cql2ParserBase::token::NUMBER_FLOAT;
 }
 
 "TRUE" {
-  yyout << "TOKEN " << yytext << std::endl;
-  lval_->boolean = true;
-  return Cql2ParserBase::TRUE;
+  print("BOOL_LIT", yytext);
+  yylval_->emplace<bool>() = true;
+  return Cql2ParserBase::token::TRUE;
 }
 "FALSE" {
-  yyout << "TOKEN " << yytext << std::endl;
-  lval_->boolean = false;
-  return Cql2ParserBase::FALSE;
+  print("BOOL_LIT", yytext);
+  yylval_->emplace<bool>() = false;
+  return Cql2ParserBase::token::FALSE;
 }
 
 "AND" {
-  yyout << "TOKEN " << yytext << std::endl;
-  return Cql2ParserBase::AND;
+  print("BOOL_EXPR", yytext);
+  return Cql2ParserBase::token::AND;
 }
 
 "OR" {
-  yyout << "TOKEN " << yytext << std::endl;
-  return Cql2ParserBase::OR;
+  print("BOOL_EXPR", yytext);
+  return Cql2ParserBase::token::OR;
 }
 
 "NOT" {
-  yyout << "TOKEN " << yytext << std::endl;
-  return Cql2ParserBase::NOT;
+  print("BOOL_EXPR", yytext);
+  return Cql2ParserBase::token::NOT;
 }
 
 "CASEI" {
-  yyout << "TOKEN " << yytext << std::endl;
-  return Cql2ParserBase::CASEI;
+  print("", yytext);
+  return Cql2ParserBase::token::CASEI;
 }
 
 "ACCENTI" {
-  yyout << "TOKEN " << yytext << std::endl;
-  return Cql2ParserBase::ACCENTI;
+  print("", yytext);
+  return Cql2ParserBase::token::ACCENTI;
 }
 
 "(" {
-  yyout << "TOKEN LPT " << yytext << std::endl;
-  lval_->c = '(';
-  return Cql2ParserBase::LPT;
+  print("LPT", yytext);
+  return Cql2ParserBase::token::LPT;
 }
 
 ")" {
-  yyout << "TOKEN RPT " << yytext << std::endl;
-  lval_->c = ')';
-  return Cql2ParserBase::RPT;
+  print("RPT", yytext);
+  return Cql2ParserBase::token::RPT;
 }
 
 "\"" {
-  yyout << "TOKEN DQUOTE " << yytext << std::endl;
-  return Cql2ParserBase::DQUOTE;
+  print("DQUOTE", yytext);
+  return Cql2ParserBase::token::DQUOTE;
 }
 "'" {
-  yyout << "TOKEN SQUOTE " << yytext << std::endl;
-  return Cql2ParserBase::SQUOTE;
+  print("SQUOTE", yytext);
+  return Cql2ParserBase::token::SQUOTE;
 }
 
 "," {
-  yyout << "TOKEN COMMA " << yytext << std::endl;
-  lval_->c = ',';
-  return Cql2ParserBase::COMMA;
+  print("COMMA", yytext);
+  return Cql2ParserBase::token::COMMA;
 }
 
 
 S_INTERSECTS|S_EQUALS|S_DISJOINT|S_TOUCHES|S_WITHIN|S_OVERLAPS|S_CROSSES|S_CONTAINS {
-  yyout << "TOKEN " << yytext << std::endl;
-  token_texts_.emplace_back(yytext);
-  lval_->str = token_texts_.back().c_str();
-  return Cql2ParserBase::SPT_FUNC;
+  print("SPATIAL", yytext);
+  yylval_->emplace<std::string>(yytext);
+  return Cql2ParserBase::token::SPT_FUNC;
 }
 
 
 POINT[Z]?"("[0-9. +\-\n]+")" {
-  yyout << "TOKEN " << yytext << std::endl;
-  token_texts_.emplace_back(yytext);
-  lval_->str = token_texts_.back().c_str();
-  return Cql2ParserBase::POINT_WKT;
+  print("GEOMETRY", yytext);
+  yylval_->emplace<std::string>() = yytext;
+  return Cql2ParserBase::token::POINT_WKT;
 }
 
 LINESTRING[Z]?"("[0-9. +\-,\n]+")" {
-  yyout << "TOKEN " << yytext << std::endl;
-  token_texts_.emplace_back(yytext);
-  lval_->str = token_texts_.back().c_str();
-  return Cql2ParserBase::LINESTRING_WKT;
+  print("GEOMETRY", yytext);
+  yylval_->emplace<std::string>() = yytext;
+  return Cql2ParserBase::token::LINESTRING_WKT;
 }
 
 POLYGON[Z]?"(("[0-9. +\-,\n]+"))" {
-  yyout << "TOKEN " << yytext << std::endl;
-  token_texts_.emplace_back(yytext);
-  lval_->str = token_texts_.back().c_str();
-  return Cql2ParserBase::POLYGON_WKT;
+  print("GEOMETRY", yytext);
+  yylval_->emplace<std::string>() = yytext;
+  return Cql2ParserBase::token::POLYGON_WKT;
 }
 
 BBOX"("[0-9. +\-,\n]+")" {
-  yyout << "TOKEN " << yytext << std::endl;
-  token_texts_.emplace_back(yytext);
-  lval_->str = token_texts_.back().c_str();
-  return Cql2ParserBase::BBOX_TEXT;
+  print("BBOX", yytext);
+  yylval_->emplace<std::string>() = yytext;
+  return Cql2ParserBase::token::BBOX_TEXT;
 }
 
 IN {
-  yyout << "TOKEN " << yytext << std::endl;
-  token_texts_.emplace_back(yytext);
-  lval_->str = token_texts_.back().c_str();
-  return Cql2ParserBase::IN;
+  print("IN", yytext);
+  return Cql2ParserBase::token::IN;
 }
 
 {ID} {
-  yyout << "TOKEN ID " << yytext << std::endl;
-  token_texts_.emplace_back(yytext);
-  lval_->str = token_texts_.back().c_str();
-  return Cql2ParserBase::ID;
+  print("ID", yytext);
+  yylval_->emplace<std::string>(yytext);
+  return Cql2ParserBase::token::ID;
 }
 
-"+" { yyout << "TOKEN " << yytext << std::endl; return Cql2ParserBase::PLUS; }
-"-" { yyout << "TOKEN " << yytext << std::endl; return Cql2ParserBase::MINUS;}
-"*" { yyout << "TOKEN " << yytext << std::endl; return Cql2ParserBase::MULT; }
-"/" { yyout << "TOKEN " << yytext << std::endl; return Cql2ParserBase::DIV;  }
-"=" { yyout << "TOKEN " << yytext << std::endl; return Cql2ParserBase::EQ;  }
-"<" { yyout << "TOKEN " << yytext << std::endl; return Cql2ParserBase::LT;  }
-">" { yyout << "TOKEN " << yytext << std::endl; return Cql2ParserBase::GT;  }
+"+" { print("OP", yytext); return Cql2ParserBase::token::PLUS; }
+"-" { print("OP", yytext); return Cql2ParserBase::token::MINUS;}
+"*" { print("OP", yytext); return Cql2ParserBase::token::MULT; }
+"/" { print("OP", yytext); return Cql2ParserBase::token::DIV;  }
+"=" { print("OP", yytext); return Cql2ParserBase::token::EQ;  }
+"<" { print("OP", yytext); return Cql2ParserBase::token::LT;  }
+">" { print("OP", yytext); return Cql2ParserBase::token::GT;  }
 
 "{"[^{}\n]*"}" {/* eat up one-line comments */}
 
 [ \t\n]+ {/* eat up whitespace */}
 
-. { yyout << "Unrecognized character: " << yytext << std::endl; }
+. { LOG(INFO) << "Unrecognized character: " << yytext << std::endl; }
 
 %%

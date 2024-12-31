@@ -37,15 +37,23 @@ set(BISON_FILE ${CMAKE_SOURCE_DIR}/src/cql2_parser.y)
 set(BISON_OUTPUT ${CMAKE_BINARY_DIR}/cql2_parser_base.cc)
 add_custom_command(
   OUTPUT ${BISON_OUTPUT}
-  COMMAND bison++ -v -d -o ${BISON_OUTPUT} ${BISON_FILE}
+  COMMAND bison -v -d -o ${BISON_OUTPUT} ${BISON_FILE}
   DEPENDS ${BISON_FILE}
-  COMMENT "Generating ${BISON_OUTPUT} from ${BISON_FILE} using bison++"
+  COMMENT "Generating ${BISON_OUTPUT} from ${BISON_FILE} using bison"
 )
 
 add_definitions(-DUSE_UNSTABLE_GEOS_CPP_API)
 
+set(CQL2CPP_SRC
+  src/id_generator.cc
+  src/ast_node.cc
+  src/global_yylex.cc
+  ${FLEX_OUTPUT}
+  ${BISON_OUTPUT}
+)
+
 # library
-add_library(cql2cpp src/id_generator.cc src/ast_node.cc ${FLEX_OUTPUT} ${BISON_OUTPUT})
+add_library(cql2cpp ${CQL2CPP_SRC})
 target_compile_options(cql2cpp PRIVATE -Wno-register -Wno-write-strings)
 target_link_libraries(cql2cpp GEOS::geos glog::glog)
 

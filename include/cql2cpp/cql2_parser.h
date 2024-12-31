@@ -13,22 +13,18 @@
 #include <FlexLexer.h>
 #include <glog/logging.h>
 
-#include <cql2_parser_base.h>
+#include <cql2_parser_base.hh>
 
-class Cql2Parser : public Cql2ParserBase {
+class Cql2Parser : public cql2cpp::Cql2ParserBase {
  private:
-  FlexLexer* lexer_;
+  cql2cpp::AstNode* root_;
 
  public:
-  Cql2Parser(FlexLexer* lexer) : lexer_(lexer) {
-    yydebug = false;
-  }
+  Cql2Parser() : cql2cpp::Cql2ParserBase(&root_) {}
 
-  void yyerror(char* s) override {
-    LOG(ERROR) << "Cql2Parser Error: " << s << std::endl;
+  void error(const std::string& msg) override {
+    LOG(ERROR) << "Cql2Parser Error: " << msg << std::endl;
   }
-
-  int yylex() override { return lexer_->yylex(); }
 
   cql2cpp::AstNode* root() const { return root_; }
 

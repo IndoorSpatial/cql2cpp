@@ -9,6 +9,7 @@
  */
 
 #include <cql2cpp/cql2cpp.h>
+#include <cql2cpp/global_yylex.h>
 #include <cql2cpp/feature_source_geojson.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Point.h>

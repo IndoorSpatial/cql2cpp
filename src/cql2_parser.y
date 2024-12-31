@@ -1,15 +1,9 @@
-%{
+%code {
 #include <iostream>
 #include <cstdlib>
 #include <geos/io/WKTReader.h>
 #include <cql2cpp/ast_node.h>
 #include <cql2cpp/bbox_reader.h>
-
-extern int yylex();  // Declare the lexer function
-extern void yyerror(const char *s);  // Declare the error handler
-
-#define YY_Cql2ParserBase_ERROR_BODY   {}
-#define YY_Cql2ParserBase_LEX_BODY   { return 0; }
 
 using cql2cpp::AstNode;
 
@@ -32,82 +26,85 @@ using cql2cpp::In;
 using cql2cpp::NotIn;
 
 using cql2cpp::NameOp;
-%}
 
-%header{
+void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
+  LOG(ERROR) << msg;
+}
+
+}
+
+%code requires {
 
 #include <geos/geom/Geometry.h>
 #include <cql2cpp/ast_node.h>
-#define YY_Cql2ParserBase_MEMBERS cql2cpp::AstNode* root_;
-#define YY_Cql2ParserBase_DEBUG 1
-#define YYDEBUG
 
-%}
-
-%name Cql2ParserBase
-
-%union {
-  bool boolean;
-  int num_int;
-  double num_float;
-  const char* str;
-  char c;
-  cql2cpp::AstNode* node;
-  geos::geom::Geometry* geom;
-  geos::geom::Envelope* env;
 }
 
-%token <num_int> NUMBER_INT
-%token <num_float> NUMBER_FLOAT
-%token <boolean> BOOLEAN
-%token <boolean> TRUE FALSE
-%token <str> ID
-%token <str> CHAR_LIT
-%token <str> SPT_FUNC
-%token <str> arrayFunction
+%code provides {
+
+#include <cql2cpp/global_yylex.h>
+
+}
+
+%language "C++"
+%define api.namespace {cql2cpp}
+%define api.parser.class {Cql2ParserBase}
+%define api.value.type variant
+%define parse.error verbose
+%parse-param {cql2cpp::AstNode **root_}
+
+%token <int> NUMBER_INT
+%token <double> NUMBER_FLOAT
+%token <bool> BOOLEAN
+%token <bool> TRUE FALSE
+%token <std::string> ID
+%token <std::string> CHAR_LIT
+%token <std::string> SPT_FUNC
+%token <std::string> arrayFunction
 %token PLUS MINUS MULT DIV
 %token EQ GT LT  // = > <
 %token AND OR NOT
 %token IN
-%token <c> LPT RPT COMMA  // ( ) ,
+%token <char> LPT RPT COMMA  // ( ) ,
 %token CASEI ACCENTI
 %token SQUOTE DQUOTE
 
-%token <str> POINT_WKT
-%token <str> LINESTRING_WKT
-%token <str> POLYGON_WKT
-%token <str> BBOX_TEXT
+%token <std::string> POINT_WKT
+%token <std::string> LINESTRING_WKT
+%token <std::string> POLYGON_WKT
+%token <std::string> BBOX_TEXT
 
-%type <node> booleanExpression
-%type <node> booleanTerm
-%type <node> booleanFactor
-%type <node> booleanPrimary
-%type <node> booleanLiteral
-%type <node> characterExpression
-%type <node> characterClause
-%type <node> propertyName
-%type <node> predicate
-%type <node> comparisonPredicate
-%type <node> binaryComparisonPredicate
-%type <node> scalarExpression
-%type <node> numericLiteral
-%type <node> spatialPredicate
-%type <node> geomExpression
-%type <node> spatialInstance
-%type <node> isInListPredicate
-%type <node> inList
-%type <node> arrayPredicate
-%type <node> arrayExpression
-%type <node> array
-%type <node> arrayElement
-%type <node> function
-%type <node> argumentList
-%type <node> argument
-%type <str> geometryLiteral
-%type <str> pointTaggedText
-%type <str> linestringTaggedText
-%type <str> polygonTaggedText
-%type <str> bboxTaggedText
+%type <AstNode*> booleanExpression
+%type <AstNode*> booleanTerm
+%type <AstNode*> booleanFactor
+%type <AstNode*> booleanPrimary
+%type <AstNode*> booleanLiteral
+%type <AstNode*> characterExpression
+%type <AstNode*> characterClause
+%type <AstNode*> propertyName
+%type <AstNode*> predicate
+%type <AstNode*> comparisonPredicate
+%type <AstNode*> binaryComparisonPredicate
+%type <AstNode*> scalarExpression
+%type <AstNode*> numericLiteral
+%type <AstNode*> spatialPredicate
+%type <AstNode*> geomExpression
+%type <AstNode*> spatialInstance
+%type <AstNode*> isInListPredicate
+%type <AstNode*> inList
+%type <AstNode*> arrayPredicate
+%type <AstNode*> arrayExpression
+%type <AstNode*> array
+%type <AstNode*> arrayElement
+%type <AstNode*> function
+%type <AstNode*> argumentList
+%type <AstNode*> argument
+
+%type <std::string> geometryLiteral
+%type <std::string> pointTaggedText
+%type <std::string> linestringTaggedText
+%type <std::string> polygonTaggedText
+%type <std::string> bboxTaggedText
 
 %left PLUS MINUS
 %left MULT DIV
@@ -119,7 +116,7 @@ using cql2cpp::NameOp;
 // Grammar rules:
 
 program:
-       booleanExpression { root_ = $1 }
+       booleanExpression { *root_ = $1; }
 
 booleanExpression:
   booleanTerm
@@ -137,7 +134,7 @@ booleanPrimary:
   function
   | predicate
   | booleanLiteral
-  | LPT booleanExpression RPT { $$ = $2 }
+  | LPT booleanExpression RPT { $$ = $2; }
 
 booleanLiteral:
   TRUE { $$ = new AstNode($1); }
@@ -166,7 +163,7 @@ binaryComparisonPredicate:
   | scalarExpression LT    scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::Lesser,   {$1, $3}); }
   | scalarExpression GT    scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::Greater,  {$1, $3}); }
   | scalarExpression LT EQ scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::LesserEqual, {$1, $4}); }
-  | scalarExpression GT EQ scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::GreaterEqual, {$1, $4}) }
+  | scalarExpression GT EQ scalarExpression { $$ = new AstNode(BinCompPred, cql2cpp::GreaterEqual, {$1, $4}); }
 
 scalarExpression:
   numericLiteral
@@ -208,7 +205,7 @@ spatialInstance:
     if (p) {
       $$ = new AstNode(p.release());
     } else {
-      yyerror("Can not parse WKT");
+      error("Can not parse WKT");
       YYERROR;
     }
   }
@@ -217,7 +214,7 @@ spatialInstance:
     if (p) {
       $$ = new AstNode(p.release());
     } else {
-      yyerror("Can not parse BBOX");
+      error("Can not parse BBOX");
       YYERROR;
     }
   }
@@ -229,7 +226,7 @@ arrayExpression:
   LPT RPT { $$ = new AstNode(Array, NullOp, {}); }
   | propertyName
   | function
-  | LPT array RPT { $$ = $2 }
+  | LPT array RPT { $$ = $2; }
 
 array:
   arrayElement  { $$ = new AstNode(Array, NullOp, {$1}); }
