@@ -43,6 +43,15 @@ class ParseTest : public testing::Test {
     cql2cpp::AstNode::set_ostream(&std::cout);
     bool ret = cql2cpp::Cql2Cpp<void*>::ToDot(query, &dot, nullptr);
     if (ret) LOG(INFO) << dot;
+
+    std::string dot_filename = case_name + ".dot";
+    // std::ofstream fout(dot_filename);
+    // if (fout.is_open()) {
+    //   fout << dot;
+    //   fout.close();
+    // } else {
+    //   LOG(ERROR) << "Can not open file " << dot_filename;
+    // }
     return ret;
   }
 };
