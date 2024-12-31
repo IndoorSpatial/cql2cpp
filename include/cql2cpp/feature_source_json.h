@@ -24,33 +24,47 @@ class FeatureSourceJson : public FeatureSource {
  public:
   FeatureSourceJson(const geos_nlohmann::json& json) : json_(json) {}
 
-  ValueT get_property(const std::string& property_path) const override {
-    const geos_nlohmann::json* value =
-        JsonHelper::get_property(property_path, json_);
-    if (value == nullptr) return NullValue;
-
-    switch (value->type()) {
+  ValueT get_property(const geos_nlohmann::json& json) const {
+    switch (json.type()) {
       case geos_nlohmann::json::value_t::null:
         return NullValue;
       case geos_nlohmann::json::value_t::object:
         return NullValue;
+      case geos_nlohmann::json::value_t::array: {
+        ArrayType array;
+        for (const auto& child : json) {
+          ValueT child_value = get_property(child);
+          if (not std::holds_alternative<NullStruct>(child_value))
+            array.insert(child_value);
+        }
+        return array;
+      }
       case geos_nlohmann::json::value_t::string:
-        return value->get<std::string>();
+        return json.get<std::string>();
       case geos_nlohmann::json::value_t::boolean:
-        return value->get<bool>();
+        return json.get<bool>();
       case geos_nlohmann::json::value_t::number_integer:
-        return value->get<int64_t>();
+        return json.get<int64_t>();
       case geos_nlohmann::json::value_t::number_unsigned:
-        return value->get<uint64_t>();
+        return json.get<uint64_t>();
       case geos_nlohmann::json::value_t::number_float:
-        return value->get<double>();
+        return json.get<double>();
       case geos_nlohmann::json::value_t::binary:
-        return value->get<std::string>();
+        return json.get<std::string>();
       case geos_nlohmann::json::value_t::discarded:
         return NullValue;
       default:
         return NullValue;
     }
+  }
+
+  ValueT get_property(const std::string& property_path) const override {
+    const geos_nlohmann::json* value =
+        JsonHelper::get_property(property_path, json_);
+    if (value == nullptr)
+      return NullValue;
+    else
+      return get_property(*value);
   }
 };
 

@@ -31,7 +31,7 @@ bool CheckValueNumberType(const std::string& op, size_t num,
   }
   for (size_t i = 0; i < num; i++)
     if (not std::holds_alternative<ValueType>(vs.at(i))) {
-      *errmsg = "value " + std::to_string(i) + "of " + op + " is incorrect";
+      *errmsg = "value " + std::to_string(i) + " of " + op + " is incorrect";
       return false;
     }
   return true;
