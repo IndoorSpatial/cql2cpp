@@ -145,6 +145,12 @@ IN {
   return Cql2ParserBase::token::ID;
 }
 
+A_EQUALS|A_CONTAINS|A_CONTAINEDBY|A_OVERLAPS {
+  print("ARRAY", yytext);
+  yylval_->emplace<std::string>(yytext);
+  return Cql2ParserBase::token::arrayFunction;
+}
+
 "+" { print("OP", yytext); return Cql2ParserBase::token::PLUS; }
 "-" { print("OP", yytext); return Cql2ParserBase::token::MINUS;}
 "*" { print("OP", yytext); return Cql2ParserBase::token::MULT; }

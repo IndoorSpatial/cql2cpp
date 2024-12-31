@@ -52,6 +52,7 @@ TEST_F(ParseTest, binary        ) { EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseTest, is_in_list    ) { EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseTest, is_not_in_list) { EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseTest, localization  ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseTest, array  )        { EXPECT_TRUE(Parse(case_name_)); }
 // TEST_F(ParseTest, binlocations  ) { EXPECT_TRUE(Parse(case_name_)); }  // function
 // TEST_F(ParseTest, labels        ) { EXPECT_TRUE(Parse(case_name_)); }
 // clang-format on

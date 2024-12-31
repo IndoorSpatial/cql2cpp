@@ -240,7 +240,7 @@ arrayElement:
   | numericLiteral
   // | temporalInstance
   | spatialInstance
-  | array  // shift/reduce conflict
+  // | array  // shift/reduce conflict
   // | arithmeticExpression
   | booleanExpression
   | propertyName
