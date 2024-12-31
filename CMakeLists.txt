@@ -37,7 +37,7 @@ set(BISON_FILE ${CMAKE_SOURCE_DIR}/src/cql2_parser.y)
 set(BISON_OUTPUT ${CMAKE_BINARY_DIR}/cql2_parser_base.cc)
 add_custom_command(
   OUTPUT ${BISON_OUTPUT}
-  COMMAND bison -v -d -o ${BISON_OUTPUT} ${BISON_FILE}
+  COMMAND bison -v -d -o ${BISON_OUTPUT} ${BISON_FILE} -W -Wcounterexamples
   DEPENDS ${BISON_FILE}
   COMMENT "Generating ${BISON_OUTPUT} from ${BISON_FILE} using bison"
 )

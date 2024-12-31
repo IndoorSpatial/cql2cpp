@@ -96,6 +96,7 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 %type <AstNode*> arrayExpression
 %type <AstNode*> array
 %type <AstNode*> arrayElement
+%type <AstNode*> arrayList
 %type <AstNode*> function
 %type <AstNode*> argumentList
 %type <AstNode*> argument
@@ -108,7 +109,6 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 
 %left PLUS MINUS
 %left MULT DIV
-%left NOT AND OR
 
 %define parse.trace
 %%
@@ -223,21 +223,24 @@ arrayPredicate:
   arrayFunction LPT arrayExpression COMMA arrayExpression RPT { $$ = new AstNode(ArrayPred, NameOp.at($1), {$3, $5}); }
 
 arrayExpression:
-  LPT RPT { $$ = new AstNode(Array, NullOp, {}); }
+  array
   | propertyName
   | function
-  | LPT array RPT { $$ = $2; }
 
 array:
+  LPT RPT { $$ = new AstNode(Array, NullOp, {}); }
+  | LPT arrayList RPT { $$ = $2; }
+
+arrayList:
   arrayElement  { $$ = new AstNode(Array, NullOp, {$1}); }
-  | array COMMA arrayElement  { $1->append($3);  $$ = $1; }
+  | arrayList COMMA arrayElement  { $1->append($3);  $$ = $1; }
 
 arrayElement:
   characterClause
   | numericLiteral
   // | temporalInstance
   | spatialInstance
-  // | array  // shift/reduce conflict
+  | array  // shift/reduce conflict
   // | arithmeticExpression
   | booleanExpression
   | propertyName
