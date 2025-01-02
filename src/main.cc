@@ -114,10 +114,6 @@ int main(int argc, char** argv) {
     std::map<cql2cpp::FeatureSourcePtr, const geos::io::GeoJSONFeature*>
         fs_feature;
     for (const auto& feature : fc.getFeatures()) {
-      LOG(INFO) << "feature id: " << feature.getId();
-      geos::io::GeoJSONWriter writer;
-      std::string serialized = writer.write(feature);
-      LOG(INFO) << "feature content: " << serialized;
       cql2cpp::FeatureSourcePtr fp =
           std::make_shared<cql2cpp::FeatureSourceGeoJson>(feature);
       fs_feature[fp] = &feature;
