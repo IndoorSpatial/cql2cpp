@@ -9,8 +9,8 @@
  */
 
 #include <cql2cpp/cql2cpp.h>
-#include <cql2cpp/global_yylex.h>
 #include <cql2cpp/feature_source_geojson.h>
+#include <cql2cpp/global_yylex.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Point.h>
 #include <geos/io/GeoJSON.h>
@@ -20,41 +20,50 @@
 
 #include <fstream>
 
-DEFINE_string(cql2_query, "", "cql2 query string");
-DEFINE_string(geojson, "", "data set to be queried");
+#include "cql2cpp/feature_source.h"
+
+DEFINE_string(query, "", "cql2 query string");
+DEFINE_string(geojson, "",
+              "geojson data set with multiple features in one feature "
+              "collection to be queried");
+DEFINE_uint32(index, 0, "index of the feature in geojson");
 DEFINE_string(dot, "", "generate dot file");
 DEFINE_bool(verbose, false, "Enable verbose output");
 
 int main(int argc, char** argv) {
   gflags::SetUsageMessage(
-      "cql2 usage: cql2 [-cql2_query=\"city='Toronto'\"] "
-      "-geojson=\"path/to/geo.json\"");
+      "Usage: cql2 -query=\"city='Toronto'\" "
+      "-geojson=\"path/to/feature_collection.geojson\" -index=0");
+  gflags::SetVersionString("0.1.0");
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
   google::InitGoogleLogging(argv[0]);
   google::InstallFailureSignalHandler();
   google::LogToStderr();
 
+  if (FLAGS_query.empty()) {
+    gflags::ShowUsageWithFlagsRestrict(argv[0], "main.cc");
+    LOG(ERROR) << "you should provide query";
+    return -1;
+  }
+
   // print flags
   LOG(INFO) << "==== flags ====";
-  LOG(INFO) << "cql2_query: " << FLAGS_cql2_query;
+  LOG(INFO) << "query: " << FLAGS_query;
   LOG(INFO) << "geojson: " << FLAGS_geojson;
   LOG(INFO) << "dot: " << FLAGS_dot;
 
   if (FLAGS_verbose) cql2cpp::AstNode::set_ostream(&std::cout);
 
-  if (FLAGS_cql2_query.empty()) {
-    LOG(ERROR) << "you should provide cql2_query";
-    return 0;
-  }
-
   std::string error_msg;
 
-  // just parse the query and dump a dot file
+  // case 1:
+  // we have only query without any feature
+  // just parse the query and may dump a dot file
   if (FLAGS_geojson.empty()) {
     std::string dot;
     cql2cpp::Cql2Cpp<geos::io::GeoJSONFeature> cql2cpp;
-    if (cql2cpp.ToDot(FLAGS_cql2_query, &dot, &error_msg)) {
+    if (cql2cpp.ToDot(FLAGS_query, &dot, &error_msg)) {
       LOG(INFO) << error_msg;
       if (not FLAGS_dot.empty()) {
         std::string dot_filename = FLAGS_dot;
@@ -65,6 +74,7 @@ int main(int argc, char** argv) {
         if (fout.is_open()) {
           fout << dot;
           fout.close();
+          LOG(INFO) << "dump dot file into " << dot_filename;
         } else {
           LOG(ERROR) << "Can not open file " << dot_filename;
         }
@@ -73,7 +83,9 @@ int main(int argc, char** argv) {
       LOG(ERROR) << error_msg;
     }
   } else {
-    // read geojson text
+    // case 2:
+    // we have query and a feature collection
+    // filter matched features from the feature collection
     std::string geojson_text;
     std::ifstream fin(FLAGS_geojson);
     if (fin.good()) {
@@ -108,7 +120,7 @@ int main(int argc, char** argv) {
     cql2cpp::Cql2Cpp<const geos::io::GeoJSONFeature*> cql2cpp;
     cql2cpp.set_feature_source(fs_feature);
     std::vector<const geos::io::GeoJSONFeature*> result;
-    if (cql2cpp.filter(FLAGS_cql2_query, &result)) {
+    if (cql2cpp.filter(FLAGS_query, &result)) {
       LOG(INFO) << "get feature count: " << result.size();
       for (const auto& feature : result) {
         LOG(INFO) << "get feature geometry: "
@@ -116,6 +128,35 @@ int main(int argc, char** argv) {
       }
     } else {
       LOG(ERROR) << "filter error: " << cql2cpp.error_msg();
+    }
+
+    if (FLAGS_index >= fc.getFeatures().size()) {
+      LOG(ERROR) << "index(" << FLAGS_index << ") out of range [0.."
+                 << fc.getFeatures().size() - 1 << "]";
+      goto FAILED;
+    }
+    cql2cpp::FeatureSourceGeoJson fs(fc.getFeatures().at(FLAGS_index));
+
+    std::string dot;
+    bool eval_result;
+    if (cql2cpp::Cql2Cpp<const geos::io::GeoJSONFeature*>::Evaluate(
+            FLAGS_query, fs, &eval_result, &error_msg, &dot)) {
+      if (not FLAGS_dot.empty()) {
+        std::string dot_filename = FLAGS_dot;
+        if (dot_filename.find(".dot") == std::string::npos)
+          dot_filename += ".dot";
+
+        std::ofstream fout(dot_filename);
+        if (fout.is_open()) {
+          fout << dot;
+          fout.close();
+          LOG(INFO) << "dump dot file into " << dot_filename;
+        } else {
+          LOG(ERROR) << "Can not open file " << dot_filename;
+        }
+      }
+    } else {
+      LOG(ERROR) << error_msg;
     }
   }
 FAILED:

@@ -20,9 +20,9 @@
 #include "cql2_parser.h"
 #include "evaluator.h"
 #include "feature_source.h"
+#include "global_yylex.h"
 #include "node_evaluator.h"
 #include "tree_dot.h"
-#include "global_yylex.h"
 
 namespace cql2cpp {
 
@@ -64,7 +64,7 @@ class Cql2Cpp {
           LOG(ERROR) << "evaluation result type error";
         }
       } else {
-          LOG(ERROR) << "evaluation error: " << tree_evaluator.error_msg();
+        LOG(ERROR) << "evaluation error: " << tree_evaluator.error_msg();
       }
     }
     Cql2Parser::DeConstructAST(root);
@@ -74,8 +74,8 @@ class Cql2Cpp {
 
   const std::string error_msg() const { return error_msg_; }
 
-  static bool filter(const std::string& cql2_query, const FeatureSource& fs,
-                     bool* result, std::string* error_msg, std::string* dot) {
+  static bool Evaluate(const std::string& cql2_query, const FeatureSource& fs,
+                       bool* result, std::string* error_msg, std::string* dot) {
     // Parse
     AstNode* root;
     if (not Parse(cql2_query, &root, error_msg)) return false;
