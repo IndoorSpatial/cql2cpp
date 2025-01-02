@@ -35,7 +35,7 @@ class FeatureSourceJson : public FeatureSource {
         for (const auto& child : json) {
           ValueT child_value = get_property(child);
           if (not std::holds_alternative<NullStruct>(child_value))
-            array.insert(child_value);
+            array.emplace_back(child_value);
         }
         return array;
       }

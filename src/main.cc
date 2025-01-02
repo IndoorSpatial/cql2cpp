@@ -26,8 +26,10 @@ DEFINE_string(query, "", "cql2 query string");
 DEFINE_string(geojson, "",
               "geojson data set with multiple features in one feature "
               "collection to be queried");
-DEFINE_uint32(index, 0, "index of the feature in geojson");
 DEFINE_string(dot, "", "generate dot file");
+DEFINE_uint32(index, 0,
+              "the dot file will generated according to the feature with this "
+              "index in geojson file");
 DEFINE_bool(verbose, false, "Enable verbose output");
 
 int main(int argc, char** argv) {
@@ -112,6 +114,10 @@ int main(int argc, char** argv) {
     std::map<cql2cpp::FeatureSourcePtr, const geos::io::GeoJSONFeature*>
         fs_feature;
     for (const auto& feature : fc.getFeatures()) {
+      LOG(INFO) << "feature id: " << feature.getId();
+      geos::io::GeoJSONWriter writer;
+      std::string serialized = writer.write(feature);
+      LOG(INFO) << "feature content: " << serialized;
       cql2cpp::FeatureSourcePtr fp =
           std::make_shared<cql2cpp::FeatureSourceGeoJson>(feature);
       fs_feature[fp] = &feature;

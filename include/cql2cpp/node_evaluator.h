@@ -18,6 +18,7 @@
 #include <variant>
 
 #include "evaluator.h"
+#include "function.h"
 #include "value_compare.h"
 
 namespace cql2cpp {
@@ -34,6 +35,48 @@ bool CheckValueNumberType(const std::string& op, size_t num,
       *errmsg = "value " + std::to_string(i) + " of " + op + " is incorrect";
       return false;
     }
+  return true;
+}
+
+inline bool ComparisonCheck(const std::vector<ValueT>& vs, double* left,
+                            double* right, std::string* errmsg) {
+  if (vs.size() != 2) {
+    *errmsg = "binary compare needs two values but we have " +
+              std::to_string(vs.size());
+    return false;
+  }
+
+  if (std::holds_alternative<int64_t>(vs.at(0)))
+    *left = std::get<int64_t>(vs.at(0));
+  else if (std::holds_alternative<uint64_t>(vs.at(0)))
+    *left = std::get<uint64_t>(vs.at(0));
+  else if (std::holds_alternative<double>(vs.at(0)))
+    *left = std::get<double>(vs.at(0));
+  else {
+    *errmsg = "left hand size of compare is not int or double";
+    return false;
+  }
+
+  if (std::holds_alternative<int64_t>(vs.at(1)))
+    *right = std::get<int64_t>(vs.at(1));
+  else if (std::holds_alternative<uint64_t>(vs.at(1)))
+    *right = std::get<uint64_t>(vs.at(1));
+  else if (std::holds_alternative<double>(vs.at(1)))
+    *right = std::get<double>(vs.at(1));
+  else {
+    *errmsg = "right hand size of compare is not int or double";
+    return false;
+  }
+
+  if (std::isnan(*left)) {
+    *errmsg = "left hand side is nan";
+    return false;
+  }
+  if (std::isnan(*right)) {
+    *errmsg = "right hand side is nan";
+    return false;
+  }
+
   return true;
 }
 
@@ -126,7 +169,7 @@ const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
      {{NullOp,
        [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
          ArrayType result;
-         for (const auto& v : vs) result.insert(ArrayElement(v));
+         for (const auto& v : vs) result.emplace_back(Element(v));
          *value = result;
          return true;
        }}}},
@@ -151,14 +194,16 @@ const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
           [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
             if (not CheckValueNumberType<ArrayType>("Array Op", 2, vs, errmsg))
               return false;
-            const auto& lhs = std::get<ArrayType>(vs.at(0));
-            const auto& rhs = std::get<ArrayType>(vs.at(1));
-            if (lhs.size() < rhs.size()) {
+            const auto& lhs_array = std::get<ArrayType>(vs.at(0));
+            const auto& rhs_array = std::get<ArrayType>(vs.at(1));
+            if (lhs_array.size() < rhs_array.size()) {
               *value = false;
               return true;
             }
-            for (const auto& e : rhs)
-              if (lhs.find(e) == lhs.end()) {
+            SetType lhs_set(lhs_array.begin(), lhs_array.end());
+            SetType rhs_set(rhs_array.begin(), rhs_array.end());
+            for (const auto& e : rhs_set)
+              if (lhs_set.find(e) == lhs_set.end()) {
                 *value = false;
                 return true;
               }
@@ -170,14 +215,16 @@ const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
             if (not CheckValueNumberType<ArrayType>("Array Op", 2, vs, errmsg))
               return false;
 
-            const auto& lhs = std::get<ArrayType>(vs.at(0));
-            const auto& rhs = std::get<ArrayType>(vs.at(1));
-            if (lhs.size() > rhs.size()) {
+            const auto& lhs_array = std::get<ArrayType>(vs.at(0));
+            const auto& rhs_array = std::get<ArrayType>(vs.at(1));
+            if (lhs_array.size() > rhs_array.size()) {
               *value = false;
               return true;
             }
-            for (const auto& e : lhs)
-              if (rhs.find(e) == rhs.end()) {
+            SetType lhs_set(lhs_array.begin(), lhs_array.end());
+            SetType rhs_set(rhs_array.begin(), rhs_array.end());
+            for (const auto& e : lhs_set)
+              if (rhs_set.find(e) == rhs_set.end()) {
                 *value = false;
                 return true;
               }
@@ -242,8 +289,80 @@ const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
          *value = fs->get_property(std::get<std::string>(n->value()));
          return true;
        }}}},
+    {Function,
+     {{NullOp,
+       [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+         if (vs.empty()) {
+           *errmsg = "function needs a name and argument list";
+           return false;
+         }
+         if (not std::holds_alternative<std::string>(vs.at(0))) {
+           *errmsg = "function name should be a string";
+           return false;
+         }
+         std::string function_name = std::get<std::string>(vs.at(0));
+         if (functions.find(function_name) == functions.end()) {
+           *errmsg = "can not find function " + function_name;
+           return false;
+         }
+         if (vs.size() == 1)
+           return functions.at(function_name).operator()({}, value, errmsg);
+         else if (vs.size() == 2) {
+           if (not std::holds_alternative<ArrayType>(vs.at(1))) {
+             *errmsg = "the second value of a function should be argument list";
+             return false;
+           }
+           std::vector<ValueT> vec;
+           for (const auto& element : std::get<ArrayType>(vs.at(1)))
+             vec.emplace_back(element.value);
+
+           return functions.at(function_name)
+               .
+               operator()(vec, value, errmsg);
+         } else {
+           *errmsg =
+               "function needs only two child (name and argument list) but we "
+               "get " +
+               std::to_string(vs.size());
+           return false;
+         }
+       }}}},
+    {ArgumentList,
+     {{NullOp,
+       [](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+         ArrayType result;
+         for (const auto& v : vs) result.emplace_back(Element(v));
+         *value = result;
+         return true;
+       }}}},
     {BinCompPred,
-     {{NotEqual,
+     {{Greater, {[](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+         double left, right;
+         if (not ComparisonCheck(vs, &left, &right, errmsg)) return false;
+         *value = (left > right);
+         return true;
+       }}},
+      {GreaterEqual,
+       {[](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+         double left, right;
+         if (not ComparisonCheck(vs, &left, &right, errmsg)) return false;
+         *value = (left >= right);
+         return true;
+       }}},
+      {Lesser, {[](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+         double left, right;
+         if (not ComparisonCheck(vs, &left, &right, errmsg)) return false;
+         *value = (left < right);
+         return true;
+       }}},
+      {LesserEqual,
+       {[](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
+         double left, right;
+         if (not ComparisonCheck(vs, &left, &right, errmsg)) return false;
+         *value = (left <= right);
+         return true;
+       }}},
+      {NotEqual,
        {[](auto n, auto vs, auto fs, auto value, auto errmsg) -> bool {
          const NodeEval& equal_lambda = node_evals.at(BinCompPred).at(Equal);
          bool ret = equal_lambda.operator()(n, vs, fs, value, errmsg);
@@ -269,41 +388,10 @@ const std::map<NodeType, std::map<Operator, NodeEval>> node_evals = {
            return true;
          }
 
-         double* lhs = nullptr;
-         if (std::holds_alternative<int64_t>(vs.at(0))) {
-           lhs = new double;
-           *lhs = (double)std::get<int64_t>(vs.at(0));
-         } else if (std::holds_alternative<uint64_t>(vs.at(0))) {
-           lhs = new double;
-           *lhs = (double)std::get<uint64_t>(vs.at(0));
-         } else if (std::holds_alternative<double>(vs.at(0))) {
-           lhs = new double;
-           *lhs = std::get<double>(vs.at(0));
-         }
-         double* rhs = nullptr;
-         if (std::holds_alternative<int64_t>(vs.at(1))) {
-           rhs = new double;
-           *rhs = (double)std::get<int64_t>(vs.at(1));
-         } else if (std::holds_alternative<uint64_t>(vs.at(1))) {
-           rhs = new double;
-           *rhs = (double)std::get<uint64_t>(vs.at(1));
-         } else if (std::holds_alternative<double>(vs.at(1))) {
-           rhs = new double;
-           *rhs = std::get<double>(vs.at(1));
-         }
-
-         if (lhs != nullptr and rhs != nullptr) {
-           *value = fabs(*lhs - *rhs) < kEpsilon;
-           delete lhs;
-           delete rhs;
-           return true;
-         }
-
-         if (lhs != nullptr) delete lhs;
-         if (rhs != nullptr) delete rhs;
-
-         *errmsg = "type mismatch around equal";
-         return false;
+         double left, right;
+         if (not ComparisonCheck(vs, &left, &right, errmsg)) return false;
+         *value = (fabs(left - right) < kEpsilon);
+         return true;
        }}}},
 };
 

@@ -24,14 +24,14 @@ namespace cql2cpp {
 
 enum NullStruct { NullValue };
 
-struct ArrayElement;
+struct Element;
 
 class ArrayElementComp {
  public:
   static constexpr double tolerance = 1e-9;
 
  public:
-  bool operator()(const ArrayElement& a, const ArrayElement& b) const;
+  bool operator()(const Element& a, const Element& b) const;
 
  private:
   template <typename T, typename U>
@@ -40,15 +40,22 @@ class ArrayElementComp {
   }
 };
 
-using ArrayType = std::set<ArrayElement, ArrayElementComp>;
+// https://docs.ogc.org/is/21-065r2/21-065r2.html#_array_functions
+// /req/array-functions/array-predicates Requirement 16 B
+// Both array expressions SHALL be evaluated as sets.
+// No inherent order SHALL be implied in an array of values.
+using SetType = std::set<Element, ArrayElementComp>;
 
-using ValueT = std::variant<NullStruct, bool, int64_t, uint64_t, double,
-                            std::string, ArrayType, const geos::geom::Geometry*,
-                            const geos::geom::Envelope*>;
+using ArrayType = std::vector<Element>;
 
-struct ArrayElement {
+using ValueT =
+    std::variant<NullStruct, bool, int64_t, uint64_t, double, std::string,
+                 ArrayType, const geos::geom::Geometry*,
+                 const geos::geom::Envelope*>;
+
+struct Element {
   ValueT value;
-  ArrayElement(const ValueT& value) : value(value) {}
+  Element(const ValueT& value) : value(value) {}
 };
 
 static std::string value_str(ValueT value, bool with_type = false) {

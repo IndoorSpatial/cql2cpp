@@ -2,11 +2,11 @@
   "type": "FeatureCollection",
   "features": [
     {
-      "id": 0,
+      "id": "0",
       "type": "Feature",
       "geometry": {
-        "coordinates": [ 0.5, 0.5 ],
-        "type": "Point"
+        "type": "Point",
+        "coordinates": [ 0.5, 0.5 ]
       },
       "properties": {
         "string_field": "Beijing",
@@ -16,13 +16,41 @@
           "value_1",
           "value_2"
         ],
+        "fois": [
+          "{ \"$ref\": \"1\" },",
+          "{ \"$ref\": \"1\" },",
+          "there is a bug: GeoJsonWriter.cpp:118"
+        ],
         "int_field": 1,
         "signed_int_field": 456,
         "minus_int_field": -789,
         "float_field": 0.666,
         "object": {
           "key": "value"
-        }
+        },
+        "windSpeed": [ 1, 2, 3 ]
+      }
+    },
+    {
+      "id": "1",
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [ 0, 0 ]
+      },
+      "properties": {
+        "binlocations": [ "A-01", "A-02" ]
+      }
+    },
+    {
+      "id": "2",
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [ 0, 0 ]
+      },
+      "properties": {
+        "binlocations": [ "A-03", "A-04" ]
       }
     }
   ]

@@ -12,8 +12,8 @@
 
 namespace cql2cpp {
 
-bool ArrayElementComp::operator()(const ArrayElement& lhs,
-                                  const ArrayElement& rhs) const {
+bool ArrayElementComp::operator()(const Element& lhs,
+                                  const Element& rhs) const {
   const auto& a = lhs.value;
   const auto& b = rhs.value;
   if (a.index() != b.index()) return std::less()(a.index(), b.index());

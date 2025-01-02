@@ -13,7 +13,7 @@ void print(const std::string& prefix, const char* yytext) {
 %option noyywrap
 
 DIGIT    [0-9]
-ID       [a-z][.a-z0-9_\-]*
+ID       [a-z][.a-zA-Z0-9_\-]*
 CHAR_LIT \'[^\']*\'
 
 %%

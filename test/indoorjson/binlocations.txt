@@ -1,1 +1,1 @@
-'PICKING' IN labels AND 'A-01-03' IN refs_prop_union(fois, binlocations)
+A_CONTAINEDBY(('PICKING'), labels) AND A_CONTAINEDBY(('A-01-03'), (related_bins(fois, binlocations)))

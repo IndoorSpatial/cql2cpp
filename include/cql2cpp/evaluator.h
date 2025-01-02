@@ -60,7 +60,8 @@ class TreeEvaluator {
         root, child_values, fs, result, &error_msg_);
     if (ret) {
       root->set_value(*result);
-      LOG(INFO) << "Evaluate Node " << root->id()
+      LOG(INFO) << "Evaluate Node " << root->id() << " "
+                << TypeName.at(root->type())
                 << " value: " << value_str(*result, true);
     } else {
       LOG(ERROR) << "Evaluate Node " << root->id() << " error: " << error_msg_;
