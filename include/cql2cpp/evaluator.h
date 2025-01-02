@@ -22,6 +22,11 @@ using NodeEval =
     std::function<bool(const AstNode*, const std::vector<ValueT>&,
                        const FeatureSource*, ValueT*, std::string* error_msg)>;
 
+class NodeEvaluator {
+ public:
+   virtual const std::map<NodeType, std::map<Operator, NodeEval>>& GetEvaluators() const = 0;
+};
+
 class TreeEvaluator {
  private:
   std::map<NodeType, std::map<Operator, NodeEval>> type_evaluator_;
