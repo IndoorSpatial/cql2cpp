@@ -18,9 +18,11 @@
         ],
         "fois": [
           "{ \"$ref\": \"1\" },",
-          "{ \"$ref\": \"1\" },",
-          "there is a bug: GeoJsonWriter.cpp:118"
+          "{ \"$ref\": \"2\" },",
+          "there is a bug: GeoJsonWriter.cpp:118",
+          "https://github.com/libgeos/geos/pull/1216"
         ],
+        "foi_ids": [ "1", "2" ],
         "int_field": 1,
         "signed_int_field": 456,
         "minus_int_field": -789,
