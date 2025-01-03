@@ -61,7 +61,7 @@ class Evaluator {
     eval_func.Register(functor);
   }
 
-  bool Evaluate(const AstNode* root, const FeatureSource* fs,
+  bool Evaluate(const AstNodePtr root, const FeatureSource* fs,
                 ValueT* result) const {
     if (type_evaluator_.find(root->type()) == type_evaluator_.end() ||
         type_evaluator_.at(root->type()).find(root->op()) ==
@@ -73,7 +73,7 @@ class Evaluator {
     }
 
     std::vector<ValueT> child_values;
-    for (AstNode* child : root->children()) {
+    for (AstNodePtr child : root->children()) {
       ValueT value;
       if (Evaluate(child, fs, &value))
         child_values.emplace_back(value);

@@ -18,14 +18,14 @@ namespace cql2cpp {
 
 class Tree2Dot {
  public:
-  static std::string node_name(const AstNode* node) {
+  static std::string node_name(const AstNodePtr node) {
     if (node->op() != NullOp)
       return OpName.at(node->op());
     else
       return TypeName.at(node->type());
   }
 
-  static bool GenerateDot(std::ostream& ous, const AstNode* node) {
+  static bool GenerateDot(std::ostream& ous, const AstNodePtr node) {
     ous << "digraph G {" << std::endl;
     GenerateDotNode(ous, node);
     ous << std::endl;
@@ -34,21 +34,21 @@ class Tree2Dot {
     return true;
   }
 
-  static bool GenerateDotNode(std::ostream& ous, const AstNode* node) {
+  static bool GenerateDotNode(std::ostream& ous, const AstNodePtr node) {
     if (node == nullptr) return true;
 
     ous << "  \"" << node->id() << "\" [label=\"" << node->id() << ". "
         << node_name(node) << "(" << value_str(node->value()) << ")"
         << "\"];" << std::endl;
-    for (const auto child : node->children()) GenerateDotNode(ous, child);
+    for (const auto& child : node->children()) GenerateDotNode(ous, child);
 
     return true;
   }
 
-  static bool GenerateDotEdge(std::ostream& ous, const AstNode* node) {
+  static bool GenerateDotEdge(std::ostream& ous, const AstNodePtr node) {
     if (node == nullptr) return true;
 
-    for (const auto child : node->children()) {
+    for (const auto& child : node->children()) {
       ous << "  \"" << node->id() << "\" -> \"" << child->id() << "\";\n";
       GenerateDotEdge(ous, child);
     }

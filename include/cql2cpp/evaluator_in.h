@@ -61,8 +61,8 @@ class EvaluatorIn : public EvaluatorAstNode {
         *errmsg = "left hand side is not scalar type";
         return false;
       }
-      AstNode* in_list = n->children()[1];
-      for (const AstNode* grand_child : in_list->children()) {
+      AstNodePtr in_list = n->children()[1];
+      for (const AstNodePtr& grand_child : in_list->children()) {
         if (isVariantEqual(vs.at(0), grand_child->value())) {
           *value = true;
           return true;

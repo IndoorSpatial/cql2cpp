@@ -20,7 +20,7 @@
 namespace cql2cpp {
 
 using NodeEval =
-    std::function<bool(const AstNode*, const std::vector<ValueT>&,
+    std::function<bool(const AstNodePtr, const std::vector<ValueT>&,
                        const FeatureSource*, ValueT*, std::string* error_msg)>;
 
 class EvaluatorAstNode {

@@ -11,6 +11,7 @@
 #pragma once
 
 #include <glog/logging.h>
+#include <unistd.h>
 
 #include <memory>
 #include <vector>
@@ -31,7 +32,7 @@ class AstNode {
   std::string id_;
   NodeType type_;
   Operator op_;
-  std::vector<AstNode*> children_;
+  std::vector<AstNodePtr> children_;
   ValueT origin_value_;
   mutable ValueT value_;
   static std::ostream* ous_;
@@ -39,22 +40,22 @@ class AstNode {
  public:
   static void set_ostream(std::ostream* ous) { ous_ = ous; }
 
-  AstNode(NodeType type, Operator op, const std::vector<AstNode*> children)
+  AstNode(NodeType type, Operator op, const std::vector<AstNodePtr> children)
       : type_(type), op_(op), children_(children) {
     id_ = idg.Gen();
-    *ous_ << "AstNode " << ToString() << std::endl;
+    LOG(INFO) << "AstNode " << ToString() << std::endl;
   }
 
   AstNode(NodeType type, const ValueT& value)
       : type_(type), op_(NullOp), origin_value_(value), value_(NullValue) {
     id_ = idg.Gen();
-    *ous_ << "AstNode " << ToString() << std::endl;
+    LOG(INFO) << "AstNode " << ToString() << std::endl;
   }
 
   AstNode(const ValueT& value)
       : type_(Literal), op_(NullOp), origin_value_(value), value_(NullValue) {
     id_ = idg.Gen();
-    *ous_ << "AstNode " << ToString() << std::endl;
+    LOG(INFO) << "AstNode " << ToString() << std::endl;
   }
 
   const std::string& id() const { return id_; }
@@ -63,8 +64,8 @@ class AstNode {
 
   Operator op() const { return op_; }
 
-  const std::vector<AstNode*>& children() const { return children_; }
-  void append(AstNode* node) { children_.emplace_back(node); }
+  const std::vector<AstNodePtr>& children() const { return children_; }
+  void append(AstNodePtr node) { children_.emplace_back(node); }
 
   const ValueT& origin_value() const { return origin_value_; }
   ValueT value() const { return value_; }

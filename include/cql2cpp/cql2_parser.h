@@ -17,7 +17,7 @@
 
 class Cql2Parser : public cql2cpp::Cql2ParserBase {
  private:
-  cql2cpp::AstNode* root_;
+  cql2cpp::AstNodePtr root_;
 
  public:
   Cql2Parser() : cql2cpp::Cql2ParserBase(&root_) {}
@@ -26,12 +26,5 @@ class Cql2Parser : public cql2cpp::Cql2ParserBase {
     LOG(ERROR) << "Cql2Parser Error: " << msg << std::endl;
   }
 
-  cql2cpp::AstNode* root() const { return root_; }
-
-  void DeConstructRoot() { DeConstructAST(root_); }
-
-  static void DeConstructAST(cql2cpp::AstNode* node) {
-    for (auto* child : node->children()) DeConstructAST(child);
-    delete node;
-  }
+  cql2cpp::AstNodePtr root() const { return root_; }
 };
