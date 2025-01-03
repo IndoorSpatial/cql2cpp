@@ -12,11 +12,11 @@
 
 #include <geos/geom/GeometryFactory.h>
 
-#include "evaluator.h"
+#include "evaluator_ast_node.h"
 
 namespace cql2cpp {
 
-class EvaluatorSpatial : public NodeEvaluator {
+class EvaluatorSpatial : public EvaluatorAstNode {
  private:
   std::map<NodeType, std::map<Operator, NodeEval>> evaluators_;
 

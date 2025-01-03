@@ -10,45 +10,65 @@
 
 #pragma once
 
-#include <functional>
 #include <map>
 
 #include "ast_node.h"
+#include "evaluator_array.h"
+#include "evaluator_ast_node.h"
+#include "evaluator_bool.h"
+#include "evaluator_compare.h"
+#include "evaluator_function.h"
+#include "evaluator_in.h"
+#include "evaluator_literal.h"
+#include "evaluator_property.h"
+#include "evaluator_spatial.h"
 #include "feature_source.h"
+#include "functor.h"
+#include "functor_avg.h"
+#include "functor_buffer.h"
+#include "functor_related_bins.h"
 
 namespace cql2cpp {
 
-using NodeEval =
-    std::function<bool(const AstNode*, const std::vector<ValueT>&,
-                       const FeatureSource*, ValueT*, std::string* error_msg)>;
-
-class NodeEvaluator {
- public:
-   virtual const std::map<NodeType, std::map<Operator, NodeEval>>& GetEvaluators() const = 0;
-};
-
-class TreeEvaluator {
+class Evaluator {
  private:
   std::map<NodeType, std::map<Operator, NodeEval>> type_evaluator_;
-  std::string error_msg_;
+  EvaluatorFunction eval_func;
+  mutable std::string error_msg_;
 
  public:
-  void RegisterNodeEvaluator(Operator op, NodeType type, NodeEval evaluator) {
-    type_evaluator_[type][op] = evaluator;
+  Evaluator() {
+    Register(EvaluatorBool().GetEvaluators());
+    Register(EvaluatorCompare().GetEvaluators());
+    Register(EvaluatorSpatial().GetEvaluators());
+    Register(EvaluatorArray().GetEvaluators());
+    Register(EvaluatorIn().GetEvaluators());
+    Register(EvaluatorLiteral().GetEvaluators());
+    Register(EvaluatorProperty().GetEvaluators());
+
+    Register(eval_func.GetEvaluators());
+    eval_func.Register(std::make_shared<FunctorAvg>());
+    eval_func.Register(std::make_shared<FunctorBuffer>());
+    eval_func.Register(std::make_shared<FunctorRelatedBins>());
   }
 
-  void RegisterNodeEvaluator(
+  void Register(
       const std::map<NodeType, std::map<Operator, NodeEval>> evaluators) {
     type_evaluator_.insert(evaluators.begin(), evaluators.end());
   }
 
-  bool Evaluate(const AstNode* root, const FeatureSource* fs, ValueT* result) {
+  void RegisterFunctor(const FunctorPtr functor) {
+    eval_func.Register(functor);
+  }
+
+  bool Evaluate(const AstNode* root, const FeatureSource* fs,
+                ValueT* result) const {
     if (type_evaluator_.find(root->type()) == type_evaluator_.end() ||
-        type_evaluator_[root->type()].find(root->op()) ==
-            type_evaluator_[root->type()].end()) {
+        type_evaluator_.at(root->type()).find(root->op()) ==
+            type_evaluator_.at(root->type()).end()) {
       error_msg_ = "can not find evaluator for operator \"" +
-                   OpName.at(root->op()) + "\" in node type " +
-                   TypeName.at(root->type());
+                   OpName.at(root->op()) + "\" in node type \"" +
+                   TypeName.at(root->type()) + "\"";
       return false;
     }
 
@@ -61,8 +81,10 @@ class TreeEvaluator {
         return false;
     }
 
-    bool ret = type_evaluator_[root->type()][root->op()].operator()(
-        root, child_values, fs, result, &error_msg_);
+    bool ret = type_evaluator_.at(root->type())
+                   .at(root->op())
+                   .
+                   operator()(root, child_values, fs, result, &error_msg_);
     if (ret) {
       root->set_value(*result);
       LOG(INFO) << "Evaluate Node " << root->id() << " "
@@ -75,7 +97,7 @@ class TreeEvaluator {
     return ret;
   }
 
-  const std::string& error_msg() { return error_msg_; }
+  const std::string& error_msg() const { return error_msg_; }
 };
 
 }  // namespace cql2cpp

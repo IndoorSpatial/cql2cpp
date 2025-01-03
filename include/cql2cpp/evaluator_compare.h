@@ -10,14 +10,56 @@
 
 #pragma once
 
-#include "evaluator.h"
+#include "evaluator_ast_node.h"
 #include "value_compare.h"
 
 namespace cql2cpp {
 
-class EvaluatorCompare : public NodeEvaluator {
+class EvaluatorCompare : public EvaluatorAstNode {
  private:
   std::map<NodeType, std::map<Operator, NodeEval>> evaluators_;
+
+  static bool ComparisonCheck(const std::vector<ValueT>& vs, double* left,
+                              double* right, std::string* errmsg) {
+    if (vs.size() != 2) {
+      *errmsg = "binary compare needs two values but we have " +
+                std::to_string(vs.size());
+      return false;
+    }
+
+    if (std::holds_alternative<int64_t>(vs.at(0)))
+      *left = std::get<int64_t>(vs.at(0));
+    else if (std::holds_alternative<uint64_t>(vs.at(0)))
+      *left = std::get<uint64_t>(vs.at(0));
+    else if (std::holds_alternative<double>(vs.at(0)))
+      *left = std::get<double>(vs.at(0));
+    else {
+      *errmsg = "left hand size of compare is not int or double";
+      return false;
+    }
+
+    if (std::holds_alternative<int64_t>(vs.at(1)))
+      *right = std::get<int64_t>(vs.at(1));
+    else if (std::holds_alternative<uint64_t>(vs.at(1)))
+      *right = std::get<uint64_t>(vs.at(1));
+    else if (std::holds_alternative<double>(vs.at(1)))
+      *right = std::get<double>(vs.at(1));
+    else {
+      *errmsg = "right hand size of compare is not int or double";
+      return false;
+    }
+
+    if (std::isnan(*left)) {
+      *errmsg = "left hand side is nan";
+      return false;
+    }
+    if (std::isnan(*right)) {
+      *errmsg = "right hand side is nan";
+      return false;
+    }
+
+    return true;
+  }
 
  public:
   EvaluatorCompare() {

@@ -21,7 +21,6 @@
 #include "evaluator.h"
 #include "feature_source.h"
 #include "global_yylex.h"
-#include "node_evaluator.h"
 #include "tree_dot.h"
 
 namespace cql2cpp {
@@ -31,6 +30,8 @@ class Cql2Cpp {
  private:
   std::map<FeatureSourcePtr, FeatureType> feature_source_2_type_;
   std::ostream& ostr_;
+  Evaluator evaluator_;
+
   mutable std::string error_msg_;
 
  public:
@@ -44,6 +45,10 @@ class Cql2Cpp {
 
   void clear() { feature_source_2_type_.clear(); }
 
+  void RegisterFunctor(const FunctorPtr functor) {
+    evaluator_.RegisterFunctor(functor);
+  }
+
   bool filter(const std::string& cql2_query,
               std::vector<FeatureType>* result) const {
     // Parse
@@ -51,20 +56,18 @@ class Cql2Cpp {
     if (not Parse(cql2_query, &root, &error_msg_)) return false;
 
     // Prepare evaluator
-    cql2cpp::TreeEvaluator tree_evaluator;
-    tree_evaluator.RegisterNodeEvaluator(node_evals);
     cql2cpp::ValueT value;
 
     // Loop over all features
     for (const auto& [fs, f] : feature_source_2_type_) {
-      if (tree_evaluator.Evaluate(root, fs.get(), &value)) {
+      if (evaluator_.Evaluate(root, fs.get(), &value)) {
         if (std::holds_alternative<bool>(value)) {
           if (std::get<bool>(value)) result->emplace_back(f);
         } else {
           LOG(ERROR) << "evaluation result type error";
         }
       } else {
-        LOG(ERROR) << "evaluation error: " << tree_evaluator.error_msg();
+        LOG(ERROR) << "evaluation error: " << evaluator_.error_msg();
       }
     }
     Cql2Parser::DeConstructAST(root);
@@ -74,17 +77,15 @@ class Cql2Cpp {
 
   const std::string error_msg() const { return error_msg_; }
 
-  static bool Evaluate(const std::string& cql2_query, const FeatureSource& fs,
-                       bool* result, std::string* error_msg, std::string* dot) {
+  bool Evaluate(const std::string& cql2_query, const FeatureSource& fs,
+                bool* result, std::string* error_msg, std::string* dot) {
     // Parse
     AstNode* root;
     if (not Parse(cql2_query, &root, error_msg)) return false;
 
     // Evaluate
-    cql2cpp::TreeEvaluator tree_evaluator;
-    tree_evaluator.RegisterNodeEvaluator(node_evals);
     cql2cpp::ValueT value;
-    if (tree_evaluator.Evaluate(root, &fs, &value) &&
+    if (evaluator_.Evaluate(root, &fs, &value) &&
         std::holds_alternative<bool>(value)) {
       *result = std::get<bool>(value);
       if (dot != nullptr) {
@@ -95,7 +96,7 @@ class Cql2Cpp {
       Cql2Parser::DeConstructAST(root);
       return true;
     } else {
-      if (error_msg != nullptr) *error_msg = tree_evaluator.error_msg();
+      if (error_msg != nullptr) *error_msg = evaluator_.error_msg();
       Cql2Parser::DeConstructAST(root);
       return false;
     }

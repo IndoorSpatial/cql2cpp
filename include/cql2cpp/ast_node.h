@@ -10,10 +10,10 @@
 
 #pragma once
 
+#include <glog/logging.h>
+
 #include <memory>
 #include <vector>
-
-#include <glog/logging.h>
 
 #include "id_generator.h"
 #include "node_type.h"
@@ -32,6 +32,7 @@ class AstNode {
   NodeType type_;
   Operator op_;
   std::vector<AstNode*> children_;
+  ValueT origin_value_;
   mutable ValueT value_;
   static std::ostream* ous_;
 
@@ -45,16 +46,16 @@ class AstNode {
   }
 
   AstNode(NodeType type, const ValueT& value)
-      : type_(type), op_(NullOp), value_(value) {
+      : type_(type), op_(NullOp), origin_value_(value), value_(NullValue) {
     id_ = idg.Gen();
     *ous_ << "AstNode " << ToString() << std::endl;
   }
 
-  AstNode(const ValueT& value) : type_(Literal), op_(NullOp), value_(value) {
+  AstNode(const ValueT& value)
+      : type_(Literal), op_(NullOp), origin_value_(value), value_(NullValue) {
     id_ = idg.Gen();
     *ous_ << "AstNode " << ToString() << std::endl;
   }
-
 
   const std::string& id() const { return id_; }
 
@@ -65,6 +66,7 @@ class AstNode {
   const std::vector<AstNode*>& children() const { return children_; }
   void append(AstNode* node) { children_.emplace_back(node); }
 
+  const ValueT& origin_value() const { return origin_value_; }
   ValueT value() const { return value_; }
   void set_value(const ValueT& value) const { value_ = value; }
 

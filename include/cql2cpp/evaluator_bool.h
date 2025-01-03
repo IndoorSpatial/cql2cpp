@@ -10,29 +10,30 @@
 
 #pragma once
 
-#include "evaluator.h"
+#include "evaluator_ast_node.h"
 
 namespace cql2cpp {
 
-template <typename ValueType>
-inline bool CheckValueNumberType(const std::string& op, size_t num,
-                                 const std::vector<ValueT>& vs,
-                                 std::string* errmsg) {
-  if (vs.size() != num) {
-    *errmsg = op + " needs two values but we have " + std::to_string(vs.size());
-    return false;
-  }
-  for (size_t i = 0; i < num; i++)
-    if (not std::holds_alternative<ValueType>(vs.at(i))) {
-      *errmsg = "value " + std::to_string(i) + " of " + op + " is incorrect";
-      return false;
-    }
-  return true;
-}
-
-class EvaluatorBool : public NodeEvaluator {
+class EvaluatorBool : public EvaluatorAstNode {
  private:
   std::map<NodeType, std::map<Operator, NodeEval>> evaluators_;
+
+  template <typename ValueType>
+  static bool CheckValueNumberType(const std::string& op, size_t num,
+                                   const std::vector<ValueT>& vs,
+                                   std::string* errmsg) {
+    if (vs.size() != num) {
+      *errmsg =
+          op + " needs two values but we have " + std::to_string(vs.size());
+      return false;
+    }
+    for (size_t i = 0; i < num; i++)
+      if (not std::holds_alternative<ValueType>(vs.at(i))) {
+        *errmsg = "value " + std::to_string(i) + " of " + op + " is incorrect";
+        return false;
+      }
+    return true;
+  }
 
  public:
   EvaluatorBool() {

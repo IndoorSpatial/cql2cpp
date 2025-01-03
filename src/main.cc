@@ -9,6 +9,7 @@
  */
 
 #include <cql2cpp/cql2cpp.h>
+#include <cql2cpp/feature_source.h>
 #include <cql2cpp/feature_source_geojson.h>
 #include <cql2cpp/global_yylex.h>
 #include <geos/geom/GeometryFactory.h>
@@ -19,8 +20,6 @@
 #include <glog/logging.h>
 
 #include <fstream>
-
-#include "cql2cpp/feature_source.h"
 
 DEFINE_string(query, "", "cql2 query string");
 DEFINE_string(geojson, "",
@@ -40,6 +39,7 @@ int main(int argc, char** argv) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
   google::InitGoogleLogging(argv[0]);
+  FLAGS_colorlogtostderr = true;
   google::InstallFailureSignalHandler();
   google::LogToStderr();
 
@@ -141,8 +141,7 @@ int main(int argc, char** argv) {
 
     std::string dot;
     bool eval_result;
-    if (cql2cpp::Cql2Cpp<const geos::io::GeoJSONFeature*>::Evaluate(
-            FLAGS_query, fs, &eval_result, &error_msg, &dot)) {
+    if (cql2cpp.Evaluate(FLAGS_query, fs, &eval_result, &error_msg, &dot)) {
       if (not FLAGS_dot.empty()) {
         std::string dot_filename = FLAGS_dot;
         if (dot_filename.find(".dot") == std::string::npos)
@@ -164,5 +163,6 @@ int main(int argc, char** argv) {
 FAILED:
 
   gflags::ShutDownCommandLineFlags();
+  google::ShutdownGoogleLogging();
   return 0;
 }

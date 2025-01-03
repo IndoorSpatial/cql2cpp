@@ -10,19 +10,26 @@
 
 #pragma once
 
-#include "evaluator.h"
-#include "function.h"
+#include "evaluator_ast_node.h"
+#include "functor.h"
 
 namespace cql2cpp {
 
-class EvaluatorFunction : public NodeEvaluator {
+class EvaluatorFunction : public EvaluatorAstNode {
  private:
   std::map<NodeType, std::map<Operator, NodeEval>> evaluators_;
+  std::map<std::string, FunctorPtr> functions_;
 
  public:
+  void Register(const FunctorPtr& functor) {
+    if (functions_.find(functor->name()) != functions_.end())
+      LOG(WARNING) << "replace functor " << functor->name();
+    functions_[functor->name()] = functor;
+  }
+
   EvaluatorFunction() {
-    evaluators_[Function][NullOp] = [](auto n, auto vs, auto fs, auto value,
-                                       auto errmsg) -> bool {
+    evaluators_[Function][NullOp] = [this](auto n, auto vs, auto fs, auto value,
+                                           auto errmsg) -> bool {
       if (vs.empty()) {
         *errmsg = "function needs a name and argument list";
         return false;
@@ -32,12 +39,12 @@ class EvaluatorFunction : public NodeEvaluator {
         return false;
       }
       std::string function_name = std::get<std::string>(vs.at(0));
-      if (functions.find(function_name) == functions.end()) {
+      if (functions_.find(function_name) == functions_.end()) {
         *errmsg = "can not find function " + function_name;
         return false;
       }
       if (vs.size() == 1)
-        return functions.at(function_name).operator()({}, value, errmsg);
+        return functions_.at(function_name)->operator()({}, value, errmsg);
       else if (vs.size() == 2) {
         if (not std::holds_alternative<ArrayType>(vs.at(1))) {
           *errmsg = "the second value of a function should be argument list";
@@ -47,7 +54,7 @@ class EvaluatorFunction : public NodeEvaluator {
         for (const auto& element : std::get<ArrayType>(vs.at(1)))
           vec.emplace_back(element.value);
 
-        return functions.at(function_name).operator()(vec, value, errmsg);
+        return functions_.at(function_name)->operator()(vec, value, errmsg);
       } else {
         *errmsg =
             "function needs only two child (name and argument list) but we "

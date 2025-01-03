@@ -10,12 +10,12 @@
 
 #pragma once
 
-#include "evaluator.h"
+#include "evaluator_ast_node.h"
 #include "value_compare.h"
 
 namespace cql2cpp {
 
-class EvaluatorIn : public NodeEvaluator {
+class EvaluatorIn : public EvaluatorAstNode {
  private:
   std::map<NodeType, std::map<Operator, NodeEval>> evaluators_;
 

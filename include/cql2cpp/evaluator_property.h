@@ -10,11 +10,11 @@
 
 #pragma once
 
-#include "evaluator.h"
+#include "evaluator_ast_node.h"
 
 namespace cql2cpp {
 
-class EvaluatorProperty : public NodeEvaluator {
+class EvaluatorProperty : public EvaluatorAstNode {
  private:
   std::map<NodeType, std::map<Operator, NodeEval>> evaluators_;
 
@@ -22,11 +22,11 @@ class EvaluatorProperty : public NodeEvaluator {
   EvaluatorProperty() {
     evaluators_[PropertyName][NullOp] = [](auto n, auto vs, auto fs, auto value,
                                            auto errmsg) -> bool {
-      if (not std::holds_alternative<std::string>(n->value())) {
-        *errmsg = "value of property name is not string";
+      if (not std::holds_alternative<std::string>(n->origin_value())) {
+        *errmsg = "value of property name is not string " + value_str(n->value());
         return false;
       }
-      *value = fs->get_property(std::get<std::string>(n->value()));
+      *value = fs->get_property(std::get<std::string>(n->origin_value()));
       return true;
     };
   }

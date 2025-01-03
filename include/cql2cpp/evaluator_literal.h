@@ -10,19 +10,19 @@
 
 #pragma once
 
-#include "evaluator.h"
+#include "evaluator_ast_node.h"
 
 namespace cql2cpp {
 
-class EvaluatorLiteral : public NodeEvaluator {
+class EvaluatorLiteral : public EvaluatorAstNode {
  private:
   std::map<NodeType, std::map<Operator, NodeEval>> evaluators_;
 
  public:
   EvaluatorLiteral() {
-    evaluators_[PropertyName][NullOp] = [](auto n, auto vs, auto fs, auto value,
+    evaluators_[Literal][NullOp] = [](auto n, auto vs, auto fs, auto value,
                                            auto errmsg) -> bool {
-      *value = n->value();
+      *value = n->origin_value();
       return true;
     };
   }
