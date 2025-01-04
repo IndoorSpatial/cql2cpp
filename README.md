@@ -10,7 +10,7 @@ As of the end of 2024, only a limited number of syntax features have been develo
 
 # Dependencies
 1. flex: lexer
-2. bison++: parser
+2. bison: parser
 3. gflags: for cli tool
 4. glog: for logging
 5. geos: for geometry and spatial predicate and geojson
@@ -21,7 +21,7 @@ As of the end of 2024, only a limited number of syntax features have been develo
 ## build locally
 ```bash
 sudo apt-get install -y build-essential g++-aarch64-linux-gnu
-sudo apt-get install -y flex bison++
+sudo apt-get install -y flex bison
 sudo apt-get install -y libgflags-dev libgoogle-glog-dev libgtest-dev libgeos++-dev
 mkdir build && cd build
 cmake ..
@@ -31,6 +31,8 @@ make -j16
 
 ## build by conan
 ```bash
+sudo apt-get install -y build-essential g++-aarch64-linux-gnu
+sudo apt-get install -y flex bison
 pip install conan
 cd cql2cpp
 conan install . --build=missing --output-folder build
