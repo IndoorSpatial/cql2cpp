@@ -57,7 +57,7 @@ class ParseTest : public testing::Test {
 };
 
 // clang-format off
-TEST_F(ParseTest, binary        ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseTest, bbox          ) { EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseTest, is_in_list    ) { EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseTest, is_not_in_list) { EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseTest, localization  ) { EXPECT_TRUE(Parse(case_name_)); }
@@ -65,5 +65,6 @@ TEST_F(ParseTest, array  )        { EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseTest, binlocations  ) { EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseTest, related_bins  ) { EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseTest, avg           ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseTest, spatial       ) { EXPECT_TRUE(Parse(case_name_)); }
 // TEST_F(ParseTest, labels        ) { EXPECT_TRUE(Parse(case_name_)); }  // standard unsupported
 // clang-format on

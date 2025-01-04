@@ -122,9 +122,20 @@ LINESTRING[Z]?"("[0-9. +\-,\n]+")" {
   return Cql2ParserBase::token::LINESTRING_WKT;
 }
 
-POLYGON[Z]?"(("[0-9. +\-,\n]+"))" {
-  print("GEOMETRY", yytext);
-  yylval_->emplace<std::string>() = yytext;
+POLYGON[Z]?[ ]?"(" {
+  std::stringstream ss;
+  ss << yytext;
+
+  size_t parenthesis = 1;
+  do {
+    char c = yyinput();;
+    ss << c;
+    if (c == '(') parenthesis ++;
+    if (c == ')') parenthesis --;
+  } while (parenthesis > 0);
+  std::string text = ss.str();
+  print("GEOMETRY", text.c_str());
+  yylval_->emplace<std::string>() = text;
   return Cql2ParserBase::token::POLYGON_WKT;
 }
 
