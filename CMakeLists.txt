@@ -5,6 +5,7 @@ project(cql2cpp
   HOMEPAGE_URL "https://github.com/IndoorSpatial/cql2cpp"
   LANGUAGES CXX
 )
+add_definitions(-DVERSION="${PROJECT_VERSION}")
 
 find_package(GTest REQUIRED)
 find_package(geos REQUIRED)

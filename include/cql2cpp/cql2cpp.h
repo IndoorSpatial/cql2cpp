@@ -23,6 +23,10 @@
 #include "global_yylex.h"
 #include "tree_dot.h"
 
+#ifndef VERSION
+#define VERSION "0.0.0"
+#endif
+
 namespace cql2cpp {
 
 template <typename FeatureType>
@@ -112,6 +116,8 @@ class Cql2Cpp {
 
     return true;
   }
+
+  static std::string version() { return VERSION; }
 
  private:
   static bool Parse(const std::string& cql2_query, AstNodePtr* root,

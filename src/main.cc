@@ -21,6 +21,10 @@
 
 #include <fstream>
 
+#ifndef VERSION
+#define VERSION "0.0.0"
+#endif
+
 DEFINE_string(query, "", "cql2 query string");
 DEFINE_string(geojson, "",
               "geojson data set with multiple features in one feature "
@@ -35,7 +39,7 @@ int main(int argc, char** argv) {
   gflags::SetUsageMessage(
       "Usage: cql2 -query=\"city='Toronto'\" "
       "-geojson=\"path/to/feature_collection.geojson\" -index=0");
-  gflags::SetVersionString("0.1.0");
+  gflags::SetVersionString(VERSION);
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
   google::InitGoogleLogging(argv[0]);
