@@ -12,10 +12,10 @@
 
 #include <memory>
 #include <functional>
-#include "ast_node.h"
-#include "node_type.h"
-#include "operator.h"
-#include "feature_source.h"
+#include <cql2cpp/ast_node.h>
+#include <cql2cpp/node_type.h>
+#include <cql2cpp/operator.h>
+#include <cql2cpp/feature_source.h>
 
 namespace cql2cpp {
 

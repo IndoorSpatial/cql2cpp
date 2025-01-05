@@ -10,9 +10,7 @@
 
 #pragma once
 
-// #include <functional>
-
-#include "value.h"
+#include <cql2cpp/value.h>
 
 namespace cql2cpp {
 

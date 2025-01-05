@@ -10,8 +10,9 @@
 
 #pragma once
 
-#include "evaluator_ast_node.h"
-#include "functor.h"
+#include <cql2cpp/ast_node.h>
+#include <cql2cpp/functor.h>
+#include "ast_node.h"
 
 namespace cql2cpp {
 

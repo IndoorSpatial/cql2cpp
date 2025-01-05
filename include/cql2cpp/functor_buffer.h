@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "functor.h"
+#include <cql2cpp/functor.h>
 
 namespace cql2cpp {
 
