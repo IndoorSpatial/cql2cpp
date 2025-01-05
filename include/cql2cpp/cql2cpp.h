@@ -17,7 +17,7 @@
 
 #include "ast_node.h"
 #include "cql2_lexer.h"
-#include "cql2_parser.h"
+#include "cql2_parser_text.h"
 #include "evaluator.h"
 #include "feature_source.h"
 #include "global_yylex.h"
@@ -60,7 +60,7 @@ class Cql2Cpp {
     if (not Parse(cql2_query, &root, &error_msg_)) return false;
 
     // Prepare evaluator
-    cql2cpp::ValueT value;
+    ValueT value;
 
     // Loop over all features
     for (const auto& [fs, f] : feature_source_2_type_) {
@@ -87,13 +87,13 @@ class Cql2Cpp {
     if (not Parse(cql2_query, &root, error_msg)) return false;
 
     // Evaluate
-    cql2cpp::ValueT value;
+    ValueT value;
     if (evaluator_.Evaluate(root, &fs, &value) &&
         std::holds_alternative<bool>(value)) {
       *result = std::get<bool>(value);
       if (dot != nullptr) {
         std::stringstream ss;
-        cql2cpp::Tree2Dot::GenerateDot(ss, root);
+        Tree2Dot::GenerateDot(ss, root);
         *dot = ss.str();
       }
       return true;
@@ -111,7 +111,7 @@ class Cql2Cpp {
 
     // to dot
     std::stringstream ss;
-    cql2cpp::Tree2Dot::GenerateDot(ss, root);
+    Tree2Dot::GenerateDot(ss, root);
     *dot = ss.str();
 
     return true;
@@ -129,7 +129,7 @@ class Cql2Cpp {
 
     cql2cpp::AstNode::set_ostream(&oss);
 
-    Cql2Parser parser;
+    Cql2ParserText parser;
     int ret = parser.parse();
     if (error_msg != nullptr) *error_msg = oss.str();
     if (ret == 0) {
