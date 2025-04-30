@@ -223,7 +223,7 @@ numericLiteral:
 
 propertyName:
   ID { $$ = std::make_shared<AstNode>(PropertyName, std::string($1)); }
-  // | DQUOTE ID DQUOTE;
+  | DQUOTE ID DQUOTE  { $$ = std::make_shared<AstNode>(PropertyName, std::string($2)); }
 
 spatialPredicate:
   SPT_FUNC LPT geomExpression COMMA geomExpression RPT { $$ = std::make_shared<AstNode>(SpatialPred, NameOp.at($1), std::vector({$3, $5})); }

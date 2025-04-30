@@ -13,20 +13,15 @@ void print(const std::string& prefix, const char* yytext) {
 %option noyywrap
 
 DIGIT    [0-9]
-ID       [a-z][.a-zA-Z0-9_\-]*
-CHAR_LIT \'[^\']*\'
+ID       [:_a-zA-Z][:_a-zA-Z.0-9]*
+CHAR_LIT \'[!"#$%&()*+,-.:;<=>?@a-zA-Z[\\\]^_`0-9 \t\r\n]*\'
 
 %%
+
 "div" { print("OP", yytext); return Cql2ParserBase::token::DIVINT;  }
 "LIKE" { print("OP", yytext); return Cql2ParserBase::token::LIKE;  }
 "IS" { print("OP", yytext); return Cql2ParserBase::token::IS;  }
 "NULL" { print("OP", yytext); return Cql2ParserBase::token::NIL;  }
-
-{CHAR_LIT} {
-  print("CHAR_LIT", yytext);
-  yylval_->emplace<std::string>() = yytext;
-  return Cql2ParserBase::token::CHAR_LIT;
-}
 
 [+-]?{DIGIT}+    {
   print("DIGIT_INT", yytext);
@@ -154,16 +149,16 @@ IN {
   return Cql2ParserBase::token::IN;
 }
 
-{ID} {
-  print("ID", yytext);
-  yylval_->emplace<std::string>(yytext);
-  return Cql2ParserBase::token::ID;
-}
-
 A_EQUALS|A_CONTAINS|A_CONTAINEDBY|A_OVERLAPS {
   print("ARRAY", yytext);
   yylval_->emplace<std::string>(yytext);
   return Cql2ParserBase::token::arrayFunction;
+}
+
+{ID} {
+  print("ID", yytext);
+  yylval_->emplace<std::string>(yytext);
+  return Cql2ParserBase::token::ID;
 }
 
 "+" { print("OP", yytext); return Cql2ParserBase::token::PLUS; }
@@ -179,6 +174,12 @@ A_EQUALS|A_CONTAINS|A_CONTAINEDBY|A_OVERLAPS {
 "{"[^{}\n]*"}" {/* eat up one-line comments */}
 
 [ \t\n]+ {/* eat up whitespace */}
+
+{CHAR_LIT} {
+  print("CHAR_LIT", yytext);
+  yylval_->emplace<std::string>() = yytext;
+  return Cql2ParserBase::token::CHAR_LIT;
+}
 
 . { LOG(INFO) << "Unrecognized character: " << yytext << std::endl; }
 
