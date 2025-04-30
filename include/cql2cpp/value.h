@@ -48,10 +48,9 @@ using SetType = std::set<Element, ArrayElementComp>;
 
 using ArrayType = std::vector<Element>;
 
-using ValueT =
-    std::variant<NullStruct, bool, int64_t, uint64_t, double, std::string,
-                 ArrayType, const geos::geom::Geometry*,
-                 const geos::geom::Envelope*>;
+using ValueT = std::variant<NullStruct, bool, int64_t, uint64_t, double,
+                            std::string, ArrayType, const geos::geom::Geometry*,
+                            const geos::geom::Envelope*>;
 
 struct Element {
   ValueT value;
@@ -101,6 +100,15 @@ static std::string value_str(ValueT value, bool with_type = false) {
   }
 
   return "unknown type";
+}
+
+static std::string value_str(ValueT origin_value, ValueT value,
+                             bool with_type = false) {
+  auto s = value_str(value, with_type);
+  if (s != "null")
+    return s;
+  else
+    return value_str(origin_value, with_type);
 }
 
 }  // namespace cql2cpp

@@ -28,6 +28,10 @@ using cql2cpp::NotIn;
 
 using cql2cpp::NameOp;
 
+// print line number to debug
+#define PL LOG(INFO) << __LINE__
+#define MakeAstNode std::make_shared<AstNode>
+
 void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
   LOG(ERROR) << msg;
 }
@@ -54,7 +58,7 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 %define parse.error verbose
 %parse-param {cql2cpp::AstNodePtr* root_}
 
-%token <int> NUMBER_INT
+%token <int64_t> NUMBER_INT
 %token <double> NUMBER_FLOAT
 %token <bool> BOOLEAN
 %token <bool> TRUE FALSE
@@ -123,29 +127,29 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 // Grammar rules:
 
 program:
-       booleanExpression { *root_ = $1; }
+       booleanExpression { PL; *root_ = $1; }
 
 booleanExpression:
   booleanTerm
-  | booleanTerm OR booleanExpression { $$ = std::make_shared<AstNode>(BoolExpr, Or, std::vector({$1, $3})); }
+  | booleanTerm OR booleanExpression { PL; $$ = MakeAstNode(BoolExpr, Or, std::vector({$1, $3})); }
 
 booleanTerm:
   booleanFactor
-  | booleanFactor AND booleanTerm  { $$ = std::make_shared<AstNode>(BoolExpr, And, std::vector({$1, $3})); }
+  | booleanFactor AND booleanTerm  { PL; $$ = MakeAstNode(BoolExpr, And, std::vector({$1, $3})); }
 
 booleanFactor:
   booleanPrimary
-  | NOT booleanPrimary { $$ = std::make_shared<AstNode>(BoolExpr, Not, std::vector({ $2 })); }
+  | NOT booleanPrimary { PL; $$ = MakeAstNode(BoolExpr, Not, std::vector({ $2 })); }
 
 booleanPrimary:
   function
   | predicate
   | booleanLiteral
-  | LPT booleanExpression RPT { $$ = $2; }
+  | LPT booleanExpression RPT { PL; $$ = $2; }
 
 booleanLiteral:
-  TRUE { $$ = std::make_shared<AstNode>($1); }
-  | FALSE { $$ = std::make_shared<AstNode>($1); }
+  TRUE { PL; $$ = MakeAstNode($1); }
+  | FALSE { PL; $$ = MakeAstNode($1); }
 
 predicate:
   comparisonPredicate
@@ -160,12 +164,12 @@ comparisonPredicate:
   | isNullPredicate
 
 isInListPredicate:
-  scalarExpression IN LPT inList RPT { $$ = std::make_shared<AstNode>(IsInListPred, In, std::vector({$1, $4})); }
-  | scalarExpression NOT IN LPT inList RPT { $$ = std::make_shared<AstNode>(IsInListPred, NotIn, std::vector({$1, $5})); }
+  scalarExpression IN LPT inList RPT { PL; $$ = MakeAstNode(IsInListPred, In, std::vector({$1, $4})); }
+  | scalarExpression NOT IN LPT inList RPT { PL; $$ = MakeAstNode(IsInListPred, NotIn, std::vector({$1, $5})); }
 
 inList:
-  scalarExpression { $$ = std::make_shared<AstNode>(InList, NullOp, std::vector({$1})); }
-  | inList COMMA scalarExpression { $1->append($3);  $$ = $1; }
+  scalarExpression { PL; $$ = MakeAstNode(InList, NullOp, std::vector({$1})); }
+  | inList COMMA scalarExpression { PL; $1->append($3);  $$ = $1; }
 
 isNullPredicate:
   isNullOperand IS NIL
@@ -182,12 +186,12 @@ isNullOperand:
   | function
 
 binaryComparisonPredicate:
-  scalarExpression EQ scalarExpression { $$ = std::make_shared<AstNode>(BinCompPred, cql2cpp::Equal, std::vector({$1, $3})); }
-  | scalarExpression LT GT scalarExpression { $$ = std::make_shared<AstNode>(BinCompPred, cql2cpp::NotEqual, std::vector({$1, $4})); }
-  | scalarExpression LT    scalarExpression { $$ = std::make_shared<AstNode>(BinCompPred, cql2cpp::Lesser,   std::vector({$1, $3})); }
-  | scalarExpression GT    scalarExpression { $$ = std::make_shared<AstNode>(BinCompPred, cql2cpp::Greater,  std::vector({$1, $3})); }
-  | scalarExpression LT EQ scalarExpression { $$ = std::make_shared<AstNode>(BinCompPred, cql2cpp::LesserEqual, std::vector({$1, $4})); }
-  | scalarExpression GT EQ scalarExpression { $$ = std::make_shared<AstNode>(BinCompPred, cql2cpp::GreaterEqual, std::vector({$1, $4})); }
+  scalarExpression EQ scalarExpression { PL; $$ = MakeAstNode(BinCompPred, cql2cpp::Equal, std::vector({$1, $3})); }
+  | scalarExpression LT GT scalarExpression { PL; $$ = MakeAstNode(BinCompPred, cql2cpp::NotEqual, std::vector({$1, $4})); }
+  | scalarExpression LT    scalarExpression { PL; $$ = MakeAstNode(BinCompPred, cql2cpp::Lesser,   std::vector({$1, $3})); }
+  | scalarExpression GT    scalarExpression { PL; $$ = MakeAstNode(BinCompPred, cql2cpp::Greater,  std::vector({$1, $3})); }
+  | scalarExpression LT EQ scalarExpression { PL; $$ = MakeAstNode(BinCompPred, cql2cpp::LesserEqual, std::vector({$1, $4})); }
+  | scalarExpression GT EQ scalarExpression { PL; $$ = MakeAstNode(BinCompPred, cql2cpp::GreaterEqual, std::vector({$1, $4})); }
 
 scalarExpression:
   characterClause
@@ -209,24 +213,28 @@ patternExpression:
 
 
 characterClause:
-  CASEI LPT characterExpression RPT { $$ = $3; }  // TODO
-  | ACCENTI LPT characterExpression RPT { $$ = $3; }  // TODO
-  | CHAR_LIT { std::string s = std::string($1); $$ = std::make_shared<AstNode>(s.substr(1, s.size() - 2)); }
+  CASEI LPT characterExpression RPT { PL; $$ = $3; }  // TODO
+  | ACCENTI LPT characterExpression RPT { PL; $$ = $3; }  // TODO
+  | CHAR_LIT { PL; std::string s = std::string($1); $$ = MakeAstNode(s.substr(1, s.size() - 2)); }
 
 characterExpression:
   characterClause
-  | propertyName { $$ = $1; }
+  | propertyName { PL; $$ = $1; }
 
 numericLiteral:
-  NUMBER_INT { $$ = std::make_shared<AstNode>($1); }
-  | NUMBER_FLOAT { $$ = std::make_shared<AstNode>($1); }
+  MINUS NUMBER_INT { PL; $$ = MakeAstNode($2 * -1); }
+  | MINUS NUMBER_FLOAT { PL; $$ = MakeAstNode($2 * -1.0); }
+  | NUMBER_INT { PL; $$ = MakeAstNode($1); }
+  | NUMBER_FLOAT { PL; $$ = MakeAstNode($1); }
+  | PLUS NUMBER_INT { PL; $$ = MakeAstNode($2); }
+  | PLUS NUMBER_FLOAT { PL; $$ = MakeAstNode($2); }
 
 propertyName:
-  ID { $$ = std::make_shared<AstNode>(PropertyName, std::string($1)); }
-  | DQUOTE ID DQUOTE  { $$ = std::make_shared<AstNode>(PropertyName, std::string($2)); }
+  ID { PL; $$ = MakeAstNode(PropertyName, std::string($1)); }
+  | DQUOTE ID DQUOTE  { PL; $$ = MakeAstNode(PropertyName, std::string($2)); }
 
 spatialPredicate:
-  SPT_FUNC LPT geomExpression COMMA geomExpression RPT { $$ = std::make_shared<AstNode>(SpatialPred, NameOp.at($1), std::vector({$3, $5})); }
+  SPT_FUNC LPT geomExpression COMMA geomExpression RPT { PL; $$ = MakeAstNode(SpatialPred, NameOp.at($1), std::vector({$3, $5})); }
 
 
 geomExpression:
@@ -239,7 +247,7 @@ spatialInstance:
   geometryLiteral {
     auto p = geos::io::WKTReader().read($1);
     if (p) {
-      $$ = std::make_shared<AstNode>(p.release());
+      $$ = MakeAstNode(p.release());
     } else {
       error("Can not parse WKT");
       YYERROR;
@@ -248,7 +256,7 @@ spatialInstance:
   | bboxTaggedText {
     auto p = cql2cpp::BBoxReader().read($1);
     if (p) {
-      $$ = std::make_shared<AstNode>(p.release());
+      $$ = MakeAstNode(p.release());
     } else {
       error("Can not parse BBOX");
       YYERROR;
@@ -256,7 +264,7 @@ spatialInstance:
   }
 
 arrayPredicate:
-  arrayFunction LPT arrayExpression COMMA arrayExpression RPT { $$ = std::make_shared<AstNode>(ArrayPred, NameOp.at($1), std::vector({$3, $5})); }
+  arrayFunction LPT arrayExpression COMMA arrayExpression RPT { PL; $$ = MakeAstNode(ArrayPred, NameOp.at($1), std::vector({$3, $5})); }
 
 arrayExpression:
   array
@@ -264,12 +272,12 @@ arrayExpression:
   | function
 
 array:
-  LPT RPT { $$ = std::make_shared<AstNode>(Array, NullOp, std::vector<AstNodePtr>()); }
-  | LPT arrayList RPT { $$ = $2; }
+  LPT RPT { PL; $$ = MakeAstNode(Array, NullOp, std::vector<AstNodePtr>()); }
+  | LPT arrayList RPT { PL; $$ = $2; }
 
 arrayList:
-  arrayElement  { $$ = std::make_shared<AstNode>(Array, NullOp, std::vector({$1})); }
-  | arrayList COMMA arrayElement  { $1->append($3);  $$ = $1; }
+  arrayElement  { PL; $$ = MakeAstNode(Array, NullOp, std::vector({$1})); }
+  | arrayList COMMA arrayElement  { PL; $1->append($3);  $$ = $1; }
 
 arrayElement:
   characterClause
@@ -284,24 +292,24 @@ arrayElement:
 
 arithmeticExpression:
   arithmeticTerm
-  | arithmeticTerm PLUS arithmeticExpression { $$ = std::make_shared<AstNode>(ArithExpr, PLUS, std::vector({$1, $3})); }
-  | arithmeticTerm MINUS arithmeticExpression { $$ = std::make_shared<AstNode>(ArithExpr, MINUS, std::vector({$1, $3})); }
+  | arithmeticTerm PLUS arithmeticExpression { PL; $$ = MakeAstNode(ArithExpr, PLUS, std::vector({$1, $3})); }
+  | arithmeticTerm MINUS arithmeticExpression { PL; $$ = MakeAstNode(ArithExpr, MINUS, std::vector({$1, $3})); }
 
 arithmeticTerm:
   powerTerm
-  | powerTerm MULT arithmeticTerm { $$ = std::make_shared<AstNode>(ArithExpr, MULT, std::vector({$1, $3})); }
-  | powerTerm DIV arithmeticTerm { $$ = std::make_shared<AstNode>(ArithExpr, DIV, std::vector({$1, $3})); }
-  | powerTerm MOD arithmeticTerm { $$ = std::make_shared<AstNode>(ArithExpr, MOD, std::vector({$1, $3})); }
-  | powerTerm DIVINT arithmeticTerm { $$ = std::make_shared<AstNode>(ArithExpr, DIVINT, std::vector({$1, $3})); }
+  | powerTerm MULT arithmeticTerm { PL; $$ = MakeAstNode(ArithExpr, MULT, std::vector({$1, $3})); }
+  | powerTerm DIV arithmeticTerm { PL; $$ = MakeAstNode(ArithExpr, DIV, std::vector({$1, $3})); }
+  | powerTerm MOD arithmeticTerm { PL; $$ = MakeAstNode(ArithExpr, MOD, std::vector({$1, $3})); }
+  | powerTerm DIVINT arithmeticTerm { PL; $$ = MakeAstNode(ArithExpr, DIVINT, std::vector({$1, $3})); }
 
 powerTerm:
   arithmeticFactor
-  | arithmeticFactor POWER arithmeticFactor { $$ = std::make_shared<AstNode>(ArithExpr, POWER, std::vector({$1, $3})); }
+  | arithmeticFactor POWER arithmeticFactor { PL; $$ = MakeAstNode(ArithExpr, POWER, std::vector({$1, $3})); }
 
 arithmeticFactor:
-  LPT arithmeticExpression RPT { $$ = $2; }
+  LPT arithmeticExpression RPT { PL; $$ = $2; }
   | arithmeticOperand
-  | MINUS arithmeticOperand { $$ = std::make_shared<AstNode>(ArithExpr, MINUS, std::vector({$2})); }
+  | MINUS arithmeticOperand { PL; $$ = MakeAstNode(ArithExpr, MINUS, std::vector({$2})); }
 
 arithmeticOperand:
   numericLiteral
@@ -310,18 +318,18 @@ arithmeticOperand:
 
 function:
   ID LPT RPT {
-    AstNodePtr function_name = std::make_shared<AstNode>($1);
-    $$ = std::make_shared<AstNode>(Function, NullOp, std::vector({function_name}));
+    AstNodePtr function_name = MakeAstNode($1);
+    $$ = MakeAstNode(Function, NullOp, std::vector({function_name}));
   }
   | ID LPT argumentList RPT {
-    AstNodePtr function_name = std::make_shared<AstNode>($1);
-    $$ = std::make_shared<AstNode>(Function, NullOp, std::vector({function_name, $3}));
+    AstNodePtr function_name = MakeAstNode($1);
+    $$ = MakeAstNode(Function, NullOp, std::vector({function_name, $3}));
   }
 
 
 argumentList:
-  argument { $$ = std::make_shared<AstNode>(ArgumentList, NullOp, std::vector({$1})); }
-  | argumentList COMMA argument { $1->append($3); $$ = $1; }
+  argument { PL; $$ = MakeAstNode(ArgumentList, NullOp, std::vector({$1})); }
+  | argumentList COMMA argument { PL; $1->append($3); $$ = $1; }
 
 argument:
   propertyName

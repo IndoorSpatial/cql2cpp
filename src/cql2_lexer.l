@@ -23,19 +23,19 @@ CHAR_LIT \'[!"#$%&()*+,-.:;<=>?@a-zA-Z[\\\]^_`0-9 \t\r\n]*\'
 "IS" { print("OP", yytext); return Cql2ParserBase::token::IS;  }
 "NULL" { print("OP", yytext); return Cql2ParserBase::token::NIL;  }
 
-[+-]?{DIGIT}+    {
+{DIGIT}+    {
   print("DIGIT_INT", yytext);
-  yylval_->emplace<int>() = atoi(yytext);
+  yylval_->emplace<int64_t>() = atoi(yytext);
   return Cql2ParserBase::token::NUMBER_INT;
 }
 
-[+-]?{DIGIT}+"."{DIGIT}* {
+{DIGIT}+"."{DIGIT}* {
   print("DIGIT_FLOAT", yytext);
   yylval_->emplace<double>() = atof(yytext);
   return Cql2ParserBase::token::NUMBER_FLOAT;
 }
 
-[+-]?"."{DIGIT}* {
+"."{DIGIT}* {
   print("DIGIT_FLOAT", yytext);
   yylval_->emplace<double>() = atof(yytext);
   return Cql2ParserBase::token::NUMBER_FLOAT;

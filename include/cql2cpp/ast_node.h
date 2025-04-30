@@ -73,7 +73,8 @@ class AstNode {
 
   std::string ToString() {
     if (op_ == NullOp)
-      return id_ + " " + TypeName.at(type()) + " " + value_str(value_, true);
+      return id_ + " " + TypeName.at(type()) + " " +
+             value_str(origin_value_, value_, true);
     else
       return id_ + " " + TypeName.at(type()) + " " + OpName.at(op());
   }

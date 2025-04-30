@@ -38,7 +38,8 @@ class Tree2Dot {
     if (node == nullptr) return true;
 
     ous << "  \"" << node->id() << "\" [label=\"" << node->id() << ". "
-        << node_name(node) << "(" << value_str(node->value()) << ")"
+        << node_name(node) << "("
+        << value_str(node->origin_value(), node->value()) << ")"
         << "\"];" << std::endl;
     for (const auto& child : node->children()) GenerateDotNode(ous, child);
 
