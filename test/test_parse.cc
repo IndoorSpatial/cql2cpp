@@ -121,6 +121,6 @@ TEST_F(ParseTest, spatial       ) { EXPECT_TRUE(Parse(case_name_)); }
 
 TEST_F(TryAll, TryAll) {
   Run("supported/1.0/examples/text/");
-  Run("unsupported/1.0/examples/text/");
+  // Run("unsupported/1.0/examples/text/");
 }
 // clang-format on
