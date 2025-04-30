@@ -8,7 +8,7 @@
 using cql2cpp::AstNode;
 using cql2cpp::AstNodePtr;
 
-using cql2cpp::BoolExpression;
+using cql2cpp::BoolExpr;
 using cql2cpp::BinCompPred;
 using cql2cpp::SpatialPred;
 using cql2cpp::PropertyName;
@@ -62,10 +62,11 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 %token <std::string> CHAR_LIT
 %token <std::string> SPT_FUNC
 %token <std::string> arrayFunction
-%token PLUS MINUS MULT DIV
+%token PLUS MINUS MULT DIV MOD DIVINT POWER
 %token EQ GT LT  // = > <
-%token AND OR NOT
+%token AND OR NOT LIKE
 %token IN
+%token IS NIL // NILL=="NULL" to avoid conflict with C NULL
 %token <char> LPT RPT COMMA  // ( ) ,
 %token CASEI ACCENTI
 %token SQUOTE DQUOTE
@@ -101,6 +102,11 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 %type <AstNodePtr> function
 %type <AstNodePtr> argumentList
 %type <AstNodePtr> argument
+%type <AstNodePtr> arithmeticExpression
+%type <AstNodePtr> arithmeticFactor
+%type <AstNodePtr> arithmeticTerm
+%type <AstNodePtr> arithmeticOperand
+%type <AstNodePtr> powerTerm
 
 %type <std::string> geometryLiteral
 %type <std::string> pointTaggedText
@@ -121,15 +127,15 @@ program:
 
 booleanExpression:
   booleanTerm
-  | booleanTerm OR booleanExpression { $$ = std::make_shared<AstNode>(BoolExpression, Or, std::vector({$1, $3})); }
+  | booleanTerm OR booleanExpression { $$ = std::make_shared<AstNode>(BoolExpr, Or, std::vector({$1, $3})); }
 
 booleanTerm:
   booleanFactor
-  | booleanFactor AND booleanTerm  { $$ = std::make_shared<AstNode>(BoolExpression, And, std::vector({$1, $3})); }
+  | booleanFactor AND booleanTerm  { $$ = std::make_shared<AstNode>(BoolExpr, And, std::vector({$1, $3})); }
 
 booleanFactor:
   booleanPrimary
-  | NOT booleanPrimary { $$ = std::make_shared<AstNode>(BoolExpression, Not, std::vector({ $2 })); }
+  | NOT booleanPrimary { $$ = std::make_shared<AstNode>(BoolExpr, Not, std::vector({ $2 })); }
 
 booleanPrimary:
   function
@@ -148,7 +154,10 @@ predicate:
 
 comparisonPredicate:
   binaryComparisonPredicate
+  | isLikePredicate
+  // | isBetweenPredicate
   | isInListPredicate
+  | isNullPredicate
 
 isInListPredicate:
   scalarExpression IN LPT inList RPT { $$ = std::make_shared<AstNode>(IsInListPred, In, std::vector({$1, $4})); }
@@ -157,6 +166,20 @@ isInListPredicate:
 inList:
   scalarExpression { $$ = std::make_shared<AstNode>(InList, NullOp, std::vector({$1})); }
   | inList COMMA scalarExpression { $1->append($3);  $$ = $1; }
+
+isNullPredicate:
+  isNullOperand IS NIL
+  | isNullOperand IS NOT NIL
+
+isNullOperand:
+  characterClause
+  | numericLiteral
+  // | temporalInstance
+  | spatialInstance
+  | arithmeticExpression
+  | booleanExpression
+  | propertyName
+  | function
 
 binaryComparisonPredicate:
   scalarExpression EQ scalarExpression { $$ = std::make_shared<AstNode>(BinCompPred, cql2cpp::Equal, std::vector({$1, $3})); }
@@ -167,11 +190,23 @@ binaryComparisonPredicate:
   | scalarExpression GT EQ scalarExpression { $$ = std::make_shared<AstNode>(BinCompPred, cql2cpp::GreaterEqual, std::vector({$1, $4})); }
 
 scalarExpression:
-  numericLiteral
+  characterClause
+  | numericLiteral
+  // | instantInstance
+  | arithmeticExpression
+  | booleanLiteral
   | propertyName
   | function
-  | booleanLiteral
-  | characterClause
+
+isLikePredicate:
+  characterExpression LIKE patternExpression
+  | characterExpression NOT LIKE patternExpression
+
+patternExpression:
+  CASEI LPT patternExpression RPT
+  | ACCENTI LPT patternExpression RPT
+  | CHAR_LIT
+
 
 characterClause:
   CASEI LPT characterExpression RPT { $$ = $3; }  // TODO
@@ -242,10 +277,36 @@ arrayElement:
   // | temporalInstance
   | spatialInstance
   // | array  // shift/reduce conflict
-  // | arithmeticExpression
+  | arithmeticExpression
   | booleanExpression
   | propertyName
   // | function  // reduce/reduce conflict
+
+arithmeticExpression:
+  arithmeticTerm
+  | arithmeticTerm PLUS arithmeticExpression { $$ = std::make_shared<AstNode>(ArithExpr, PLUS, std::vector({$1, $3})); }
+  | arithmeticTerm MINUS arithmeticExpression { $$ = std::make_shared<AstNode>(ArithExpr, MINUS, std::vector({$1, $3})); }
+
+arithmeticTerm:
+  powerTerm
+  | powerTerm MULT arithmeticTerm { $$ = std::make_shared<AstNode>(ArithExpr, MULT, std::vector({$1, $3})); }
+  | powerTerm DIV arithmeticTerm { $$ = std::make_shared<AstNode>(ArithExpr, DIV, std::vector({$1, $3})); }
+  | powerTerm MOD arithmeticTerm { $$ = std::make_shared<AstNode>(ArithExpr, MOD, std::vector({$1, $3})); }
+  | powerTerm DIVINT arithmeticTerm { $$ = std::make_shared<AstNode>(ArithExpr, DIVINT, std::vector({$1, $3})); }
+
+powerTerm:
+  arithmeticFactor
+  | arithmeticFactor POWER arithmeticFactor { $$ = std::make_shared<AstNode>(ArithExpr, POWER, std::vector({$1, $3})); }
+
+arithmeticFactor:
+  LPT arithmeticExpression RPT { $$ = $2; }
+  | arithmeticOperand
+  | MINUS arithmeticOperand { $$ = std::make_shared<AstNode>(ArithExpr, MINUS, std::vector({$2})); }
+
+arithmeticOperand:
+  numericLiteral
+  | propertyName
+  | function
 
 function:
   ID LPT RPT {
@@ -270,7 +331,7 @@ argument:
   // | temporalInstance
   // | spatialInstance
   // | array
-  // | arithmeticExpression
+  | arithmeticExpression
   // | booleanExpression
 
 geometryLiteral:

@@ -37,9 +37,19 @@ enum Operator {
   NotIn,
   IsNull,
 
+  // arithmetic operators
+  PLUS,
+  MINUS,
+  MULT,
+  DIV,
+  DIVINT,
+  MOD,
+  POWER,
+
   // spatial operators
   S_Contains,
   S_Crosses,
+  S_Disjoint,
   S_Equals,
   S_Intersects,
   S_Overlaps,
@@ -92,8 +102,17 @@ const std::map<Operator, std::string> OpName {
   OP_2_NAME(NotIn)
   OP_2_NAME(IsNull)
 
+  OP_2_NAME(PLUS)
+  OP_2_NAME(MINUS)
+  OP_2_NAME(MULT)
+  OP_2_NAME(DIV)
+  OP_2_NAME(DIVINT)
+  OP_2_NAME(MOD)
+  OP_2_NAME(POWER)
+
   OP_2_NAME(S_Contains)
   OP_2_NAME(S_Crosses)
+  OP_2_NAME(S_Disjoint)
   OP_2_NAME(S_Equals)
   OP_2_NAME(S_Intersects)
   OP_2_NAME(S_Overlaps)
@@ -125,6 +144,7 @@ const std::map<Operator, std::string> OpName {
 const std::map<std::string, Operator> NameOp {
   {"S_CONTAINS", S_Contains},
   {"S_CROSSES", S_Crosses},
+  {"S_DISJOINT", S_Disjoint},
   {"S_EQUALS", S_Equals},
   {"S_INTERSECTS", S_Intersects},
   {"S_OVERLAPS", S_Overlaps},
@@ -145,8 +165,8 @@ const std::map<std::string, Operator> NameOp {
   {"T_OVERLAPPEDBY", T_OverlappedBy},
   {"T_OVERLAPS", T_Overlaps},
   {"T_STARTEDBY", T_StartedBy},
-
   {"T_STARTS", T_Starts},
+
   {"A_CONTAINEDBY", A_ContainedBy},
   {"A_CONTAINS", A_Contains},
   {"A_EQUALS", A_Equals},

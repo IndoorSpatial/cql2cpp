@@ -37,19 +37,19 @@ class EvaluatorBool : public EvaluatorAstNode {
 
  public:
   EvaluatorBool() {
-    evaluators_[BoolExpression][And] = [](auto n, auto vs, auto fs, auto value,
+    evaluators_[BoolExpr][And] = [](auto n, auto vs, auto fs, auto value,
                                           auto errmsg) -> bool {
       if (not CheckValueNumberType<bool>("AND", 2, vs, errmsg)) return false;
       *value = std::get<bool>(vs.at(0)) and std::get<bool>(vs.at(1));
       return true;
     };
-    evaluators_[BoolExpression][Or] = [](auto n, auto vs, auto fs, auto value,
+    evaluators_[BoolExpr][Or] = [](auto n, auto vs, auto fs, auto value,
                                          auto errmsg) -> bool {
       if (not CheckValueNumberType<bool>("OR", 2, vs, errmsg)) return false;
       *value = std::get<bool>(vs.at(0)) or std::get<bool>(vs.at(1));
       return true;
     };
-    evaluators_[BoolExpression][Not] = [](auto n, auto vs, auto fs, auto value,
+    evaluators_[BoolExpr][Not] = [](auto n, auto vs, auto fs, auto value,
                                           auto errmsg) -> bool {
       if (not CheckValueNumberType<bool>("NOT", 1, vs, errmsg)) return false;
       *value = not std::get<bool>(vs.at(0));

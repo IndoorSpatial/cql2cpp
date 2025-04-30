@@ -13,6 +13,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include <cstdlib>
 
 namespace fs = std::filesystem;
 
@@ -47,26 +48,22 @@ class ParseTest : public testing::Test {
     std::string dot;
     cql2cpp::AstNode::set_ostream(&std::cout);
     bool ret = cql2cpp::Cql2Cpp<void*>::ToDot(query, &dot, nullptr);
-    if (ret) LOG(INFO) << dot;
-
-    std::string dot_filename = case_name + ".dot";
-    if (gen_dot_) {
+    if (ret and gen_dot_) {
+      std::string dot_filename = case_name + ".dot";
       std::ofstream fout(dot_filename);
       if (fout.is_open()) {
         fout << dot;
         fout.close();
+        std::stringstream ss;
+        ss << "dot -Tpng " << dot_filename << " -o " << case_name << ".png";
+        int ret = std::system(ss.str().c_str());
+        if (ret != 0)
+          LOG(WARNING) << "run dot command error";
       } else {
         LOG(ERROR) << "Can not open file " << dot_filename;
       }
     }
     return ret;
-  }
-};
-
-class ParseTestOverExamples : public ParseTest {
- public:
-  ParseTestOverExamples() : ParseTest() {
-    prefix_ = "supported/1.0/examples/text/";
   }
 };
 
@@ -91,7 +88,9 @@ class TryAll : public ParseTest {
 
   void Run(const std::string& path) {
     prefix_ = path;
+    gen_dot_ = true;
     auto files = ListFilesInDirectory(path);
+    std::sort(files.begin(), files.end());
     std::vector<std::string> ok;
     std::vector<std::string> error;
     for (const auto& file : files) {
@@ -102,9 +101,9 @@ class TryAll : public ParseTest {
     }
 
     for (const auto& f : ok)
-      LOG(INFO) << "OK " << f;
+      LOG(INFO) << "OK  " << f;
     for (const auto& f : error)
-      LOG(INFO) << "ER " << f;
+      LOG(INFO) << "ERR " << f;
   }
 };
 
@@ -120,16 +119,8 @@ TEST_F(ParseTest, avg           ) { EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseTest, spatial       ) { EXPECT_TRUE(Parse(case_name_)); }
 // TEST_F(ParseTest, labels        ) { EXPECT_TRUE(Parse(case_name_)); }  // standard unsupported
 
-
-TEST_F(ParseTestOverExamples, clause6_01 ) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseTestOverExamples, clause6_02a) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseTestOverExamples, clause6_02b) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseTestOverExamples, clause6_02c) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(ParseTestOverExamples, clause6_02d) { EXPECT_TRUE(Parse(case_name_)); }  // date
-// TEST_F(ParseTestOverExamples, clause6_03 ) { EXPECT_TRUE(Parse(case_name_)); }  // IS NOT NULL
-
-TEST_F(TryAll, TryAllUnSupported) {
-  // Run("supported/1.0/examples/text/");
+TEST_F(TryAll, TryAll) {
+  Run("supported/1.0/examples/text/");
   Run("unsupported/1.0/examples/text/");
 }
 // clang-format on

@@ -19,23 +19,21 @@ namespace cql2cpp {
 enum NodeType {
   Literal,
 
-  BoolExpression,
+  BoolExpr,
 
   // Comparison Predicate
   BinCompPred,
   IsLikePred,
   IsBetweenPred,
-
   IsInListPred,
   InList,
-
   IsNullPred,
-
   SpatialPred,
-
   TemporalPred,
-
   ArrayPred,
+
+  ArithExpr,
+
   Array,
 
   PropertyName,
@@ -48,7 +46,7 @@ enum NodeType {
 
 const std::map<NodeType, std::string> TypeName {
   TYPE_2_NAME(Literal)
-  TYPE_2_NAME(BoolExpression)
+  TYPE_2_NAME(BoolExpr)
   TYPE_2_NAME(BinCompPred)
   TYPE_2_NAME(IsLikePred)
   TYPE_2_NAME(IsBetweenPred)
@@ -58,6 +56,7 @@ const std::map<NodeType, std::string> TypeName {
   TYPE_2_NAME(SpatialPred)
   TYPE_2_NAME(TemporalPred)
   TYPE_2_NAME(ArrayPred)
+  TYPE_2_NAME(ArithExpr)
   TYPE_2_NAME(Array)
   TYPE_2_NAME(PropertyName)
   TYPE_2_NAME(Function)

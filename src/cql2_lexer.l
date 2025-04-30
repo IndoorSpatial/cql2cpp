@@ -166,9 +166,15 @@ A_EQUALS|A_CONTAINS|A_CONTAINEDBY|A_OVERLAPS {
 "-" { print("OP", yytext); return Cql2ParserBase::token::MINUS;}
 "*" { print("OP", yytext); return Cql2ParserBase::token::MULT; }
 "/" { print("OP", yytext); return Cql2ParserBase::token::DIV;  }
+"%" { print("OP", yytext); return Cql2ParserBase::token::MOD;  }
+"^" { print("OP", yytext); return Cql2ParserBase::token::POWER;  }
 "=" { print("OP", yytext); return Cql2ParserBase::token::EQ;  }
 "<" { print("OP", yytext); return Cql2ParserBase::token::LT;  }
 ">" { print("OP", yytext); return Cql2ParserBase::token::GT;  }
+"div" { print("OP", yytext); return Cql2ParserBase::token::DIVINT;  }
+"LIKE" { print("OP", yytext); return Cql2ParserBase::token::LIKE;  }
+"IS" { print("OP", yytext); return Cql2ParserBase::token::IS;  }
+"NULL" { print("OP", yytext); return Cql2ParserBase::token::NIL;  }
 
 "{"[^{}\n]*"}" {/* eat up one-line comments */}
 
