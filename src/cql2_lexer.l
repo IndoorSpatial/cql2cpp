@@ -17,6 +17,10 @@ ID       [a-z][.a-zA-Z0-9_\-]*
 CHAR_LIT \'[^\']*\'
 
 %%
+"div" { print("OP", yytext); return Cql2ParserBase::token::DIVINT;  }
+"LIKE" { print("OP", yytext); return Cql2ParserBase::token::LIKE;  }
+"IS" { print("OP", yytext); return Cql2ParserBase::token::IS;  }
+"NULL" { print("OP", yytext); return Cql2ParserBase::token::NIL;  }
 
 {CHAR_LIT} {
   print("CHAR_LIT", yytext);
@@ -171,10 +175,6 @@ A_EQUALS|A_CONTAINS|A_CONTAINEDBY|A_OVERLAPS {
 "=" { print("OP", yytext); return Cql2ParserBase::token::EQ;  }
 "<" { print("OP", yytext); return Cql2ParserBase::token::LT;  }
 ">" { print("OP", yytext); return Cql2ParserBase::token::GT;  }
-"div" { print("OP", yytext); return Cql2ParserBase::token::DIVINT;  }
-"LIKE" { print("OP", yytext); return Cql2ParserBase::token::LIKE;  }
-"IS" { print("OP", yytext); return Cql2ParserBase::token::IS;  }
-"NULL" { print("OP", yytext); return Cql2ParserBase::token::NIL;  }
 
 "{"[^{}\n]*"}" {/* eat up one-line comments */}
 
