@@ -21,6 +21,9 @@ namespace cql2cpp {
 const std::string pattern_str =
     R"(BBOX\s*\(\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*[)])";
 
+const std::string pattern_3d_str =
+    R"(BBOX\s*\(\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*,\s*([-+]?\d*\.?\d+)\s*[)])";
+
 class BBoxReader {
  private:
  public:
@@ -36,8 +39,12 @@ class BBoxReader {
       double maxx = std::stod(matches[3]);
       double maxy = std::stod(matches[4]);
       return std::make_unique<geos::geom::Envelope>(minx, maxx, miny, maxy);
+    } else {
+      std::regex pattern3d(pattern_3d_str);
+      if (std::regex_match(bbox_tagged_text, matches, pattern3d))
+        LOG(ERROR) << "3d bbox unsupported";
+      return nullptr;
     }
-    return nullptr;
   }
 };
 

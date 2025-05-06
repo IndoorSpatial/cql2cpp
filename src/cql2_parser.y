@@ -340,7 +340,7 @@ argumentList:
 argument:
   propertyName
   | function
-  // | characterClause
+  | characterClause
   // | numericLiteral
   // | temporalInstance
   // | spatialInstance
