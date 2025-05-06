@@ -11,9 +11,9 @@
 #include <glog/logging.h>
 #include <gtest/gtest.h>
 
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
-#include <cstdlib>
 
 namespace fs = std::filesystem;
 
@@ -57,14 +57,18 @@ class ParseTest : public testing::Test {
         std::stringstream ss;
         ss << "dot -Tpng " << dot_filename << " -o " << case_name << ".png";
         int ret = std::system(ss.str().c_str());
-        if (ret != 0)
-          LOG(WARNING) << "run dot command error";
+        if (ret != 0) LOG(WARNING) << "run dot command error";
       } else {
         LOG(ERROR) << "Can not open file " << dot_filename;
       }
     }
     return ret;
   }
+};
+
+class ParseExampleTest : public ParseTest {
+ public:
+  ParseExampleTest() : ParseTest() { prefix_ = "supported/1.0/examples/text/"; }
 };
 
 class TryAll : public ParseTest {
@@ -94,16 +98,15 @@ class TryAll : public ParseTest {
     std::vector<std::string> ok;
     std::vector<std::string> error;
     for (const auto& file : files) {
+      LOG(INFO) << file;
       if (Parse(file.substr(0, file.size() - 4)))
         ok.emplace_back(file);
       else
         error.emplace_back(file);
     }
 
-    for (const auto& f : ok)
-      LOG(INFO) << "OK  " << f;
-    for (const auto& f : error)
-      LOG(INFO) << "ERR " << f;
+    for (const auto& f : ok) LOG(INFO) << "OK  " << f;
+    for (const auto& f : error) LOG(INFO) << "ERR " << f;
   }
 };
 
@@ -119,8 +122,29 @@ TEST_F(ParseTest, avg           ) { EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseTest, spatial       ) { EXPECT_TRUE(Parse(case_name_)); }
 // TEST_F(ParseTest, labels        ) { EXPECT_TRUE(Parse(case_name_)); }  // standard unsupported
 
-TEST_F(TryAll, TryAll) {
-  Run("supported/1.0/examples/text/");
-  // Run("unsupported/1.0/examples/text/");
-}
+
+TEST_F(ParseExampleTest, clause6_01 ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause6_02a) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause6_02b) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause6_02c) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause7_03a) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause7_03b) { EXPECT_TRUE(Parse(case_name_)); }
+// TEST_F(ParseExampleTest, clause7_04 ) { EXPECT_TRUE(Parse(case_name_)); }  // encoding
+// TEST_F(ParseExampleTest, clause7_05 ) { EXPECT_TRUE(Parse(case_name_)); }  // encoding
+TEST_F(ParseExampleTest, clause7_07 ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause7_10 ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause7_16 ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example09  ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example10  ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example14  ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example15  ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example17  ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example18  ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example23  ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example24  ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example25  ) { EXPECT_TRUE(Parse(case_name_)); }
+// TEST_F(ParseExampleTest, example26  ) { EXPECT_TRUE(Parse(case_name_)); }  // encoding
+// TEST_F(ParseExampleTest, example27  ) { EXPECT_TRUE(Parse(case_name_)); }  // encoding
+
+TEST_F(TryAll, TryAll) { Run("supported/1.0/examples/text/"); }
 // clang-format on

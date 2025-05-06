@@ -15,7 +15,6 @@ void print(const std::string& prefix, const char* yytext) {
 DIGIT    [0-9]
 ID       [:_a-zA-Z][:_a-zA-Z.0-9]*
 CHAR_LIT \'[!"#$%&()*+,-.:;<=>?@a-zA-Z[\\\]^_`0-9 \t\r\n]*\'
-
 %%
 
 "div" { print("OP", yytext); return Cql2ParserBase::token::DIVINT;  }
@@ -53,17 +52,17 @@ CHAR_LIT \'[!"#$%&()*+,-.:;<=>?@a-zA-Z[\\\]^_`0-9 \t\r\n]*\'
 }
 
 "AND" {
-  print("BOOL_EXPR", yytext);
+  print("BOOL_OP", yytext);
   return Cql2ParserBase::token::AND;
 }
 
 "OR" {
-  print("BOOL_EXPR", yytext);
+  print("BOOL_OP", yytext);
   return Cql2ParserBase::token::OR;
 }
 
 "NOT" {
-  print("BOOL_EXPR", yytext);
+  print("BOOL_OP", yytext);
   return Cql2ParserBase::token::NOT;
 }
 
@@ -90,10 +89,6 @@ CHAR_LIT \'[!"#$%&()*+,-.:;<=>?@a-zA-Z[\\\]^_`0-9 \t\r\n]*\'
 "\"" {
   print("DQUOTE", yytext);
   return Cql2ParserBase::token::DQUOTE;
-}
-"'" {
-  print("SQUOTE", yytext);
-  return Cql2ParserBase::token::SQUOTE;
 }
 
 "," {
@@ -179,6 +174,11 @@ A_EQUALS|A_CONTAINS|A_CONTAINEDBY|A_OVERLAPS {
   print("CHAR_LIT", yytext);
   yylval_->emplace<std::string>() = yytext;
   return Cql2ParserBase::token::CHAR_LIT;
+}
+
+"'" {
+  print("SQUOTE", yytext);
+  return Cql2ParserBase::token::SQUOTE;
 }
 
 . { LOG(INFO) << "Unrecognized character: " << yytext << std::endl; }

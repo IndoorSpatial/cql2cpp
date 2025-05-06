@@ -161,7 +161,7 @@ comparisonPredicate:
   | isLikePredicate
   // | isBetweenPredicate
   | isInListPredicate
-  | isNullPredicate
+  // | isNullPredicate
 
 isInListPredicate:
   scalarExpression IN LPT inList RPT { PL; $$ = MakeAstNode(IsInListPred, In, std::vector({$1, $4})); }
@@ -171,19 +171,19 @@ inList:
   scalarExpression { PL; $$ = MakeAstNode(InList, NullOp, std::vector({$1})); }
   | inList COMMA scalarExpression { PL; $1->append($3);  $$ = $1; }
 
-isNullPredicate:
-  isNullOperand IS NIL
-  | isNullOperand IS NOT NIL
+// isNullPredicate:
+//   isNullOperand IS NIL
+//   | isNullOperand IS NOT NIL
 
-isNullOperand:
-  characterClause
-  | numericLiteral
-  // | temporalInstance
-  | spatialInstance
-  | arithmeticExpression
-  | booleanExpression
-  | propertyName
-  | function
+// isNullOperand:
+//   characterClause
+//   | numericLiteral
+//   // | temporalInstance
+//   | spatialInstance
+//   | arithmeticExpression
+//   | booleanExpression
+//   | propertyName
+//   | function
 
 binaryComparisonPredicate:
   scalarExpression EQ scalarExpression { PL; $$ = MakeAstNode(BinCompPred, cql2cpp::Equal, std::vector({$1, $3})); }
@@ -219,7 +219,8 @@ characterClause:
 
 characterExpression:
   characterClause
-  | propertyName { PL; $$ = $1; }
+  | propertyName
+  | function
 
 numericLiteral:
   MINUS NUMBER_INT { PL; $$ = MakeAstNode($2 * -1); }

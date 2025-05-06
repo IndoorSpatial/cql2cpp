@@ -1,1 +1,1 @@
-'CONTAINER' IN ('ABC', 'CONTAINER', 'xyz')
+'CONTAINER' IN ('ABC', 'CONTAINER', 'z', 'DEF')
