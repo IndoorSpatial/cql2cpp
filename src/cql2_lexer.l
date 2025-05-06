@@ -102,20 +102,7 @@ S_INTERSECTS|S_EQUALS|S_DISJOINT|S_TOUCHES|S_WITHIN|S_OVERLAPS|S_CROSSES|S_CONTA
   return Cql2ParserBase::token::SPT_FUNC;
 }
 
-
-POINT[Z]?[ ]*"("[0-9. +\-\n]+")" {
-  print("GEOMETRY", yytext);
-  yylval_->emplace<std::string>() = yytext;
-  return Cql2ParserBase::token::POINT_WKT;
-}
-
-LINESTRING[Z]?[ ]?"("[0-9. +\-,\n]+")" {
-  print("GEOMETRY", yytext);
-  yylval_->emplace<std::string>() = yytext;
-  return Cql2ParserBase::token::LINESTRING_WKT;
-}
-
-POLYGON[Z]?[ ]?"(" {
+(POINT|LINESTRING|POLYGON|GEOMETRYCOLLECTION|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON)[Z]?[ ]*"(" {
   std::stringstream ss;
   ss << yytext;
 
@@ -129,8 +116,10 @@ POLYGON[Z]?[ ]?"(" {
   std::string text = ss.str();
   print("GEOMETRY", text.c_str());
   yylval_->emplace<std::string>() = text;
-  return Cql2ParserBase::token::POLYGON_WKT;
+  return Cql2ParserBase::token::ANY_WKT;
 }
+
+
 
 BBOX"("[0-9. +\-,\n]+")" {
   print("BBOX", yytext);

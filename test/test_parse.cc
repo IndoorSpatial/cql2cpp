@@ -98,7 +98,7 @@ class TryAll : public ParseTest {
 
   void Run(const std::string& path) {
     prefix_ = path;
-    gen_dot_ = false;
+    gen_dot_ = true;
     auto files = ListFilesInDirectory(path);
     std::sort(files.begin(), files.end());
     std::vector<std::string> ok;
@@ -178,6 +178,8 @@ TEST_F(ParseExampleTest, example40_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))
 TEST_F(ParseExampleTest, example43) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example43_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
 TEST_F(ParseExampleTest, example46) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example47) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example48) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example46_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
 TEST_F(ParseExampleTest, example49_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
 TEST_F(ParseExampleTest, example50) {EXPECT_TRUE(Parse(case_name_)); }
@@ -194,6 +196,8 @@ TEST_F(ParseExampleTest, example78) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example79) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example80) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example81) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example83) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example84) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example85) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example85_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
 

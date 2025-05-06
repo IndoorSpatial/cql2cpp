@@ -80,6 +80,7 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 %token <std::string> POINT_WKT
 %token <std::string> LINESTRING_WKT
 %token <std::string> POLYGON_WKT
+%token <std::string> ANY_WKT
 %token <std::string> BBOX_TEXT
 
 %type <AstNodePtr> booleanExpression
@@ -348,15 +349,7 @@ argument:
   // | booleanExpression
 
 geometryLiteral:
-  pointTaggedText
-  | linestringTaggedText
-  | polygonTaggedText
-
-pointTaggedText: POINT_WKT
-
-linestringTaggedText: LINESTRING_WKT
-
-polygonTaggedText: POLYGON_WKT
+  ANY_WKT
 
 bboxTaggedText: BBOX_TEXT
 
