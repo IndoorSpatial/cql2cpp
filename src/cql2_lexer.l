@@ -103,13 +103,13 @@ S_INTERSECTS|S_EQUALS|S_DISJOINT|S_TOUCHES|S_WITHIN|S_OVERLAPS|S_CROSSES|S_CONTA
 }
 
 
-POINT[Z]?"("[0-9. +\-\n]+")" {
+POINT[Z]?[ ]*"("[0-9. +\-\n]+")" {
   print("GEOMETRY", yytext);
   yylval_->emplace<std::string>() = yytext;
   return Cql2ParserBase::token::POINT_WKT;
 }
 
-LINESTRING[Z]?"("[0-9. +\-,\n]+")" {
+LINESTRING[Z]?[ ]?"("[0-9. +\-,\n]+")" {
   print("GEOMETRY", yytext);
   yylval_->emplace<std::string>() = yytext;
   return Cql2ParserBase::token::LINESTRING_WKT;
