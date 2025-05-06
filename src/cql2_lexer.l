@@ -18,7 +18,6 @@ CHAR_LIT \'[!"#$%&()*+,-.:;<=>?@a-zA-Z[\\\]^_`0-9 \t\r\n]*\'
 %%
 
 "div" { print("OP", yytext); return Cql2ParserBase::token::DIVINT;  }
-"LIKE" { print("OP", yytext); return Cql2ParserBase::token::LIKE;  }
 "IS" { print("OP", yytext); return Cql2ParserBase::token::IS;  }
 "NULL" { print("OP", yytext); return Cql2ParserBase::token::NIL;  }
 
@@ -140,8 +139,21 @@ BBOX"("[0-9. +\-,\n]+")" {
 }
 
 IN {
-  print("IN", yytext);
+  print("IN_OP", yytext);
   return Cql2ParserBase::token::IN;
+}
+"NOT"[ \t\n]+"IN" {
+  print("IN_OP", yytext);
+  return Cql2ParserBase::token::NOT_IN;
+}
+
+"LIKE" {
+	print("LIKE_OP", yytext);
+	return Cql2ParserBase::token::LIKE;
+}
+"NOT"[ \t\n]+"LIKE" {
+	print("LIKE_OP", yytext);
+	return Cql2ParserBase::token::NOT_LIKE;
 }
 
 A_EQUALS|A_CONTAINS|A_CONTAINEDBY|A_OVERLAPS {

@@ -32,6 +32,12 @@ class ParseTest : public testing::Test {
         testing::UnitTest::GetInstance()->current_test_info()->name());
   }
 
+  static std::string hyphen(const std::string& case_name) {
+    std::string s = case_name;
+    std::replace(s.begin(), s.end(), '_', '-');
+    return s;
+  }
+
   void TearDown() override {}
 
   bool Parse(const std::string& case_name) {
@@ -92,17 +98,18 @@ class TryAll : public ParseTest {
 
   void Run(const std::string& path) {
     prefix_ = path;
-    gen_dot_ = true;
+    gen_dot_ = false;
     auto files = ListFilesInDirectory(path);
     std::sort(files.begin(), files.end());
     std::vector<std::string> ok;
     std::vector<std::string> error;
     for (const auto& file : files) {
-      LOG(INFO) << file;
-      if (Parse(file.substr(0, file.size() - 4)))
+      LOG(WARNING) << file;
+      if (Parse(file.substr(0, file.size() - 4))) {
         ok.emplace_back(file);
-      else
+      } else {
         error.emplace_back(file);
+      }
     }
 
     for (const auto& f : ok) LOG(INFO) << "OK  " << f;
@@ -122,29 +129,71 @@ TEST_F(ParseTest, avg           ) { EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseTest, spatial       ) { EXPECT_TRUE(Parse(case_name_)); }
 // TEST_F(ParseTest, labels        ) { EXPECT_TRUE(Parse(case_name_)); }  // standard unsupported
 
-
-TEST_F(ParseExampleTest, clause6_01 ) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, clause6_02a) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, clause6_02b) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, clause6_02c) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, clause7_03a) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, clause7_03b) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(ParseExampleTest, clause7_04 ) { EXPECT_TRUE(Parse(case_name_)); }  // encoding
-// TEST_F(ParseExampleTest, clause7_05 ) { EXPECT_TRUE(Parse(case_name_)); }  // encoding
-TEST_F(ParseExampleTest, clause7_07 ) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, clause7_10 ) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, clause7_16 ) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, example09  ) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, example10  ) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, example14  ) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, example15  ) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, example17  ) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, example18  ) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, example23  ) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, example24  ) { EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, example25  ) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(ParseExampleTest, example26  ) { EXPECT_TRUE(Parse(case_name_)); }  // encoding
-// TEST_F(ParseExampleTest, example27  ) { EXPECT_TRUE(Parse(case_name_)); }  // encoding
+TEST_F(ParseExampleTest, clause6_01) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause6_02a) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause6_02b) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause6_02c) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause7_01) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause7_03a) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause7_03b) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause7_07) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause7_10) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause7_15) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause7_16) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause7_19) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example01) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example02) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example03) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example04) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example05a) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example05b) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example06b) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example07) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example09) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example10) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example11) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example12) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example13) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example14) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example15) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example16) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example17) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example18) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example19) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example23) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example24) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example25) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example29) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example30) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example31) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example32) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example33) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example34) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example35) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example36) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example36_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
+TEST_F(ParseExampleTest, example39) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example40) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example40_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
+TEST_F(ParseExampleTest, example43) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example43_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
+TEST_F(ParseExampleTest, example46) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example46_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
+TEST_F(ParseExampleTest, example49_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
+TEST_F(ParseExampleTest, example50) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example68) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example72) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example73) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example74) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example75) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example76) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example77) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example78) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example79) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example80) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example81) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example85) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example85_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
 
 TEST_F(TryAll, TryAll) { Run("supported/1.0/examples/text/"); }
 // clang-format on

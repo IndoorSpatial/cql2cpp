@@ -50,7 +50,12 @@ class Tree2Dot {
     if (node == nullptr) return true;
 
     for (const auto& child : node->children()) {
-      ous << "  \"" << node->id() << "\" -> \"" << child->id() << "\";\n";
+      if (child == nullptr) {
+        LOG(ERROR) << "corrupt AST";
+        ous << "  \"" << node->id() << "\" -> \"null ptr\";\n";
+      } else {
+        ous << "  \"" << node->id() << "\" -> \"" << child->id() << "\";\n";
+      }
       GenerateDotEdge(ous, child);
     }
 

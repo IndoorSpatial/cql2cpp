@@ -10,6 +10,7 @@ using cql2cpp::AstNodePtr;
 
 using cql2cpp::BoolExpr;
 using cql2cpp::BinCompPred;
+using cql2cpp::IsLikePred;
 using cql2cpp::SpatialPred;
 using cql2cpp::PropertyName;
 using cql2cpp::IsInListPred;
@@ -68,8 +69,9 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 %token <std::string> arrayFunction
 %token PLUS MINUS MULT DIV MOD DIVINT POWER
 %token EQ GT LT  // = > <
-%token AND OR NOT LIKE
-%token IN
+%token AND OR NOT
+%token LIKE NOT_LIKE
+%token IN NOT_IN
 %token IS NIL // NILL=="NULL" to avoid conflict with C NULL
 %token <char> LPT RPT COMMA  // ( ) ,
 %token CASEI ACCENTI
@@ -111,6 +113,8 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 %type <AstNodePtr> arithmeticTerm
 %type <AstNodePtr> arithmeticOperand
 %type <AstNodePtr> powerTerm
+%type <AstNodePtr> isLikePredicate
+%type <AstNodePtr> patternExpression
 
 %type <std::string> geometryLiteral
 %type <std::string> pointTaggedText
@@ -165,7 +169,7 @@ comparisonPredicate:
 
 isInListPredicate:
   scalarExpression IN LPT inList RPT { PL; $$ = MakeAstNode(IsInListPred, In, std::vector({$1, $4})); }
-  | scalarExpression NOT IN LPT inList RPT { PL; $$ = MakeAstNode(IsInListPred, NotIn, std::vector({$1, $5})); }
+  | scalarExpression NOT_IN LPT inList RPT { PL; $$ = MakeAstNode(IsInListPred, NotIn, std::vector({$1, $4})); }
 
 inList:
   scalarExpression { PL; $$ = MakeAstNode(InList, NullOp, std::vector({$1})); }
@@ -203,13 +207,13 @@ scalarExpression:
   | function
 
 isLikePredicate:
-  characterExpression LIKE patternExpression
-  | characterExpression NOT LIKE patternExpression
+  characterExpression LIKE patternExpression { PL; $$ = MakeAstNode(IsLikePred, cql2cpp::Like, std::vector({$1, $3})); }
+  | characterExpression NOT_LIKE patternExpression { PL; $$ = MakeAstNode(IsLikePred, cql2cpp::NotLike, std::vector({$1, $3})); }
 
 patternExpression:
-  CASEI LPT patternExpression RPT
-  | ACCENTI LPT patternExpression RPT
-  | CHAR_LIT
+  // CASEI LPT patternExpression RPT
+  // | ACCENTI LPT patternExpression RPT
+  | CHAR_LIT { PL; std::string s = std::string($1); $$ = MakeAstNode(s.substr(1, s.size() - 2)); }
 
 
 characterClause:
