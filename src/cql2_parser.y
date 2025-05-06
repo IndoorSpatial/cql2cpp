@@ -66,7 +66,8 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 %token <std::string> ID
 %token <std::string> CHAR_LIT
 %token <std::string> SPT_FUNC
-%token <std::string> arrayFunction
+%token <std::string> TIME_FUNC
+%token <std::string> ARR_FUNC
 %token PLUS MINUS MULT DIV MOD DIVINT POWER
 %token EQ GT LT  // = > <
 %token AND OR NOT
@@ -76,10 +77,8 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 %token <char> LPT RPT COMMA  // ( ) ,
 %token CASEI ACCENTI
 %token SQUOTE DQUOTE
+%token TIMESTAMP DATE INTERVAL
 
-%token <std::string> POINT_WKT
-%token <std::string> LINESTRING_WKT
-%token <std::string> POLYGON_WKT
 %token <std::string> ANY_WKT
 %token <std::string> BBOX_TEXT
 
@@ -270,7 +269,7 @@ spatialInstance:
   }
 
 arrayPredicate:
-  arrayFunction LPT arrayExpression COMMA arrayExpression RPT { PL; $$ = MakeAstNode(ArrayPred, NameOp.at($1), std::vector({$3, $5})); }
+  ARR_FUNC LPT arrayExpression COMMA arrayExpression RPT { PL; $$ = MakeAstNode(ArrayPred, NameOp.at($1), std::vector({$3, $5})); }
 
 arrayExpression:
   array

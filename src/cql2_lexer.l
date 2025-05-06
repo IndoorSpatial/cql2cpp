@@ -75,6 +75,21 @@ CHAR_LIT \'[!"#$%&()*+,-.:;<=>?@a-zA-Z[\\\]^_`0-9 \t\r\n]*\'
   return Cql2ParserBase::token::ACCENTI;
 }
 
+TIMESTAMP|timestamp {
+  print("", yytext);
+  return Cql2ParserBase::token::TIMESTAMP;
+}
+
+DATE|date {
+  print("", yytext);
+  return Cql2ParserBase::token::DATE;
+}
+
+INTERVAL|interval {
+  print("", yytext);
+  return Cql2ParserBase::token::INTERVAL;
+}
+
 "(" {
   print("LPT", yytext);
   return Cql2ParserBase::token::LPT;
@@ -102,6 +117,12 @@ S_INTERSECTS|S_EQUALS|S_DISJOINT|S_TOUCHES|S_WITHIN|S_OVERLAPS|S_CROSSES|S_CONTA
   return Cql2ParserBase::token::SPT_FUNC;
 }
 
+T_AFTER|T_BEFORE|T_CONTAINS|T_DISJOINT|T_DURING|T_EQUALS|T_FINISHEDBY|T_FINISHES|T_INTERSECTS|T_MEETS|T_METBY|T_OVERLAPPEDBY|T_OVERLAPS|T_STARTEDBY|T_STARTS {
+  print("TIME", yytext);
+  yylval_->emplace<std::string>(yytext);
+  return Cql2ParserBase::token::TIME_FUNC;
+}
+
 (POINT|LINESTRING|POLYGON|GEOMETRYCOLLECTION|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON)[ ]*[Z]?[ ]*"(" {
   std::stringstream ss;
   ss << yytext;
@@ -118,8 +139,6 @@ S_INTERSECTS|S_EQUALS|S_DISJOINT|S_TOUCHES|S_WITHIN|S_OVERLAPS|S_CROSSES|S_CONTA
   yylval_->emplace<std::string>() = text;
   return Cql2ParserBase::token::ANY_WKT;
 }
-
-
 
 BBOX"("[0-9. +\-,\n]+")" {
   print("BBOX", yytext);
@@ -148,7 +167,7 @@ IN {
 A_EQUALS|A_CONTAINS|A_CONTAINEDBY|A_OVERLAPS {
   print("ARRAY", yytext);
   yylval_->emplace<std::string>(yytext);
-  return Cql2ParserBase::token::arrayFunction;
+  return Cql2ParserBase::token::ARR_FUNC;
 }
 
 {ID} {
