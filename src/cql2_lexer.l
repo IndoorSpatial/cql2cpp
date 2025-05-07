@@ -17,7 +17,7 @@ ID       [:_a-zA-Z][:_a-zA-Z.0-9]*
 CHAR_LIT \'[!"#$%&()*+,-.:;<=>?@a-zA-Z[\\\]^_`0-9 \t\r\n]*\'
 %%
 
-"div" { print("OP", yytext); return Cql2ParserBase::token::DIVINT;  }
+DIV|div { print("OP", yytext); return Cql2ParserBase::token::DIVINT;  }
 
 {DIGIT}+    {
   print("DIGIT_INT", yytext);
@@ -48,27 +48,27 @@ CHAR_LIT \'[!"#$%&()*+,-.:;<=>?@a-zA-Z[\\\]^_`0-9 \t\r\n]*\'
   return Cql2ParserBase::token::FALSE;
 }
 
-"AND" {
+AND|and {
   print("BOOL_OP", yytext);
   return Cql2ParserBase::token::AND;
 }
 
-"OR" {
+OR|or {
   print("BOOL_OP", yytext);
   return Cql2ParserBase::token::OR;
 }
 
-"NOT" {
+NOT|not {
   print("BOOL_OP", yytext);
   return Cql2ParserBase::token::NOT;
 }
 
-"CASEI" {
+CASEI|casei {
   print("", yytext);
   return Cql2ParserBase::token::CASEI;
 }
 
-"ACCENTI" {
+ACCENTI|accenti {
   print("", yytext);
   return Cql2ParserBase::token::ACCENTI;
 }
@@ -144,7 +144,7 @@ BBOX"("[0-9. +\-,\n]+")" {
   return Cql2ParserBase::token::BBOX_TEXT;
 }
 
-IN {
+IN|in {
   print("IN_OP", yytext);
   return Cql2ParserBase::token::IN;
 }
@@ -163,7 +163,7 @@ IN {
   return Cql2ParserBase::token::IS_NOT_NULL;
 }
 
-"LIKE" {
+LIKE|like {
 	print("LIKE_OP", yytext);
 	return Cql2ParserBase::token::LIKE;
 }
@@ -172,7 +172,7 @@ IN {
 	return Cql2ParserBase::token::NOT_LIKE;
 }
 
-"BETWEEN" {
+BETWEEN|between {
 	print("LIKE_OP", yytext);
 	return Cql2ParserBase::token::BETWEEN;
 }

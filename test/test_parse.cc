@@ -135,6 +135,7 @@ TEST_F(ParseExampleTest, clause6_02b) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, clause6_02c) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, clause6_03) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, clause7_01) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause7_02) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, clause7_03a) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, clause7_03b) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, clause7_07) {EXPECT_TRUE(Parse(case_name_)); }
