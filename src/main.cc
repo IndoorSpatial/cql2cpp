@@ -87,6 +87,7 @@ int main(int argc, char** argv) {
       }
     } else {
       LOG(ERROR) << error_msg;
+      goto FAILED;
     }
   } else {
     // case 2:
@@ -164,9 +165,14 @@ int main(int argc, char** argv) {
       LOG(ERROR) << error_msg;
     }
   }
-FAILED:
 
   gflags::ShutDownCommandLineFlags();
   google::ShutdownGoogleLogging();
   return 0;
+
+FAILED:
+
+  gflags::ShutDownCommandLineFlags();
+  google::ShutdownGoogleLogging();
+  return 1;
 }

@@ -133,6 +133,7 @@ TEST_F(ParseExampleTest, clause6_01) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, clause6_02a) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, clause6_02b) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, clause6_02c) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, clause6_03) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, clause7_01) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, clause7_03a) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, clause7_03b) {EXPECT_TRUE(Parse(case_name_)); }
@@ -175,12 +176,15 @@ TEST_F(ParseExampleTest, example36_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))
 TEST_F(ParseExampleTest, example39) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example40) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example40_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
+TEST_F(ParseExampleTest, example41) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example42) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example42_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
 TEST_F(ParseExampleTest, example43) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example43_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
 TEST_F(ParseExampleTest, example46) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example46_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
 TEST_F(ParseExampleTest, example47) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example48) {EXPECT_TRUE(Parse(case_name_)); }
-TEST_F(ParseExampleTest, example46_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
 TEST_F(ParseExampleTest, example49_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
 TEST_F(ParseExampleTest, example50) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example51) {EXPECT_TRUE(Parse(case_name_)); }

@@ -15,6 +15,7 @@ using cql2cpp::SpatialPred;
 using cql2cpp::PropertyName;
 using cql2cpp::IsInListPred;
 using cql2cpp::InList;
+using cql2cpp::IsNullPred;
 using cql2cpp::ArrayPred;
 using cql2cpp::Array;
 using cql2cpp::Function;
@@ -73,7 +74,8 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 %token AND OR NOT
 %token LIKE NOT_LIKE
 %token IN NOT_IN
-%token IS NIL // NILL=="NULL" to avoid conflict with C NULL
+%token IS_NULL
+%token IS_NOT_NULL
 %token <char> LPT RPT COMMA  // ( ) ,
 %token CASEI ACCENTI
 %token SQUOTE DQUOTE
@@ -115,11 +117,10 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 %type <AstNodePtr> powerTerm
 %type <AstNodePtr> isLikePredicate
 %type <AstNodePtr> patternExpression
+%type <AstNodePtr> isNullPredicate
+%type <AstNodePtr> isNullOperand
 
 %type <std::string> geometryLiteral
-%type <std::string> pointTaggedText
-%type <std::string> linestringTaggedText
-%type <std::string> polygonTaggedText
 %type <std::string> bboxTaggedText
 
 %left PLUS MINUS
@@ -165,7 +166,7 @@ comparisonPredicate:
   | isLikePredicate
   // | isBetweenPredicate
   | isInListPredicate
-  // | isNullPredicate
+  | isNullPredicate
 
 isInListPredicate:
   scalarExpression IN LPT inList RPT { PL; $$ = MakeAstNode(IsInListPred, In, std::vector({$1, $4})); }
@@ -175,19 +176,19 @@ inList:
   scalarExpression { PL; $$ = MakeAstNode(InList, NullOp, std::vector({$1})); }
   | inList COMMA scalarExpression { PL; $1->append($3);  $$ = $1; }
 
-// isNullPredicate:
-//   isNullOperand IS NIL
-//   | isNullOperand IS NOT NIL
+isNullPredicate:
+  isNullOperand IS_NULL { PL; $$ = MakeAstNode(IsNullPred, IsNull, std::vector({$1})); }
+  | isNullOperand IS_NOT_NULL { PL; $$ = MakeAstNode(IsNullPred, IsNotNull, std::vector({$1})); }
 
-// isNullOperand:
-//   characterClause
-//   | numericLiteral
-//   // | temporalInstance
-//   | spatialInstance
-//   | arithmeticExpression
-//   | booleanExpression
-//   | propertyName
-//   | function
+isNullOperand:
+  characterClause
+  | numericLiteral
+  // | temporalInstance
+  | spatialInstance
+  | arithmeticExpression
+  // | booleanExpression
+  | propertyName
+  | function
 
 binaryComparisonPredicate:
   scalarExpression EQ scalarExpression { PL; $$ = MakeAstNode(BinCompPred, cql2cpp::Equal, std::vector({$1, $3})); }
@@ -211,9 +212,9 @@ isLikePredicate:
   | characterExpression NOT_LIKE patternExpression { PL; $$ = MakeAstNode(IsLikePred, cql2cpp::NotLike, std::vector({$1, $3})); }
 
 patternExpression:
-  // CASEI LPT patternExpression RPT
+  CHAR_LIT { PL; std::string s = std::string($1); $$ = MakeAstNode(s.substr(1, s.size() - 2)); }
+  // | CASEI LPT patternExpression RPT
   // | ACCENTI LPT patternExpression RPT
-  | CHAR_LIT { PL; std::string s = std::string($1); $$ = MakeAstNode(s.substr(1, s.size() - 2)); }
 
 
 characterClause:

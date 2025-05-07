@@ -18,8 +18,6 @@ CHAR_LIT \'[!"#$%&()*+,-.:;<=>?@a-zA-Z[\\\]^_`0-9 \t\r\n]*\'
 %%
 
 "div" { print("OP", yytext); return Cql2ParserBase::token::DIVINT;  }
-"IS" { print("OP", yytext); return Cql2ParserBase::token::IS;  }
-"NULL" { print("OP", yytext); return Cql2ParserBase::token::NIL;  }
 
 {DIGIT}+    {
   print("DIGIT_INT", yytext);
@@ -153,6 +151,16 @@ IN {
 "NOT"[ \t\n]+"IN" {
   print("IN_OP", yytext);
   return Cql2ParserBase::token::NOT_IN;
+}
+
+"IS"[ \t\n]+"NULL" {
+  print("OP", yytext);
+  return Cql2ParserBase::token::IS_NULL;
+}
+
+"IS"[ \t\n]+"NOT"[ \t\n]+"NULL" {
+  print("OP", yytext);
+  return Cql2ParserBase::token::IS_NOT_NULL;
 }
 
 "LIKE" {
