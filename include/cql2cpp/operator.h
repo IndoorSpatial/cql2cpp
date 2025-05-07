@@ -40,6 +40,9 @@ enum Operator {
   IsNull,
   IsNotNull,
 
+  CaseI,
+  AccentI,
+
   // arithmetic operators
   PLUS,
   MINUS,
@@ -107,6 +110,9 @@ const std::map<Operator, std::string> OpName {
   OP_2_NAME(NotIn)
   OP_2_NAME(IsNull)
   OP_2_NAME(IsNotNull)
+
+  OP_2_NAME(CaseI)
+  OP_2_NAME(AccentI)
 
   OP_2_NAME(PLUS)
   OP_2_NAME(MINUS)

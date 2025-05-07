@@ -21,6 +21,7 @@ using cql2cpp::ArrayPred;
 using cql2cpp::Array;
 using cql2cpp::Function;
 using cql2cpp::ArgumentList;
+using cql2cpp::CharacterClause;
 
 using cql2cpp::NullOp;
 using cql2cpp::Not;
@@ -217,8 +218,8 @@ isLikePredicate:
 
 patternExpression:
   CHAR_LIT { PL; std::string s = std::string($1); $$ = MakeAstNode(s.substr(1, s.size() - 2)); }
-  // | CASEI LPT patternExpression RPT
-  // | ACCENTI LPT patternExpression RPT
+  | CASEI LPT characterExpression RPT { PL; $$ = MakeAstNode(CharacterClause, cql2cpp::CaseI, std::vector({$3})); }
+  | ACCENTI LPT characterExpression RPT { PL; $$ = MakeAstNode(CharacterClause, cql2cpp::AccentI, std::vector({$3})); }
 
 isBetweenPredicate:
   numericExpression BETWEEN numericExpression AND numericExpression { PL; $$ = MakeAstNode(IsBetweenPred, cql2cpp::Between, std::vector({$1, $3, $5})); }
@@ -231,9 +232,9 @@ numericExpression:
   | function
 
 characterClause:
-  CASEI LPT characterExpression RPT { PL; $$ = $3; }  // TODO
-  | ACCENTI LPT characterExpression RPT { PL; $$ = $3; }  // TODO
-  | CHAR_LIT { PL; std::string s = std::string($1); $$ = MakeAstNode(s.substr(1, s.size() - 2)); }
+  CHAR_LIT { PL; std::string s = std::string($1); $$ = MakeAstNode(s.substr(1, s.size() - 2)); }
+  | CASEI LPT characterExpression RPT { PL; $$ = MakeAstNode(CharacterClause, cql2cpp::CaseI, std::vector({$3})); }
+  | ACCENTI LPT characterExpression RPT { PL; $$ = MakeAstNode(CharacterClause, cql2cpp::AccentI, std::vector({$3})); }
 
 characterExpression:
   characterClause
