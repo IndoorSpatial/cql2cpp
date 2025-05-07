@@ -115,6 +115,14 @@ S_INTERSECTS|S_EQUALS|S_DISJOINT|S_TOUCHES|S_WITHIN|S_OVERLAPS|S_CROSSES|S_CONTA
   return Cql2ParserBase::token::SPT_FUNC;
 }
 
+s_intersects|s_equals|s_disjoint|s_touches|s_within|s_overlaps|s_crosses|s_contains {
+  print("SPATIAL", yytext);
+  std::string s(yytext);
+  std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::toupper(c); });
+  yylval_->emplace<std::string>(s);
+  return Cql2ParserBase::token::SPT_FUNC;
+}
+
 T_AFTER|T_BEFORE|T_CONTAINS|T_DISJOINT|T_DURING|T_EQUALS|T_FINISHEDBY|T_FINISHES|T_INTERSECTS|T_MEETS|T_METBY|T_OVERLAPPEDBY|T_OVERLAPS|T_STARTEDBY|T_STARTS {
   print("TIME", yytext);
   yylval_->emplace<std::string>(yytext);
