@@ -360,7 +360,7 @@ argument:
   // | spatialInstance
   // | array
   | arithmeticExpression
-  // | booleanExpression
+  | booleanExpression
 
 geometryLiteral:
   ANY_WKT

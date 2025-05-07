@@ -199,6 +199,7 @@ TEST_F(ParseExampleTest, example50) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example51) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example52) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example68) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example69) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example71) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example72) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example73) {EXPECT_TRUE(Parse(case_name_)); }
