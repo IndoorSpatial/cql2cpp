@@ -34,6 +34,17 @@ class Tree2Dot {
     return true;
   }
 
+  static bool GenerateDot(std::ostream& ous, const AstNodePtr node, const std::string& title) {
+    ous << "digraph G {" << std::endl;
+    ous << "label=\"" << title << "\";";
+    ous << "labelloc = top;";
+    GenerateDotNode(ous, node);
+    ous << std::endl;
+    GenerateDotEdge(ous, node);
+    ous << "}" << std::endl;
+    return true;
+  }
+
   static bool GenerateDotNode(std::ostream& ous, const AstNodePtr node) {
     if (node == nullptr) return true;
 

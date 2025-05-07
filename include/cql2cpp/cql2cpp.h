@@ -93,7 +93,7 @@ class Cql2Cpp {
       *result = std::get<bool>(value);
       if (dot != nullptr) {
         std::stringstream ss;
-        Tree2Dot::GenerateDot(ss, root);
+        Tree2Dot::GenerateDot(ss, root, cql2_query);
         *dot = ss.str();
       }
       return true;
@@ -111,7 +111,7 @@ class Cql2Cpp {
 
     // to dot
     std::stringstream ss;
-    Tree2Dot::GenerateDot(ss, root);
+    Tree2Dot::GenerateDot(ss, root, cql2_query);
     *dot = ss.str();
 
     return true;
