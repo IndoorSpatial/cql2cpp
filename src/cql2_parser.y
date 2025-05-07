@@ -11,6 +11,7 @@ using cql2cpp::AstNodePtr;
 using cql2cpp::BoolExpr;
 using cql2cpp::BinCompPred;
 using cql2cpp::IsLikePred;
+using cql2cpp::IsBetweenPred;
 using cql2cpp::SpatialPred;
 using cql2cpp::PropertyName;
 using cql2cpp::IsInListPred;
@@ -76,6 +77,7 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 %token IN NOT_IN
 %token IS_NULL
 %token IS_NOT_NULL
+%token BETWEEN NOT_BETWEEN
 %token <char> LPT RPT COMMA  // ( ) ,
 %token CASEI ACCENTI
 %token SQUOTE DQUOTE
@@ -119,6 +121,8 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 %type <AstNodePtr> patternExpression
 %type <AstNodePtr> isNullPredicate
 %type <AstNodePtr> isNullOperand
+%type <AstNodePtr> isBetweenPredicate
+%type <AstNodePtr> numericExpression
 
 %type <std::string> geometryLiteral
 %type <std::string> bboxTaggedText
@@ -164,7 +168,7 @@ predicate:
 comparisonPredicate:
   binaryComparisonPredicate
   | isLikePredicate
-  // | isBetweenPredicate
+  | isBetweenPredicate
   | isInListPredicate
   | isNullPredicate
 
@@ -216,6 +220,15 @@ patternExpression:
   // | CASEI LPT patternExpression RPT
   // | ACCENTI LPT patternExpression RPT
 
+isBetweenPredicate:
+  numericExpression BETWEEN numericExpression AND numericExpression { PL; $$ = MakeAstNode(IsBetweenPred, cql2cpp::Between, std::vector({$1, $3, $5})); }
+  | numericExpression NOT_BETWEEN numericExpression AND numericExpression  { PL; $$ = MakeAstNode(IsBetweenPred, cql2cpp::NotBetween, std::vector({$1, $3, $5})); }
+
+numericExpression:
+  arithmeticExpression
+  | numericLiteral
+  | propertyName
+  | function
 
 characterClause:
   CASEI LPT characterExpression RPT { PL; $$ = $3; }  // TODO

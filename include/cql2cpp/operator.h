@@ -34,6 +34,7 @@ enum Operator {
   Like,
   NotLike,
   Between,
+  NotBetween,
   In,
   NotIn,
   IsNull,
@@ -101,6 +102,7 @@ const std::map<Operator, std::string> OpName {
   OP_2_NAME(Like)
   OP_2_NAME(NotLike)
   OP_2_NAME(Between)
+  OP_2_NAME(NotBetween)
   OP_2_NAME(In)
   OP_2_NAME(NotIn)
   OP_2_NAME(IsNull)

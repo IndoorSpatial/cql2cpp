@@ -172,6 +172,16 @@ IN {
 	return Cql2ParserBase::token::NOT_LIKE;
 }
 
+"BETWEEN" {
+	print("LIKE_OP", yytext);
+	return Cql2ParserBase::token::BETWEEN;
+}
+"NOT"[ \t\n]+"BETWEEN" {
+	print("LIKE_OP", yytext);
+	return Cql2ParserBase::token::NOT_BETWEEN;
+}
+
+
 A_EQUALS|A_CONTAINS|A_CONTAINEDBY|A_OVERLAPS {
   print("ARRAY", yytext);
   yylval_->emplace<std::string>(yytext);

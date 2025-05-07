@@ -148,6 +148,7 @@ TEST_F(ParseExampleTest, example03) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example04) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example05a) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example05b) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example06a) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example06b) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example07) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example09) {EXPECT_TRUE(Parse(case_name_)); }
@@ -173,6 +174,9 @@ TEST_F(ParseExampleTest, example34) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example35) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example36) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example36_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
+TEST_F(ParseExampleTest, example37) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example38) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example38_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
 TEST_F(ParseExampleTest, example39) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example40) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example40_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
@@ -181,6 +185,8 @@ TEST_F(ParseExampleTest, example42) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example42_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
 TEST_F(ParseExampleTest, example43) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example43_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
+TEST_F(ParseExampleTest, example44) {EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseExampleTest, example44_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
 TEST_F(ParseExampleTest, example46) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example46_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
 TEST_F(ParseExampleTest, example47) {EXPECT_TRUE(Parse(case_name_)); }
@@ -204,6 +210,7 @@ TEST_F(ParseExampleTest, example83) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example84) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example85) {EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseExampleTest, example85_alt01) {EXPECT_TRUE(Parse(hyphen(case_name_))); }
+
 
 TEST_F(TryAll, TryAll) { Run("supported/1.0/examples/text/"); }
 // clang-format on
