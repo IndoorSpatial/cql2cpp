@@ -8,17 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- parse arithmetic expression
-- parse LIKE
-- parse MULTI* geometry
-- parse IS NULL and IS NOT NULL
-- parse BETWEEN
-- parse CASEI and ACCENTI
-- parse some lower case operators
-- add test function to test all unsupported examples
+- 
 
 ### Changed
-- reject 3d bbox
+- 
 
 ### Deprecated
 - 
@@ -31,6 +24,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 - 
+
+## [0.2.0] - 2025-05-08
+### Added
+- parse arithmetic expression
+- parse LIKE
+- parse MULTI* geometry
+- parse IS NULL and IS NOT NULL
+- parse BETWEEN
+- parse CASEI and ACCENTI
+- parse some lower case operators
+- add test function to test all unsupported examples
+### Changed
+- reject 3d bbox
 
 ## [0.1.0] - 2025-01-04
 ### Added
