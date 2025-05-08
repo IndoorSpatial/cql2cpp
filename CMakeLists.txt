@@ -17,6 +17,10 @@ if (NOT GFlags_FOUND AND NOT gflags_FOUND)
   message(FATAL_ERROR "can not find gflags")
 endif()
 
+# find_package(SQLite3 REQUIRED)
+find_package(libspatialite REQUIRED)
+find_package(SQLiteCpp REQUIRED)
+
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_BINARY_DIR})
 
@@ -75,3 +79,7 @@ add_test(NAME test_parse COMMAND test_parse WORKING_DIRECTORY ${TEST_DIR})
 add_executable(test_bbox_reader ${TEST_DIR}/test_bbox_reader.cc)
 target_link_libraries(test_bbox_reader GTest::GTest GTest::Main glog::glog GEOS::geos)
 add_test(NAME test_bbox_reader COMMAND test_bbox_reader WORKING_DIRECTORY ${TEST_DIR})
+
+add_executable(test_sql ${TEST_DIR}/test_sql.cc)
+target_link_libraries(test_sql GTest::GTest GTest::Main glog::glog SQLite::SQLite3 libspatialite::libspatialite SQLiteCpp)
+add_test(NAME test_sql COMMAND test_sql WORKING_DIRECTORY ${TEST_DIR})
