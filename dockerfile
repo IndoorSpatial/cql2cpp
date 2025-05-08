@@ -23,10 +23,11 @@ RUN apt-get install -y gcc-aarch64-linux-gnu
 RUN apt-get install -y g++-aarch64-linux-gnu
 
 # install dependencies
+RUN apt-get update
 RUN apt-get install -y flex bison
 RUN apt-get install -y libgflags-dev libgoogle-glog-dev libgtest-dev
 RUN apt-get install -y libgeos++-dev
-RUN apt-get install -y sqlite3 libsqlite3-mod-spatialite
+RUN apt-get install -y libsqlite3-dev libspatialite-dev
 
 USER ubuntu
 WORKDIR /home/ubuntu/
