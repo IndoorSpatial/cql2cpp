@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(cql2cpp
-  VERSION 0.1.0
+  VERSION 0.2.1
   DESCRIPTION ""
   HOMEPAGE_URL "https://github.com/IndoorSpatial/cql2cpp"
   LANGUAGES CXX
