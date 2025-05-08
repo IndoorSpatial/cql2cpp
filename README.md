@@ -31,6 +31,9 @@ In the second quarter of 2025, we completed the parsing of almost all features e
 | pattern expression | &check; | &#10008; | &#10008; |
 | non-ascii charactor literal | &#10008; | &#10008; | &#10008; |
 
+you can find a full list of features supported here:
+https://github.com/orgs/IndoorSpatial/projects/1/views/1
+
 # Dependencies
 1. flex: lexer
 2. bison: parser
