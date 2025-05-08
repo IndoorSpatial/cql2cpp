@@ -69,7 +69,7 @@ make -j16
 
 ## build in docker
 ```bash
-docker run --rm --it -v path/to/cql2cpp:/home/ubuntu/cql2cpp/ kunlinyu/cql2cpp:latest bash
+docker run --rm -it -v path/to/cql2cpp:/home/ubuntu/cql2cpp/ kunlinyu/cql2cpp:latest bash
 docker$ cd cql2cpp
 docker$ mkdir build && cd build
 docker$ cmake ..
