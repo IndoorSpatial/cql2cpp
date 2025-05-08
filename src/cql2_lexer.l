@@ -129,6 +129,28 @@ T_AFTER|T_BEFORE|T_CONTAINS|T_DISJOINT|T_DURING|T_EQUALS|T_FINISHEDBY|T_FINISHES
   return Cql2ParserBase::token::TIME_FUNC;
 }
 
+t_after|t_before|t_contains|t_disjoint|t_during|t_equals|t_finishedby|t_finishes|t_intersects|t_meets|t_metby|t_overlappedby|t_overlaps|t_startedby|t_starts {
+  print("TIME", yytext);
+  std::string s(yytext);
+  std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::toupper(c); });
+  yylval_->emplace<std::string>(s);
+  return Cql2ParserBase::token::TIME_FUNC;
+}
+
+A_EQUALS|A_CONTAINS|A_CONTAINEDBY|A_OVERLAPS {
+  print("ARRAY", yytext);
+  yylval_->emplace<std::string>(yytext);
+  return Cql2ParserBase::token::ARR_FUNC;
+}
+
+a_equals|a_contains|a_containedby|a_overlaps {
+  print("ARRAY", yytext);
+  std::string s(yytext);
+  std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::toupper(c); });
+  yylval_->emplace<std::string>(s);
+  return Cql2ParserBase::token::ARR_FUNC;
+}
+
 (POINT|LINESTRING|POLYGON|GEOMETRYCOLLECTION|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON)[ ]*[Z]?[ ]*"(" {
   std::stringstream ss;
   ss << yytext;
@@ -187,13 +209,6 @@ BETWEEN|between {
 "NOT"[ \t\n]+"BETWEEN" {
 	print("LIKE_OP", yytext);
 	return Cql2ParserBase::token::NOT_BETWEEN;
-}
-
-
-A_EQUALS|A_CONTAINS|A_CONTAINEDBY|A_OVERLAPS {
-  print("ARRAY", yytext);
-  yylval_->emplace<std::string>(yytext);
-  return Cql2ParserBase::token::ARR_FUNC;
 }
 
 {ID} {
