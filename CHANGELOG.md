@@ -8,13 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- support arithmetic expression
-- support LIKE
-- support MULTI* geometry
-- support IS NULL and IS NOT NULL
-- support BETWEEN
-- support CASEI and ACCENTI
-- support some lower case operators
+- parse arithmetic expression
+- parse LIKE
+- parse MULTI* geometry
+- parse IS NULL and IS NOT NULL
+- parse BETWEEN
+- parse CASEI and ACCENTI
+- parse some lower case operators
 - add test function to test all unsupported examples
 
 ### Changed
