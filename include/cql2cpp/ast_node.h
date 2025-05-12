@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include <memory>
+#include <queue>
 #include <vector>
 
 #include "id_generator.h"
@@ -27,7 +28,7 @@ class AstNode;
 using AstNodePtr = std::shared_ptr<AstNode>;
 
 // Abstract Syntax Tree
-class AstNode {
+class AstNode : public std::enable_shared_from_this<AstNode> {
  private:
   std::string id_;
   NodeType type_;
@@ -78,6 +79,71 @@ class AstNode {
     else
       return id_ + " " + TypeName.at(type()) + " " + OpName.at(op());
   }
+
+  class Iterator {
+   public:
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = AstNodePtr;
+    using difference_type = std::ptrdiff_t;
+    using pointer = AstNodePtr*;
+    using reference = AstNodePtr&;
+
+    Iterator() = default;
+    explicit Iterator(AstNodePtr root) {
+      if (root) {
+        queue_.push(root);
+        current_ = root;
+      }
+    }
+
+    Iterator& operator++() {
+      if (queue_.empty()) {
+        current_ = nullptr;
+        return *this;
+      }
+
+      queue_.pop();
+
+      if (current_) {
+        const auto& children = current_->children();
+        for (const auto& child : children) {
+          if (child) queue_.push(child);
+        }
+      }
+
+      if (queue_.empty()) {
+        current_ = nullptr;
+      } else {
+        current_ = queue_.front();
+      }
+
+      return *this;
+    }
+
+    Iterator operator++(int) {
+      Iterator tmp = *this;
+      ++(*this);
+      return tmp;
+    }
+
+    bool operator==(const Iterator& other) const {
+      return current_ == other.current_;
+    }
+
+    bool operator!=(const Iterator& other) const { return !(*this == other); }
+
+    AstNodePtr operator*() const { return current_; }
+
+   private:
+    AstNodePtr current_ = nullptr;
+    std::queue<AstNodePtr> queue_;
+  };
+
+  Iterator begin() const {
+    return Iterator(std::const_pointer_cast<AstNode>(shared_from_this()));
+  }
+
+  Iterator end() const { return Iterator(nullptr); }
 };
 
 }  // namespace cql2cpp
