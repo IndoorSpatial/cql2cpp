@@ -119,6 +119,23 @@ class Cql2Cpp {
 
   static std::string version() { return VERSION; }
 
+  static bool ConvertToSQL(const std::string& cql2_query,
+                           std::string* sql_where, std::string* error_msg) {
+    // Parse
+    AstNodePtr root;
+    if (not Parse(cql2_query, &root, error_msg)) return false;
+
+    *sql_where = cql2_query;
+
+    return true;
+  }
+
+  static AstNodePtr ParseAsAst(const std::string& cql2_query, std::string* error_msg) {
+    AstNodePtr root;
+    if (Parse(cql2_query, &root, error_msg)) return root;
+    return nullptr;
+  }
+
  private:
   static bool Parse(const std::string& cql2_query, AstNodePtr* root,
                     std::string* error_msg) {
