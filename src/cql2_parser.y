@@ -33,7 +33,12 @@ using cql2cpp::NotIn;
 using cql2cpp::NameOp;
 
 // print line number to debug
-#define PL LOG(INFO) << __LINE__
+#ifdef DEBUG
+  #define PL LOG(INFO) << __LINE__
+#else
+  #define PL
+#endif
+
 #define MakeAstNode std::make_shared<AstNode>
 
 void cql2cpp::Cql2ParserBase::error(const std::string& msg) {

@@ -5,7 +5,9 @@
 using cql2cpp::Cql2ParserBase;
 
 void print(const std::string& prefix, const char* yytext) {
-  LOG(INFO) << "TOKEN " << prefix << " \"" << yytext << "\"";
+#ifdef DEBUG
+    LOG(INFO) << "TOKEN " << prefix << " \"" << yytext << "\"";
+#endif
 }
 
 %}

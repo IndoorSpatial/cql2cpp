@@ -1,5 +1,5 @@
 /*
- * File Name: evaluator_compare.h
+ * File Name: compare.h
  *
  * Copyright (c) 2024-2025 IndoorSpatial
  *

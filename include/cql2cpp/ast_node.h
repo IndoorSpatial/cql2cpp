@@ -44,19 +44,25 @@ class AstNode : public std::enable_shared_from_this<AstNode> {
   AstNode(NodeType type, Operator op, const std::vector<AstNodePtr> children)
       : type_(type), op_(op), children_(children) {
     id_ = idg.Gen();
+#ifdef DEBUG
     LOG(INFO) << "AstNode " << ToString() << std::endl;
+#endif
   }
 
   AstNode(NodeType type, const ValueT& value)
       : type_(type), op_(NullOp), origin_value_(value), value_(NullValue) {
     id_ = idg.Gen();
+#ifdef DEBUG
     LOG(INFO) << "AstNode " << ToString() << std::endl;
+#endif
   }
 
   AstNode(const ValueT& value)
       : type_(Literal), op_(NullOp), origin_value_(value), value_(NullValue) {
     id_ = idg.Gen();
+#ifdef DEBUG
     LOG(INFO) << "AstNode " << ToString() << std::endl;
+#endif
   }
 
   const std::string& id() const { return id_; }

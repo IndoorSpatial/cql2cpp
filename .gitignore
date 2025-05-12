@@ -34,3 +34,8 @@ build_dbg
 *.exe
 *.out
 *.app
+
+# test file
+test/*.dot
+test/*.png
+test/test.sqlite

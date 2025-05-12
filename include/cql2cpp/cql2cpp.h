@@ -22,6 +22,7 @@
 #include "feature_source.h"
 #include "global_yylex.h"
 #include "tree_dot.h"
+#include "sql_converter.h"
 
 #ifndef VERSION
 #define VERSION "0.0.0"
@@ -125,9 +126,8 @@ class Cql2Cpp {
     AstNodePtr root;
     if (not Parse(cql2_query, &root, error_msg)) return false;
 
-    *sql_where = cql2_query;
-
-    return true;
+    SqlConverter converter;
+    return converter.Convert(root, sql_where);
   }
 
   static AstNodePtr ParseAsAst(const std::string& cql2_query, std::string* error_msg) {
