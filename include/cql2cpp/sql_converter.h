@@ -34,7 +34,7 @@ class SqlConverter {
       return c.at(0) + " OR " + c.at(1);
     };
     converters[BoolExpr][Not] = [](auto n, auto c) -> std::string {
-      return "NOT " + c.at(1);
+      return "NOT " + c.at(0);
     };
     converters[BinCompPred][Greater] = [](auto n, auto c) -> std::string {
       return c.at(0) + " > " + c.at(1);
@@ -100,10 +100,20 @@ class SqlConverter {
                      n->origin_value())) {
         const geos::geom::Envelope* env =
             std::get<const geos::geom::Envelope*>(n->origin_value());
+        double minx = env->getMinX();
+        double miny = env->getMinY();
+        double maxx = env->getMaxX();
+        double maxy = env->getMaxY();
+
         std::stringstream ss;
-        ss << "ST_MakeEnvelope(";
-        ss << env->getMinX() << "," << env->getMinY() << ",";
-        ss << env->getMaxX() << "," << env->getMaxY() << ")";
+        ss << "ST_GeomFromText('POLYGON(";
+        ss << minx << " " << miny << ",";
+        ss << maxx << " " << miny << ",";
+        ss << maxx << " " << maxy << ",";
+        ss << minx << " " << maxy << ",";
+        ss << minx << " " << miny << ")";
+        ss << "')";
+
         return ss.str();
       } else {
         // TODO: support array literal
@@ -149,7 +159,10 @@ class SqlConverter {
       return c.at(0) + " + " + c.at(1);
     };
     converters[ArithExpr][MINUS] = [](auto n, auto c) -> std::string {
-      return c.at(0) + " - " + c.at(1);
+      if (c.size() == 1)
+        return "- " + c.at(0);
+      else
+        return c.at(0) + " - " + c.at(1);
     };
     converters[ArithExpr][MULT] = [](auto n, auto c) -> std::string {
       return c.at(0) + " * " + c.at(1);
@@ -158,13 +171,13 @@ class SqlConverter {
       return c.at(0) + " / " + c.at(1);
     };
     converters[ArithExpr][DIVINT] = [](auto n, auto c) -> std::string {
-      return c.at(0) + " DIV " + c.at(1);
+      return c.at(0) + " / " + c.at(1);
     };
     converters[ArithExpr][MOD] = [](auto n, auto c) -> std::string {
       return c.at(0) + " % " + c.at(1);
     };
     converters[ArithExpr][POWER] = [](auto n, auto c) -> std::string {
-      return c.at(0) + " ^ " + c.at(1);
+      return "POWER(" + c.at(0) + "," + c.at(1) + ")";
     };
     converters[IsLikePred][Like] = [](auto n, auto c) -> std::string {
       return c.at(0) + " LIKE " + c.at(1);
