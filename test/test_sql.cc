@@ -156,17 +156,17 @@ TEST_F(SqlTest, clause7_19) { EXPECT_TRUE(Parse(case_name_)); }
 // TEST_F(SqlTest, example06b) { EXPECT_TRUE(Parse(case_name_)); }
 // TEST_F(SqlTest, example07) { EXPECT_TRUE(Parse(case_name_)); }
 // TEST_F(SqlTest, example08) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(SqlTest, example09) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(SqlTest, example10) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(SqlTest, example11) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(SqlTest, example12) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(SqlTest, example13) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(SqlTest, example14) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(SqlTest, example15) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(SqlTest, example16) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(SqlTest, example17) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(SqlTest, example18) { EXPECT_TRUE(Parse(case_name_)); }
-// TEST_F(SqlTest, example19) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(SqlTest, example09) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(SqlTest, example10) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(SqlTest, example11) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(SqlTest, example12) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(SqlTest, example13) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(SqlTest, example14) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(SqlTest, example15) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(SqlTest, example16) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(SqlTest, example17) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(SqlTest, example18) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(SqlTest, example19) { EXPECT_TRUE(Parse(case_name_)); }
 // TEST_F(SqlTest, example23) { EXPECT_TRUE(Parse(case_name_)); }
 // TEST_F(SqlTest, example24) { EXPECT_TRUE(Parse(case_name_)); }
 // TEST_F(SqlTest, example25) { EXPECT_TRUE(Parse(case_name_)); }
