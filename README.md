@@ -16,19 +16,19 @@ In the second quarter of 2025, we completed the parsing of almost all features e
 
 | feature | parsing | evaluation | sql |
 | ---- | ---- | ---- | ---- |
-| bool expression | &check; | &check; | &#10008; |
-| isInList predicate | &check; | &check; | &#10008; |
+| bool expression | &check; | &check; | &check; |
+| isInList predicate | &check; | &check; | &check; |
 | array predicate and all array functions | &check; | &check; | &#10008; |
-| comparison operator | &check; | &check; | &#10008; |
-| geom expression (including BBOX) | &check; | &check; | &#10008; |
-| spatial predicate | &check; | &check; | &#10008; |
-| property name | &check; | &check; | &#10008; |
+| comparison operator | &check; | &check; | &check; |
+| geom expression (including BBOX) | &check; | &check; | &check; |
+| spatial predicate | &check; | &check; | &check; |
+| property name | &check; | &check; | &check; |
 | function | &check; | &check; | &#10008; |
-| isLike predicate | &check; | &#10008; | &#10008; |
-| isBetween predicate | &check; | &#10008; | &#10008; |
-| numeric expression | &check; | &#10008; | &#10008; |
-| isNull predicate | &check; | &#10008; | &#10008; |
-| pattern expression | &check; | &#10008; | &#10008; |
+| isLike predicate | &check; | &#10008; | &check; |
+| isBetween predicate | &check; | &#10008; | &check; |
+| numeric expression | &check; | &#10008; | &check; |
+| isNull predicate | &check; | &#10008; | &check; |
+| pattern expression | &check; | &#10008; | &check; |
 | non-ascii charactor literal | &#10008; | &#10008; | &#10008; |
 
 you can find a full list of features supported here:
