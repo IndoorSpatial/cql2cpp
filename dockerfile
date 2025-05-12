@@ -28,6 +28,7 @@ RUN apt-get install -y flex bison
 RUN apt-get install -y libgflags-dev libgoogle-glog-dev libgtest-dev
 RUN apt-get install -y libgeos++-dev
 RUN apt-get install -y libsqlite3-dev libspatialite-dev
+RUN apt-get install -y graphviz
 
 USER ubuntu
 WORKDIR /home/ubuntu/
