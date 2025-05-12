@@ -145,6 +145,45 @@ class SqlConverter {
     converters[SpatialPred][S_Within] = [](auto n, auto c) -> std::string {
       return "ST_Within(" + c.at(0) + "," + c.at(1) + ")";
     };
+    converters[ArithExpr][PLUS] = [](auto n, auto c) -> std::string {
+      return c.at(0) + " + " + c.at(1);
+    };
+    converters[ArithExpr][MINUS] = [](auto n, auto c) -> std::string {
+      return c.at(0) + " - " + c.at(1);
+    };
+    converters[ArithExpr][MULT] = [](auto n, auto c) -> std::string {
+      return c.at(0) + " * " + c.at(1);
+    };
+    converters[ArithExpr][DIV] = [](auto n, auto c) -> std::string {
+      return c.at(0) + " / " + c.at(1);
+    };
+    converters[ArithExpr][DIVINT] = [](auto n, auto c) -> std::string {
+      return c.at(0) + " DIV " + c.at(1);
+    };
+    converters[ArithExpr][MOD] = [](auto n, auto c) -> std::string {
+      return c.at(0) + " % " + c.at(1);
+    };
+    converters[ArithExpr][POWER] = [](auto n, auto c) -> std::string {
+      return c.at(0) + " ^ " + c.at(1);
+    };
+    converters[IsLikePred][Like] = [](auto n, auto c) -> std::string {
+      return c.at(0) + " LIKE " + c.at(1);
+    };
+    converters[IsLikePred][NotLike] = [](auto n, auto c) -> std::string {
+      return c.at(0) + " LIKE " + c.at(1);
+    };
+    converters[IsNullPred][IsNull] = [](auto n, auto c) -> std::string {
+      return c.at(0) + " IS NULL";
+    };
+    converters[IsNullPred][IsNotNull] = [](auto n, auto c) -> std::string {
+      return c.at(0) + " IS NOT NULL";
+    };
+    converters[IsBetweenPred][Between] = [](auto n, auto c) -> std::string {
+      return c.at(0) + " BETWEEN " + c.at(1) + " AND " + c.at(2);
+    };
+    converters[IsBetweenPred][NotBetween] = [](auto n, auto c) -> std::string {
+      return c.at(0) + " NOT BETWEEN " + c.at(1) + " AND " + c.at(2);
+    };
   }
 
   void Register(
