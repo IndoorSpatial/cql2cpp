@@ -52,6 +52,8 @@ sudo apt-get install -y libgflags-dev libgoogle-glog-dev libgtest-dev libgeos++-
 mkdir build && cd build
 cmake ..
 make -j16
+suto apt-get install -y libsqlite3-dev libspatialite-dev
+ctest
 
 ```
 
@@ -74,4 +76,5 @@ docker$ cd cql2cpp
 docker$ mkdir build && cd build
 docker$ cmake ..
 docker$ make -j16
+ctest
 ```
