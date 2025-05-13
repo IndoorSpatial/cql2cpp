@@ -19,60 +19,90 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include <argparse/argparse.hpp>
 #include <fstream>
 
 #ifndef VERSION
 #define VERSION "0.0.0"
 #endif
 
-DEFINE_string(query, "", "cql2 query string");
-DEFINE_string(geojson, "",
-              "geojson data set with multiple features in one feature "
-              "collection to be queried");
-DEFINE_string(dot, "", "generate dot file");
-DEFINE_uint32(index, 0,
-              "the dot file will generated according to the feature with this "
-              "index in geojson file");
-DEFINE_bool(verbose, false, "Enable verbose output");
-
 int main(int argc, char** argv) {
-  gflags::SetUsageMessage(
-      "Usage: cql2 -query=\"city='Toronto'\" "
-      "-geojson=\"path/to/feature_collection.geojson\" -index=0");
-  gflags::SetVersionString(VERSION);
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  argparse::ArgumentParser program("cql2", VERSION);
+
+  argparse::ArgumentParser parse_command("parse", "",
+                                         argparse::default_arguments::help);
+  parse_command.add_description("parse a cql2 query and print dot file");
+  parse_command.add_argument("query").help("cql2 query string");
+  parse_command.add_argument("-V", "--verbose")
+      .help("print verbose debug log")
+      .flag();
+  parse_command.add_argument("-O", "--output").help("the output dot file");
+
+  argparse::ArgumentParser filter_command("filter", "",
+                                          argparse::default_arguments::help);
+  filter_command.add_description(
+      "filter features from geojson data collection");
+  filter_command.add_argument("query").help("cql2 query string");
+  filter_command.add_argument("--features")
+      .help(
+          "geojson file contains multiple features in one feature collection");
+  filter_command.add_argument("-V", "--verbose")
+      .help("print verbose debug log")
+      .flag();
+
+  argparse::ArgumentParser sql_command("sql", "",
+                                       argparse::default_arguments::help);
+  sql_command.add_argument("query").help("cql2 query string");
+  sql_command.add_argument("-V", "--verbose")
+      .help("print verbose debug log")
+      .flag();
+
+  argparse::ArgumentParser eval_command("evaluate", "",
+                                        argparse::default_arguments::help);
+  eval_command.add_argument("query").help("cql2 query string");
+  eval_command.add_argument("--features")
+      .help(
+          "geojson file contains multiple features in one feature collection");
+  eval_command.add_argument("--index")
+      .help("index of feature in the geojson file to be evaluated")
+      .scan<'i', int>();
+  eval_command.add_argument("-O", "--output").help("the output dot file");
+  eval_command.add_argument("-V", "--verbose")
+      .help("print verbose debug log")
+      .flag();
+
+  program.add_subparser(parse_command);
+  program.add_subparser(filter_command);
+  program.add_subparser(sql_command);
+  program.add_subparser(eval_command);
+
+  if (argc == 1) {
+    std::cout << program;
+    return 0;
+  }
+
+  try {
+    program.parse_args(argc, argv);
+  } catch (const std::exception& e) {
+    LOG(ERROR) << e.what();
+    return 1;
+  }
 
   google::InitGoogleLogging(argv[0]);
   FLAGS_colorlogtostderr = true;
   google::InstallFailureSignalHandler();
   google::LogToStderr();
 
-  if (FLAGS_query.empty()) {
-    gflags::ShowUsageWithFlagsRestrict(argv[0], "main.cc");
-    LOG(ERROR) << "you should provide query";
-    return -1;
-  }
-
-  // print flags
-  LOG(INFO) << "==== flags ====";
-  LOG(INFO) << "query: " << FLAGS_query;
-  LOG(INFO) << "geojson: " << FLAGS_geojson;
-  LOG(INFO) << "dot: " << FLAGS_dot;
-
-  if (FLAGS_verbose) cql2cpp::AstNode::set_ostream(&std::cout);
-
-  std::string error_msg;
-
-  // case 1:
-  // we have only query without any feature
-  // just parse the query and may dump a dot file
-  if (FLAGS_geojson.empty()) {
+  if (program.is_subcommand_used("parse")) {
+    if (parse_command.get<bool>("--verbose"))
+      cql2cpp::AstNode::set_ostream(&std::cout);
     std::string dot;
+    std::string error_msg;
     cql2cpp::Cql2Cpp<geos::io::GeoJSONFeature> cql2cpp;
-    if (cql2cpp.ToDot(FLAGS_query, &dot, &error_msg)) {
-      LOG(INFO) << error_msg;
-      if (not FLAGS_dot.empty()) {
-        std::string dot_filename = FLAGS_dot;
+    if (cql2cpp.ToDot(parse_command.get<std::string>("query"), &dot,
+                      &error_msg)) {
+      if (parse_command.is_used("--output")) {
+        std::string dot_filename = parse_command.get<std::string>("--output");
         if (dot_filename.find(".dot") == std::string::npos)
           dot_filename += ".dot";
 
@@ -80,41 +110,41 @@ int main(int argc, char** argv) {
         if (fout.is_open()) {
           fout << dot;
           fout.close();
-          LOG(INFO) << "dump dot file into " << dot_filename;
+          LOG(INFO) << "save dot file: " << dot_filename;
         } else {
           LOG(ERROR) << "Can not open file " << dot_filename;
         }
+      } else {
+        LOG(INFO) << dot;
       }
     } else {
       LOG(ERROR) << error_msg;
-      goto FAILED;
     }
-  } else {
-    // case 2:
-    // we have query and a feature collection
-    // filter matched features from the feature collection
+  } else if (program.is_subcommand_used("filter")) {
+    if (filter_command.get<bool>("--verbose"))
+      cql2cpp::AstNode::set_ostream(&std::cout);
     std::string geojson_text;
-    std::ifstream fin(FLAGS_geojson);
-    if (fin.good()) {
-      if (fin.is_open()) {
-        geojson_text.assign(std::istreambuf_iterator<char>(fin),
-                            std::istreambuf_iterator<char>());
-        fin.close();
-      } else {
-        LOG(ERROR) << "can not open " << FLAGS_geojson;
-        goto FAILED;
-      }
-    } else {
-      LOG(ERROR) << FLAGS_geojson << " not exist";
+    std::string features = filter_command.get<std::string>("--features");
+    std::ifstream fin(features);
+
+    if (not fin.good()) {
+      LOG(ERROR) << features << " not exist";
       goto FAILED;
     }
+    if (not fin.is_open()) {
+      LOG(ERROR) << "can not open " << features;
+      goto FAILED;
+    }
+    geojson_text.assign(std::istreambuf_iterator<char>(fin),
+                        std::istreambuf_iterator<char>());
+    fin.close();
 
     geos::io::GeoJSONFeatureCollection fc({});
     // read geojson features
     geos::io::GeoJSONReader reader;
     fc = reader.readFeatures(geojson_text);
     LOG(INFO) << "load " << fc.getFeatures().size() << " features from "
-              << FLAGS_geojson;
+              << features;
 
     std::map<cql2cpp::FeatureSourcePtr, const geos::io::GeoJSONFeature*>
         fs_feature;
@@ -124,31 +154,73 @@ int main(int argc, char** argv) {
       fs_feature[fp] = &feature;
     }
 
+    std::string query = filter_command.get<std::string>("query");
+
     cql2cpp::Cql2Cpp<const geos::io::GeoJSONFeature*> cql2cpp;
     cql2cpp.set_feature_source(fs_feature);
     std::vector<const geos::io::GeoJSONFeature*> result;
-    if (cql2cpp.filter(FLAGS_query, &result)) {
-      LOG(INFO) << "get feature count: " << result.size();
-      for (const auto& feature : result) {
-        LOG(INFO) << "get feature geometry: "
-                  << feature->getGeometry()->toText();
-      }
+    if (cql2cpp.filter(query, &result)) {
+      LOG(INFO) << result.size() << " features match the filter:";
+      geos::io::GeoJSONWriter writer;
+      for (const auto& feature : result) LOG(INFO) << writer.write(*feature);
     } else {
       LOG(ERROR) << "filter error: " << cql2cpp.error_msg();
     }
+  } else if (program.is_subcommand_used("sql")) {
+    if (sql_command.get<bool>("--verbose"))
+      cql2cpp::AstNode::set_ostream(&std::cout);
+    std::string query = sql_command.get<std::string>("query");
+    std::string sql_where;
+    std::string error_msg;
+    if (cql2cpp::Cql2Cpp<void*>::ConvertToSQL(query, &sql_where, &error_msg)) {
+      LOG(INFO) << sql_where;
+    } else {
+      LOG(ERROR) << error_msg;
+      goto FAILED;
+    }
+  } else if (program.is_subcommand_used("evaluate")) {
+    if (eval_command.get<bool>("--verbose")) {
+      cql2cpp::AstNode::set_ostream(&std::cout);
+    }
+    std::string geojson_text;
+    std::string features = eval_command.get<std::string>("--features");
+    std::ifstream fin(features);
+    if (not fin.good()) {
+      LOG(ERROR) << features << " not exist";
+      goto FAILED;
+    }
+    if (not fin.is_open()) {
+      LOG(ERROR) << "can not open " << features;
+      goto FAILED;
+    }
+    geojson_text.assign(std::istreambuf_iterator<char>(fin),
+                        std::istreambuf_iterator<char>());
+    fin.close();
 
-    if (FLAGS_index >= fc.getFeatures().size()) {
-      LOG(ERROR) << "index(" << FLAGS_index << ") out of range [0.."
+    geos::io::GeoJSONFeatureCollection fc({});
+    // read geojson features
+    geos::io::GeoJSONReader reader;
+    fc = reader.readFeatures(geojson_text);
+    LOG(INFO) << "load " << fc.getFeatures().size() << " features from "
+              << features;
+
+    int index = eval_command.get<int>("index");
+    if (index >= fc.getFeatures().size()) {
+      LOG(ERROR) << "index(" << index << ") out of range [0.."
                  << fc.getFeatures().size() - 1 << "]";
       goto FAILED;
     }
-    cql2cpp::FeatureSourceGeoJson fs(fc.getFeatures().at(FLAGS_index));
+    cql2cpp::FeatureSourceGeoJson fs(fc.getFeatures().at(index));
+    std::string query = eval_command.get<std::string>("query");
+
+    cql2cpp::Cql2Cpp<const geos::io::GeoJSONFeature*> cql2cpp;
 
     std::string dot;
     bool eval_result;
-    if (cql2cpp.Evaluate(FLAGS_query, fs, &eval_result, &error_msg, &dot)) {
-      if (not FLAGS_dot.empty()) {
-        std::string dot_filename = FLAGS_dot;
+    std::string error_msg;
+    if (cql2cpp.Evaluate(query, fs, &eval_result, &error_msg, &dot)) {
+      if (eval_command.is_used("--output")) {
+        std::string dot_filename = eval_command.get<std::string>("--output");
         if (dot_filename.find(".dot") == std::string::npos)
           dot_filename += ".dot";
 
@@ -160,10 +232,15 @@ int main(int argc, char** argv) {
         } else {
           LOG(ERROR) << "Can not open file " << dot_filename;
         }
+      } else {
+        LOG(INFO) << dot;
       }
     } else {
       LOG(ERROR) << error_msg;
     }
+
+  } else {
+    LOG(ERROR) << "unknown sub-command";
   }
 
   gflags::ShutDownCommandLineFlags();
