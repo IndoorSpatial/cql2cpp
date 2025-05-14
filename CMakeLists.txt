@@ -11,12 +11,6 @@ find_package(GTest REQUIRED)
 find_package(geos REQUIRED)
 find_package(glog REQUIRED)
 
-find_package(GFlags QUIET)
-find_package(gflags QUIET)
-if (NOT GFlags_FOUND AND NOT gflags_FOUND)
-  message(FATAL_ERROR "can not find gflags")
-endif()
-
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_BINARY_DIR})
 
