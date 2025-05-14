@@ -147,11 +147,6 @@ class SqlTest : public testing::Test {
 // TEST_F(SqlTest, example71) { EXPECT_TRUE(Convert(case_name_)); }  // CASEI
 // TEST_F(SqlTest, example86) { EXPECT_TRUE(Convert(case_name_)); }  // CASEI
 
-// TEST_F(SqlTest, clause7_15) { EXPECT_TRUE(Convert(case_name_)); }  // array
-// TEST_F(SqlTest, example79) { EXPECT_TRUE(Convert(case_name_)); }  // array
-// TEST_F(SqlTest, example80) { EXPECT_TRUE(Convert(case_name_)); }  // array
-// TEST_F(SqlTest, example81) { EXPECT_TRUE(Convert(case_name_)); }  // array
-
 TEST_F(SqlTest, clause6_02a) { EXPECT_TRUE(Convert(case_name_)); }
 TEST_F(SqlTest, clause6_02c) { EXPECT_TRUE(Convert(case_name_)); }
 TEST_F(SqlTest, clause6_03) { EXPECT_TRUE(Convert(case_name_)); }
@@ -161,6 +156,7 @@ TEST_F(SqlTest, clause7_03a) { EXPECT_TRUE(Convert(case_name_)); }
 TEST_F(SqlTest, clause7_03b) { EXPECT_TRUE(Convert(case_name_)); }
 TEST_F(SqlTest, clause7_07) { EXPECT_TRUE(Convert(case_name_)); }
 TEST_F(SqlTest, clause7_10) { EXPECT_TRUE(Convert(case_name_)); }
+TEST_F(SqlTest, clause7_15) { EXPECT_TRUE(Convert(case_name_)); }
 TEST_F(SqlTest, clause7_16) { EXPECT_TRUE(Convert(case_name_)); }
 TEST_F(SqlTest, clause7_19) { EXPECT_TRUE(Convert(case_name_)); }
 TEST_F(SqlTest, example01) { EXPECT_TRUE(Convert(case_name_)); }
@@ -224,6 +220,9 @@ TEST_F(SqlTest, example75) { EXPECT_TRUE(Convert(case_name_)); }
 TEST_F(SqlTest, example76) { EXPECT_TRUE(Convert(case_name_)); }
 TEST_F(SqlTest, example77) { EXPECT_TRUE(Convert(case_name_)); }
 TEST_F(SqlTest, example78) { EXPECT_TRUE(Convert(case_name_)); }
+TEST_F(SqlTest, example79) { EXPECT_TRUE(Convert(case_name_)); }
+TEST_F(SqlTest, example80) { EXPECT_TRUE(Convert(case_name_)); }
+TEST_F(SqlTest, example81) { EXPECT_TRUE(Convert(case_name_)); }
 TEST_F(SqlTest, example83) { EXPECT_TRUE(Convert(case_name_)); }
 TEST_F(SqlTest, example84) { EXPECT_TRUE(Convert(case_name_)); }
 TEST_F(SqlTest, example85) { EXPECT_TRUE(Convert(case_name_)); }

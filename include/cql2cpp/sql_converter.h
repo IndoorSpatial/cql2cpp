@@ -54,8 +54,10 @@ class SqlConverter {
     converters[BinCompPred][Equal] = [](auto n, auto c) -> std::string {
       return c.at(0) + " = " + c.at(1);
     };
-    converters[Function][NullOp] = [](const AstNodePtr n, auto c) -> std::string {
-      return std::get<std::string>(n->children().front()->origin_value()) + "(" + c.at(1) + ")";
+    converters[Function][NullOp] = [](const AstNodePtr n,
+                                      auto c) -> std::string {
+      return std::get<std::string>(n->children().front()->origin_value()) +
+             "(" + c.at(1) + ")";
     };
     converters[ArgumentList][NullOp] = [](auto n, auto c) -> std::string {
       std::stringstream ss;
@@ -196,6 +198,83 @@ class SqlConverter {
     };
     converters[IsBetweenPred][NotBetween] = [](auto n, auto c) -> std::string {
       return c.at(0) + " NOT BETWEEN " + c.at(1) + " AND " + c.at(2);
+    };
+    converters[Array][NullOp] = [](auto n, auto c) -> std::string {
+      std::stringstream ss;
+      ss << "VALUES ";
+      for (size_t i = 0; i < c.size(); i++) {
+        ss << "(" << c.at(i) << ")";
+        if (i != c.size() - 1) ss << ",";
+      }
+      return ss.str();
+    };
+    converters[ArrayPred][A_Equals] = [](auto n, auto c) -> std::string {
+      std::string lhs = c.at(0);
+      std::string rhs = c.at(1);
+      std::string not_null = "";
+
+      if (n->children().at(0)->type() == NodeType::PropertyName) {
+        not_null += lhs + " NOT NULL";
+        lhs = "SELECT value FROM json_each(" + lhs + ")";
+      }
+      if (n->children().at(1)->type() == NodeType::PropertyName) {
+        if (not not_null.empty()) not_null += " AND ";
+        not_null += rhs + " NOT NULL";
+        rhs = "SELECT value FROM json_each(" + rhs + ")";
+      }
+
+      if (not not_null.empty()) not_null += " AND";
+
+      return not_null + " NOT EXISTS (" + lhs + " EXCEPT " + rhs + ")" +
+             " AND NOT EXISTS (" + rhs + " EXCEPT " + lhs + ")";
+    };
+    converters[ArrayPred][A_Contains] = [](auto n, auto c) -> std::string {
+      std::string lhs = c.at(1);
+      std::string rhs = c.at(0);
+      std::string not_null = "";
+
+      if (n->children().at(1)->type() == NodeType::PropertyName) {
+        not_null += lhs + " NOT NULL";
+        lhs = "SELECT value FROM json_each(" + lhs + ")";
+      }
+      if (n->children().at(0)->type() == NodeType::PropertyName) {
+        if (not not_null.empty()) not_null += " AND ";
+        not_null += rhs + " NOT NULL";
+        rhs = "SELECT value FROM json_each(" + rhs + ")";
+      }
+
+      if (not not_null.empty()) not_null += " AND";
+
+      return not_null + " NOT EXISTS (" + lhs + " EXCEPT " + rhs + ")";
+    };
+    converters[ArrayPred][A_ContainedBy] = [](auto n, auto c) -> std::string {
+      std::string lhs = c.at(0);
+      std::string rhs = c.at(1);
+      std::string not_null = "";
+
+      if (n->children().at(0)->type() == NodeType::PropertyName) {
+        not_null += lhs + " NOT NULL";
+        lhs = "SELECT value FROM json_each(" + lhs + ")";
+      }
+      if (n->children().at(1)->type() == NodeType::PropertyName) {
+        if (not not_null.empty()) not_null += " AND ";
+        not_null += rhs + " NOT NULL";
+        rhs = "SELECT value FROM json_each(" + rhs + ")";
+      }
+
+      if (not not_null.empty()) not_null += " AND";
+
+      return not_null + " NOT EXISTS (" + lhs + " EXCEPT " + rhs + ")";
+    };
+    converters[ArrayPred][A_Overlaps] = [](const AstNodePtr n,
+                                           auto c) -> std::string {
+      std::string lhs = c.at(0);
+      std::string rhs = c.at(1);
+      if (n->children().at(0)->type() == NodeType::PropertyName)
+        lhs = "SELECT value FROM json_each(" + lhs + ")";
+      if (n->children().at(1)->type() == NodeType::PropertyName)
+        rhs = "SELECT value FROM json_each(" + rhs + ")";
+      return "EXISTS (" + lhs + " INTERSECT " + rhs + ")";
     };
   }
 
