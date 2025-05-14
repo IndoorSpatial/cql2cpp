@@ -14,7 +14,7 @@ We plan to complete all the requirements specified in Requirement 1 "/req/basic-
 
 In the second quarter of 2025, we completed the parsing of almost all features except those related to time and Unicode encoding. Additionally, we plan to translate the parsing results into the WHERE clause of the SQL language.
 
-| feature | parsing | evaluation | sql |
+| feature | parsing | evaluation | SQL |
 | ---- | ---- | ---- | ---- |
 | bool expression | &check; | &check; | &check; |
 | isInList predicate | &check; | &check; | &check; |
@@ -33,6 +33,20 @@ In the second quarter of 2025, we completed the parsing of almost all features e
 
 you can find a full list of features supported here:
 https://github.com/orgs/IndoorSpatial/projects/1/views/1
+
+# SQL
+| CQL2 | SQL WHERE clause |
+| ---- | ---- |
+| wind_speed > 2 * 3 + 4 | "wind_speed" > 2 * 3 + 4 |
+| city='Shenzhen' | "city" = 'Shenzhen' |
+| value=field^2 | "value" = POWER("field",2) |
+| "value" IN (1.0, 2.0, 3.0) | "value" IN (1.000000,2.000000,3.000000) |
+| owner NOT LIKE '%Mike%' | "owner" LIKE '%Mike%' |
+| "value" IS NULL OR "value" BETWEEN 10 AND 20 | "value" IS NULL OR "value" BETWEEN 10 AND 20 |
+| A_CONTAINS(layer:ids, ('layers-ca','layers-us')) | "layer:ids" NOT NULL AND NOT EXISTS (<br>  VALUES ('layers-ca'),('layers-us')<br>  EXCEPT<br>  SELECT value FROM json_each("layer:ids")<br>) |
+| S_INTERSECTS(geom,POINT(36.3 32.2)) | ST_Intersects("geom",ST_GeomFromText('POINT (36.3 32.2)')) |
+| S_WITHIN(location,BBOX(-118,33.8,-117.9,34)) | ST_Within("location",<br>ST_GeomFromText('POLYGON(-118 33.8,-117.9 33.8,-117.9 34,-118 34,-118 33.8)')) |
+| T_BEFORE(built, DATE('2015-01-01')) | **(UNSUPPORTED)** |
 
 # Dependencies
 1. flex: lexer
