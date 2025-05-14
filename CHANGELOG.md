@@ -25,6 +25,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - 
 
+## [0.3.0] -2025-05-14
+### Added
+- sqlite3 and spatialite as dependencies to verify SQL
+- Add iterator for ast node to loop over all property name
+- Add ConvertToSQL() in top level Cql2CPP class
+- Add unit tests for SQL
+- Use argparse to parse command line arguments instead of gflags
+- Convert arithmetic, is null, like, between to SQL
+- Convert array predicate to SQL
+### Fixed
+- Fix bug about ST_MakeEnvelope
+- Fix bug about using "-" as prefix of number
+
+## [0.2.1] - 2025-05-08
+### Fixed
+- Fix error in demo.png
+
 ## [0.2.0] - 2025-05-08
 ### Added
 - parse arithmetic expression
