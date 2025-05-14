@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package>
+  <name>cql2cpp</name>
+  <version>0.3.0</version>
+  <description>CQL2(Common Query Language) parser and SQL converter</description>
+
+  <author email="yukunlin@syriusrobotics.com">Kunlin Yu</author>
+  <maintainer email="yukunlin@syriusrobotics.com">Kunlin Yu</maintainer>
+
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+</package>
+
