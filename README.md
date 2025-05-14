@@ -18,7 +18,7 @@ In the second quarter of 2025, we completed the parsing of almost all features e
 | ---- | ---- | ---- | ---- |
 | bool expression | &check; | &check; | &check; |
 | isInList predicate | &check; | &check; | &check; |
-| array predicate and all array functions | &check; | &check; | &#10008; |
+| array predicate and all array functions | &check; | &check; | &check; |
 | comparison operator | &check; | &check; | &check; |
 | geom expression (including BBOX) | &check; | &check; | &check; |
 | spatial predicate | &check; | &check; | &check; |
