@@ -48,6 +48,28 @@ https://github.com/orgs/IndoorSpatial/projects/1/views/1
 | S_WITHIN(location,BBOX(-118,33.8,-117.9,34)) | ST_Within("location",<br>ST_GeomFromText('POLYGON(-118 33.8,-117.9 33.8,-117.9 34,-118 34,-118 33.8)')) |
 | T_BEFORE(built, DATE('2015-01-01')) | **(UNSUPPORTED)** |
 
+# command line interface
+parse a CQL2 query and print dot file
+```bash
+./cql2 parse "value=2+3"
+```
+
+parse a CQL2 query and save dot to file
+```bash
+./cql2 parse "value=2+3" -O query.dot
+```
+
+convert CQL2 to SQL WHERE clause
+```bash
+./cql2 sql "value=2+3"
+```
+
+other usefull command
+```bash
+./cql2 --help
+./cql2 --version
+```
+
 # Dependencies
 1. flex: lexer
 2. bison: parser
