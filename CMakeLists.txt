@@ -20,8 +20,14 @@ find_package(GTest REQUIRED)
 find_package(geos REQUIRED)
 find_package(glog REQUIRED)
 
-include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_BINARY_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/include)
+install(DIRECTORY
+  ${CMAKE_SOURCE_DIR}/include/cql2cpp
+  ${CMAKE_SOURCE_DIR}/include/argparse
+  DESTINATION include
+  FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
+)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
