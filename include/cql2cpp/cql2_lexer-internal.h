@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <cql2_parser_base.hh>
+#include <cql2cpp/cql2_parser_base.hh>
 #include <istream>
 #include <ostream>
 

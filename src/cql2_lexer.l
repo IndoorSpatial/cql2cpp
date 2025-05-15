@@ -1,5 +1,5 @@
 %{
-#include <cql2_parser_base.hh>
+#include <cql2cpp/cql2_parser_base.hh>
 #include <cql2cpp/cql2_lexer-internal.h>
 
 using cql2cpp::Cql2ParserBase;

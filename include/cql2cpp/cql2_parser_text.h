@@ -13,7 +13,7 @@
 #include <FlexLexer.h>
 #include <glog/logging.h>
 
-#include <cql2_parser_base.hh>
+#include <cql2cpp/cql2_parser_base.hh>
 
 namespace cql2cpp {
 
