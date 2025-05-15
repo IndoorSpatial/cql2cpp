@@ -7,6 +7,15 @@ project(cql2cpp
 )
 add_definitions(-DVERSION="${PROJECT_VERSION}")
 
+find_package(SQLite3 QUIET)
+find_package(libspatialite QUIET)
+
+if (SQLite3_FOUND AND libspatialite_FOUND)
+  set(SQLITE_LIBS SQLite::SQLite3 libspatialite::libspatialite)
+else()
+  set(SQLITE_LIBS sqlite3 spatialite)
+endif()
+
 find_package(GTest REQUIRED)
 find_package(geos REQUIRED)
 find_package(glog REQUIRED)
@@ -52,11 +61,13 @@ set(CQL2CPP_SRC
 add_library(cql2cpp ${CQL2CPP_SRC})
 target_compile_options(cql2cpp PRIVATE -Wno-register -Wno-write-strings)
 target_link_libraries(cql2cpp GEOS::geos glog::glog)
+install(TARGETS cql2cpp LIBRARY DESTINATION lib/)
 
 # CLI tool
 add_executable(cql2 src/main.cc)
 target_compile_options(cql2 PRIVATE -Wno-register -Wno-write-strings)
 target_link_libraries(cql2 cql2cpp GEOS::geos glog::glog)
+install(TARGETS cql2 RUNTIME DESTINATION lib/${PROJECT_NAME}/)
 
 # Test
 enable_testing()
@@ -71,5 +82,5 @@ target_link_libraries(test_bbox_reader GTest::GTest GTest::Main glog::glog GEOS:
 add_test(NAME test_bbox_reader COMMAND test_bbox_reader WORKING_DIRECTORY ${TEST_DIR})
 
 add_executable(test_sql ${TEST_DIR}/test_sql.cc)
-target_link_libraries(test_sql cql2cpp GTest::GTest GTest::Main glog::glog sqlite3 spatialite)
+target_link_libraries(test_sql cql2cpp GTest::GTest GTest::Main glog::glog ${SQLITE_LIBS})
 add_test(NAME test_sql COMMAND test_sql WORKING_DIRECTORY ${TEST_DIR})
