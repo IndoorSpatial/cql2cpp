@@ -5,7 +5,7 @@ project(cql2cpp
   HOMEPAGE_URL "https://github.com/IndoorSpatial/cql2cpp"
   LANGUAGES CXX
 )
-add_definitions(-DVERSION="${PROJECT_VERSION}")
+add_definitions(-DCQL2CPP_VERSION="${PROJECT_VERSION}")
 
 find_package(SQLite3 QUIET)
 find_package(libspatialite QUIET)

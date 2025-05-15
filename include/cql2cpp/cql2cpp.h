@@ -24,8 +24,8 @@
 #include "tree_dot.h"
 #include "sql_converter.h"
 
-#ifndef VERSION
-#define VERSION "0.0.0"
+#ifndef CQL2CPP_VERSION
+#define CQL2CPP_VERSION "0.0.0"
 #endif
 
 namespace cql2cpp {
@@ -118,7 +118,7 @@ class Cql2Cpp {
     return true;
   }
 
-  static std::string version() { return VERSION; }
+  static std::string version() { return CQL2CPP_VERSION; }
 
   static bool ConvertToSQL(const std::string& cql2_query,
                            std::string* sql_where, std::string* error_msg) {

@@ -22,12 +22,12 @@
 #include <argparse/argparse.hpp>
 #include <fstream>
 
-#ifndef VERSION
-#define VERSION "0.0.0"
+#ifndef CQL2CPP_VERSION
+#define CQL2CPP_VERSION "0.0.0"
 #endif
 
 int main(int argc, char** argv) {
-  argparse::ArgumentParser program("cql2", VERSION);
+  argparse::ArgumentParser program("cql2", CQL2CPP_VERSION);
 
   argparse::ArgumentParser parse_command("parse", "",
                                          argparse::default_arguments::help);
