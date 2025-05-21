@@ -98,7 +98,7 @@ int main(int argc, char** argv) {
       cql2cpp::AstNode::set_ostream(&std::cout);
     std::string dot;
     std::string error_msg;
-    cql2cpp::Cql2Cpp<geos::io::GeoJSONFeature> cql2cpp;
+    cql2cpp::Cql2Cpp cql2cpp;
     if (cql2cpp.ToDot(parse_command.get<std::string>("query"), &dot,
                       &error_msg)) {
       if (parse_command.is_used("--output")) {
@@ -146,23 +146,26 @@ int main(int argc, char** argv) {
     LOG(INFO) << "load " << fc.getFeatures().size() << " features from "
               << features;
 
+    std::vector<cql2cpp::FeatureSourcePtr> fs_feature;
     std::map<cql2cpp::FeatureSourcePtr, const geos::io::GeoJSONFeature*>
-        fs_feature;
+        fs_to_geojson;
     for (const auto& feature : fc.getFeatures()) {
       cql2cpp::FeatureSourcePtr fp =
           std::make_shared<cql2cpp::FeatureSourceGeoJson>(feature);
-      fs_feature[fp] = &feature;
+      fs_feature.emplace_back(fp);
+      fs_to_geojson[fp] = &feature;
     }
 
     std::string query = filter_command.get<std::string>("query");
 
-    cql2cpp::Cql2Cpp<const geos::io::GeoJSONFeature*> cql2cpp;
+    cql2cpp::Cql2Cpp cql2cpp;
     cql2cpp.set_feature_source(fs_feature);
-    std::vector<const geos::io::GeoJSONFeature*> result;
+    std::vector<cql2cpp::FeatureSourcePtr> result;
     if (cql2cpp.filter(query, &result)) {
       LOG(INFO) << result.size() << " features match the filter:";
       geos::io::GeoJSONWriter writer;
-      for (const auto& feature : result) LOG(INFO) << writer.write(*feature);
+      for (const auto& feature : result)
+        LOG(INFO) << writer.write(*fs_to_geojson[feature]);
     } else {
       LOG(ERROR) << "filter error: " << cql2cpp.error_msg();
     }
@@ -172,7 +175,7 @@ int main(int argc, char** argv) {
     std::string query = sql_command.get<std::string>("query");
     std::string sql_where;
     std::string error_msg;
-    if (cql2cpp::Cql2Cpp<void*>::ConvertToSQL(query, &sql_where, &error_msg)) {
+    if (cql2cpp::Cql2Cpp::ConvertToSQL(query, &sql_where, &error_msg)) {
       LOG(INFO) << sql_where;
     } else {
       LOG(ERROR) << error_msg;
@@ -213,7 +216,7 @@ int main(int argc, char** argv) {
     cql2cpp::FeatureSourceGeoJson fs(fc.getFeatures().at(index));
     std::string query = eval_command.get<std::string>("query");
 
-    cql2cpp::Cql2Cpp<const geos::io::GeoJSONFeature*> cql2cpp;
+    cql2cpp::Cql2Cpp cql2cpp;
 
     std::string dot;
     bool eval_result;

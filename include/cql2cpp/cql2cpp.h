@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <map>
 #include <string>
 #include <variant>
 #include <vector>
@@ -30,10 +29,10 @@
 
 namespace cql2cpp {
 
-template <typename FeatureType>
+
 class Cql2Cpp {
  private:
-  std::map<FeatureSourcePtr, FeatureType> feature_source_2_type_;
+  std::vector<FeatureSourcePtr> features_;
   std::ostream& ostr_;
   Evaluator evaluator_;
 
@@ -44,18 +43,18 @@ class Cql2Cpp {
 
   Cql2Cpp(std::ostream& ostr) : ostr_(ostr) {}
 
-  void set_feature_source(const std::map<FeatureSourcePtr, FeatureType> fs2t) {
-    feature_source_2_type_ = fs2t;
+  void set_feature_source(const std::vector<FeatureSourcePtr> feature_source) {
+    features_ = feature_source;
   }
 
-  void clear() { feature_source_2_type_.clear(); }
+  void clear() { features_.clear(); }
 
   void RegisterFunctor(const FunctorPtr functor) {
     evaluator_.RegisterFunctor(functor);
   }
 
   bool filter(const std::string& cql2_query,
-              std::vector<FeatureType>* result) const {
+              std::vector<FeatureSourcePtr>* result) const {
     // Parse
     AstNodePtr root;
     if (not Parse(cql2_query, &root, &error_msg_)) return false;
@@ -64,8 +63,8 @@ class Cql2Cpp {
     ValueT value;
 
     // Loop over all features
-    for (const auto& [fs, f] : feature_source_2_type_) {
-      if (evaluator_.Evaluate(root, fs.get(), &value)) {
+    for (const auto& f : features_) {
+      if (evaluator_.Evaluate(root, f.get(), &value)) {
         if (std::holds_alternative<bool>(value)) {
           if (std::get<bool>(value)) result->emplace_back(f);
         } else {

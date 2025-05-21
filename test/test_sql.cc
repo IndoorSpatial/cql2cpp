@@ -102,7 +102,7 @@ class SqlTest : public testing::Test {
                  NULL, 0, &error_msg);
 
     // Parse query to get queryables
-    cql2cpp::Cql2Cpp<void *> cql2cpp;
+    cql2cpp::Cql2Cpp cql2cpp;
     std::string error_str;
     auto root = cql2cpp.ParseAsAst(query, &error_str);
 

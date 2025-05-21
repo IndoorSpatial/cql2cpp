@@ -53,7 +53,7 @@ class ParseTest : public testing::Test {
 
     std::string dot;
     cql2cpp::AstNode::set_ostream(&std::cout);
-    bool ret = cql2cpp::Cql2Cpp<void*>::ToDot(query, &dot, nullptr);
+    bool ret = cql2cpp::Cql2Cpp::ToDot(query, &dot, nullptr);
     if (ret and gen_dot_) {
       std::string dot_filename = case_name + ".dot";
       std::ofstream fout(dot_filename);
