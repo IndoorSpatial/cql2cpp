@@ -11,6 +11,7 @@
 #pragma once
 
 #include <ostream>
+#include <regex>
 
 #include "ast_node.h"
 
@@ -34,9 +35,11 @@ class Tree2Dot {
     return true;
   }
 
-  static bool GenerateDot(std::ostream& ous, const AstNodePtr node, const std::string& title) {
+  static bool GenerateDot(std::ostream& ous, const AstNodePtr node,
+                          const std::string& title) {
     ous << "digraph G {" << std::endl;
-    ous << "label=\"" << title << "\";";
+    ous << "label=\"" << std::regex_replace(title, std::regex("\""), "\\\"")
+        << "\";";
     ous << "labelloc = top;";
     GenerateDotNode(ous, node);
     ous << std::endl;
