@@ -127,6 +127,10 @@ TEST_F(ParseTest, binlocations  ) { EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseTest, related_bins  ) { EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseTest, avg           ) { EXPECT_TRUE(Parse(case_name_)); }
 TEST_F(ParseTest, spatial       ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseTest, clause7_15    ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseTest, example79     ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseTest, example80     ) { EXPECT_TRUE(Parse(case_name_)); }
+TEST_F(ParseTest, example81     ) { EXPECT_TRUE(Parse(case_name_)); }
 // TEST_F(ParseTest, labels        ) { EXPECT_TRUE(Parse(case_name_)); }  // standard unsupported
 
 TEST_F(ParseExampleTest, clause6_01) {EXPECT_TRUE(Parse(case_name_)); }

@@ -84,7 +84,9 @@ void cql2cpp::Cql2ParserBase::error(const std::string& msg) {
 %token IS_NULL
 %token IS_NOT_NULL
 %token BETWEEN NOT_BETWEEN
-%token <char> LPT RPT COMMA  // ( ) ,
+%token <char> COMMA   // ,
+%token <char> LPT RPT // parentheses ( )
+%token <char> LSB RSB // square brackets [ ]
 %token CASEI ACCENTI
 %token SQUOTE DQUOTE
 %token TIMESTAMP DATE INTERVAL
@@ -297,8 +299,10 @@ arrayExpression:
   | function
 
 array:
-  LPT RPT { PL; $$ = MakeAstNode(Array, NullOp, std::vector<AstNodePtr>()); }
-  | LPT arrayList RPT { PL; $$ = $2; }
+  LPT RPT { PL; $$ = MakeAstNode(Array, NullOp, std::vector<AstNodePtr>()); } // TODO remove in future version
+  | LPT arrayList RPT { PL; $$ = $2; } // TODO remove in future version
+  | LSB RSB { PL; $$ = MakeAstNode(Array, NullOp, std::vector<AstNodePtr>()); }
+  | LSB arrayList RSB { PL; $$ = $2; }
 
 arrayList:
   arrayElement  { PL; $$ = MakeAstNode(Array, NullOp, std::vector({$1})); }

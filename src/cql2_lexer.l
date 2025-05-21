@@ -100,6 +100,16 @@ INTERVAL|interval {
   return Cql2ParserBase::token::RPT;
 }
 
+"[" {
+  print("LSB", yytext);
+  return Cql2ParserBase::token::LSB;
+}
+
+"]" {
+  print("RSB", yytext);
+  return Cql2ParserBase::token::RSB;
+}
+
 "\"" {
   print("DQUOTE", yytext);
   return Cql2ParserBase::token::DQUOTE;
