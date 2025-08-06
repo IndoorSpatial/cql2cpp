@@ -24,9 +24,12 @@ class SqlConverter {
  private:
   std::map<NodeType, std::map<Operator, NodeConv>> converters;
   mutable std::string error_msg_;
+  std::map<std::string, std::string> queryable_column_;
 
  public:
-  SqlConverter() {
+  SqlConverter() : SqlConverter(std::map<std::string, std::string>()) {}
+  SqlConverter(const std::map<std::string, std::string>& queryable_column)
+      : queryable_column_(queryable_column) {
     converters[BoolExpr][And] = [](auto n, auto c) -> std::string {
       return c.at(0) + " AND " + c.at(1);
     };
@@ -124,14 +127,19 @@ class SqlConverter {
       }
     };
 
-    converters[PropertyName][NullOp] = [](auto n, auto c) -> std::string {
+    converters[PropertyName][NullOp] = [this](auto n, auto c) -> std::string {
       // TODO: this is database related. We should add an option for dialects
       // sqlite: "" / []
       // Oracle: ""
       // PostgreSQL: ""
       // MySQL: ``
       // SQL Server: []
-      return "\"" + std::get<std::string>(n->origin_value()) + "\"";
+
+      std::string property_name = std::get<std::string>(n->origin_value());
+      std::string column_name = property_name;
+      if (queryable_column_.find(property_name) != queryable_column_.end())
+        column_name = queryable_column_[property_name];
+      return "\"" + column_name + "\"";
     };
     converters[SpatialPred][S_Contains] = [](auto n, auto c) -> std::string {
       return "ST_Contains(" + c.at(0) + "," + c.at(1) + ")";
