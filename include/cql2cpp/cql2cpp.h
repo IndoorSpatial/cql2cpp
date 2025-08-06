@@ -20,15 +20,14 @@
 #include "evaluator.h"
 #include "feature_source.h"
 #include "global_yylex.h"
-#include "tree_dot.h"
 #include "sql_converter.h"
+#include "tree_dot.h"
 
 #ifndef CQL2CPP_VERSION
 #define CQL2CPP_VERSION "0.0.0"
 #endif
 
 namespace cql2cpp {
-
 
 class Cql2Cpp {
  private:
@@ -121,15 +120,23 @@ class Cql2Cpp {
 
   static bool ConvertToSQL(const std::string& cql2_query,
                            std::string* sql_where, std::string* error_msg) {
+    return ConvertToSQL(cql2_query, {}, sql_where, error_msg);
+  }
+
+  static bool ConvertToSQL(
+      const std::string& cql2_query,
+      const std::map<std::string, std::string>& queryable_column,
+      std::string* sql_where, std::string* error_msg) {
     // Parse
     AstNodePtr root;
     if (not Parse(cql2_query, &root, error_msg)) return false;
 
-    SqlConverter converter;
+    SqlConverter converter(queryable_column);
     return converter.Convert(root, sql_where);
   }
 
-  static AstNodePtr ParseAsAst(const std::string& cql2_query, std::string* error_msg) {
+  static AstNodePtr ParseAsAst(const std::string& cql2_query,
+                               std::string* error_msg) {
     AstNodePtr root;
     if (Parse(cql2_query, &root, error_msg)) return root;
     return nullptr;
